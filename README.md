@@ -25,4 +25,9 @@ Documentación:
 
 * TF Lite: https://www.tensorflow.org/lite/examples?hl=es-419
 * Crear una extensión: https://towardsdatascience.com/how-to-write-a-jupyter-notebook-extension-a63f9578a38c
+* DrawFlow: https://github.com/jerosoler/Drawflow
+* ReteJS: https://retejs.org/examples
 * ...
+
+CASI MEJOR USAR https://visualblocks.withgoogle.com/#/#top
+
