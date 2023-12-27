@@ -78,7 +78,7 @@ class Block(ABC):
               Block._signals[cls][name]=SignalType(typedecl);
               def wrapper(self, data):
                   data=func(self,data);
-                  Context.instance.emit(self,name,data);
+                  if data is not None: Context.instance.emit(self,name,data);
               return wrapper;
           return decorador;
 

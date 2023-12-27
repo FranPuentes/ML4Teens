@@ -4,9 +4,13 @@ setup(
     name='ml4teens',
     version='0.1',
     packages=find_packages(),
-    install_requires=[
-        # Aquí puedes listar las dependencias de tu paquete, si las hay
-    ],
+    install_requires=[ "ipython", 
+                       "cv2", 
+                       "numpy", 
+                       "request", 
+                       "ultralytics", 
+                       "PIL", 
+                     ],
     # metadata para publicar en PyPI
     author='Francisco Puentes',
     author_email='fran@puentescalvo.com',
