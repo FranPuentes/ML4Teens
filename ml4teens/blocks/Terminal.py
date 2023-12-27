@@ -1,4 +1,4 @@
-from IPython.display import update_display, display_json, HTML;
+from IPython.display import update_display, HTML;
 
 from ..core import Block;
 

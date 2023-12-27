@@ -1,6 +1,11 @@
-##################
+
+from . import Block
+from . import SignalType, Signals
+from . import SlotType,   Slots
+
+#-------------------------------------------------------------------------------
 # Es un singleton
-##################
+#-------------------------------------------------------------------------------
 class Context:
 
     _instance = None;

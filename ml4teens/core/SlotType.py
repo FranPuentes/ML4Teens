@@ -1,13 +1,11 @@
+
+from . import Type;
+
 #=============================================================================================
 class SlotType(Type):
 
       def __init__(self, des):
           super().__init__(des,"slot");
-
-      def match(self, st):
-          assert isinstance(st, SignalType), "El método 'match' de SlotType debe recibir una instancia de SignalType como parámetro";
-          if type(self._type) is set: return any([(st._type is t) for t in self._type]);
-          else:                       return (st._type is self._type);
 
       def __eq__(self, st):
           assert isinstance(st, SignalType) or isinstance(st, SlotType);

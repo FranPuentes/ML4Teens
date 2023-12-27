@@ -1,3 +1,6 @@
+
+from . import SlotType;
+
 #======================================================================================
 class Slots: # name, type, required, value, default, stub
 

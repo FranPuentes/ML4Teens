@@ -3,6 +3,8 @@ import string;
 
 from abc import ABC, abstractmethod;
 
+from . import SignalType, SlotType;
+
 class Block(ABC):
 
       _signals={};
