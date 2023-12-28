@@ -2,14 +2,16 @@ from setuptools import setup, find_packages
 
 setup(
     name='ml4teens',
-    version='0.1',
+    version='0.1.15',
     packages=find_packages(),
     install_requires=[ "ipython", 
-                       "cv2", 
-                       "numpy", 
-                       "request", 
+                       "opencv-python", 
+                       "numpy",
+                       "requests", 
                        "ultralytics", 
-                       "PIL", 
+                       "Pillow", 
+                       "ipycanvas==0.11",
+                       "ipyevents",
                      ],
     # metadata para publicar en PyPI
     author='Francisco Puentes',
