@@ -62,7 +62,6 @@ class Block(ABC):
               cls=Block._classNameFrom(func);
               if cls not in Block._slots:   Block._slots  [cls]=Slots  ();
               if cls not in Block._signals: Block._signals[cls]=Signals();
-              #assert name not in Block._slots[cls], ValueError(f"Slot duplicado: '{name}' en '{cls}'");
               Block._slots[cls][name]={ "type":SlotType(typedecl), "required":required, "default":default };
               Block._slots[cls][name]["name"]=name;
               Block._slots[cls][name]["stub"]=func;
@@ -78,20 +77,40 @@ class Block(ABC):
           def decorador(func):
               cls=Block._classNameFrom(func);
               if cls not in Block._signals: Block._signals[cls]=Signals();
-              #assert name not in Block._signals[cls], f"Signal duplicada: '{name}' en '{cls}'";
               Block._signals[cls][name]=SignalType(typedecl);
-              def wrapper(self, data):
-                  data=func(self,data);
-                  if data is not None: Context.instance.emit(self,name,data);
+              def wrapper(self, data=None):
+                  if data is None:
+                     return self.checkSignalUsage(name);
+                  else:
+                     if self.checkSignalUsage(name):
+                        data=func(self,data);
+                        if data is not None:
+                           Context.instance.emit(self,name,data);
               return wrapper;
           return decorador;
+
+      #-------------------------------------------------------------------------
+      def checkSignalUsage(self, name):
+          """
+          Comprueba si el evento (*signal*) está asociado a un *slot*.
+          Es equivalente a invocar el método (decorado) correspondente al evento, pero con *data=None*.          
+          
+          :param name: Nombre del evento (*signal*)
+          :type  name: str
+          :return:     True si la señal está asocida a un *slot*, False en caso contrario.
+          :rtype:      bool
+          """
+          context=Context.instance;
+          return context.checkSubscription((self,name));
 
       #-------------------------------------------------------------------------
       def reset(self, *args):
           if len(args)==0:
              self._values={};
           else:
-             for k in args: self._values[k]=None;
+             for k in args:
+                 if k in self._values:
+                    self._values[k]=None;
 
       #-------------------------------------------------------------------------
       def __hash__(self):
@@ -106,3 +125,7 @@ class Block(ABC):
       @abstractmethod
       def run(self, **kwarg):
           pass;
+
+      #-------------------------------------------------------------------------
+      def __call__(self, **kwargs):
+          return self.run(**kwargs);
