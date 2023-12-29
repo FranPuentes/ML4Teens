@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='ml4teens',
-    version='0.1.15',
+    version='0.1.16',
     packages=find_packages(),
     install_requires=[ "ipython", 
                        "opencv-python", 

@@ -59,7 +59,7 @@ class SingleChannel(Block):
           return data;
 
       def run(self, **kwarg):
-          raise RuntimeError("No tiene sentido invocar el método 'run' de un objeto de clase 'BlackAndWite'.");
+          raise RuntimeError("No tiene sentido invocar el método 'run' de un objeto de clase 'SingleChannel'.");
 ```
 
 Este bloque (de tipo *passthru*), puede recibir imágenes en forma de tensor numpy por medio del slot llamado *frame* y reenvía dicho tensor por medio de una señal, igualmente llamada *frame*.

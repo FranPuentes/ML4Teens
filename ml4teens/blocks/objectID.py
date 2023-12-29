@@ -6,6 +6,9 @@ import numpy as np;
 from ..core import Block;
 
 class ObjectID(Block):
+      """
+      Este bloque recibe una imagen (slot 'frame') en forma de tensor numpy, y emite la misma imagen, pero con elementos identificados.
+      """
 
       #-------------------------------------------------------------------------
       def __init__(self, **kwargs):
