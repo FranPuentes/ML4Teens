@@ -1,6 +1,6 @@
 # ML4Teens
 
-**Machine Learning for *Teens* *** (Aprendizaje Automático para *adolescentes*)
+**Machine Learning for *Teens* ** (Aprendizaje Automático para *adolescentes*)
 
 Librería Python (ml4teens) para permitir crear *arquitecturas basadas en bloques" que lleven a cabo un proceso de ML.
 
