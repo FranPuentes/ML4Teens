@@ -1,6 +1,6 @@
 
-from .blackAndWhite import BlackAndWhite
+from .singleChannel import SingleChannel
 from .screen        import Screen
 from .terminal      import Terminal
 from .videoSource   import VideoSource
-from .yolo          import Yolo
+from .objectID      import ObjectID
