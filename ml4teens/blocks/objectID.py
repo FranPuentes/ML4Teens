@@ -11,7 +11,6 @@ class ObjectID(Block):
       URL: https://docs.ultralytics.com/modes/predict
 
       Parámetos del objeto:
-      ---------------------
       'conf':    object confidence threshold for detection (float, 0.25)
       'iou':     intersection over union (IoU) threshold for NMS (float, 0.7)
       'device':  device to run on, i.e. cuda device=0/1/2/3 or device=cpu (None|str)
@@ -19,12 +18,10 @@ class ObjectID(Block):
       'classes': filter results by class, i.e. classes=0, or classes=[0,2,3] (int|list[int])
 
       SLOTS:
-      ------
       frame <- np.ndarray
       image <- PIL.Image
 
       SIGNALS:
-      --------
       frame -> np.ndarray
       image -> PIL.Image
       boxes -> object
@@ -92,7 +89,13 @@ class ObjectID(Block):
           """
           A Boxes dictionary containing the detection bounding boxes, classes and confidences.
           """
-          boxes=[{"class":(int(r),self._model.names[int(r)]), "conf":float(c), "xywh":[int(_) for _ in p], "xyxy":[int(_) for _ in k]} for r,c,p,k in zip(data.cls,data.conf,data.xywh,data.xyxy)];
+          boxes=[{
+                  "class":(int(r),self._model.names[int(r)]),
+                  "conf":float(c),
+                  "xywh":[float(_) for _ in p],
+                  "xyxy":[float(_) for _ in k] 
+                 }
+                 for r,c,p,k in zip(data.cls,data.conf,data.xywhn,data.xyxyn)];
           return boxes;
 
       #-------------------------------------------------------------------------

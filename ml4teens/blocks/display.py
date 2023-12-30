@@ -7,7 +7,7 @@ from PIL.Image import Image;
 
 from ..core import Block;
 
-class Screen(Block):
+class Display(Block):
 
       #-------------------------------------------------------------------------
       # width

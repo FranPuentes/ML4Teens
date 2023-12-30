@@ -6,12 +6,13 @@ import numpy as np;
 import requests;
 from tempfile import NamedTemporaryFile;
 
+from ..core import Context;
 from ..core import Block;
 
 class VideoSource(Block):
 
       #-------------------------------------------------------------------------
-      # fuente
+      # source
       def __init__(self, **kwargs):
           super().__init__(**kwargs);
 
@@ -31,18 +32,15 @@ class VideoSource(Block):
           return data;
 
       #-------------------------------------------------------------------------
-      def run(self, **kwargs):
-          if kwargs and "fuente" in kwargs: fuente = kwargs     ["fuente"];
-          else:                             fuente = self._param("fuente");
-
-          if not fuente or type(fuente) is not str: raise RuntimeError(f"Necesito que pases como parámetro 'fuente' el nombre del fichero o la url que contiene el vídeo.");
+      @Block.slot("source", {str}, required=True)
+      def slot_source(self, slot, fuente):
 
           istemp=False;
-          if type(fuente) is str and fuente.startswith("http"):
+          if fuente.startswith("http"):
              with requests.get(fuente, stream=True) as r:
                   r.raise_for_status();
                   with NamedTemporaryFile(delete=False, suffix='.mp4') as f:
-                       for chunk in r.iter_content(chunk_size=65536//4):
+                       for chunk in r.iter_content(chunk_size=65536//8):
                            f.write(chunk);
                        fuente = f.name;
                        istemp=True;
@@ -85,3 +83,15 @@ class VideoSource(Block):
           finally:
             fd.release();
             if istemp: os.remove(fuente);
+      
+      #-------------------------------------------------------------------------
+      # source
+      def run(self, **kwargs):
+          if kwargs and "source" in kwargs: fuente = kwargs     ["source"];
+          else:                             fuente = self._param("source");
+
+          if not fuente or type(fuente) is not str:
+             raise RuntimeError(f"Necesito que pases como parámetro 'source' el nombre del fichero o la url que contiene el vídeo.");
+
+          Context.instance.emit(self, "source", fuente, check=False);
+             
