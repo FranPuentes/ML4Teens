@@ -1,5 +1,4 @@
 import PIL;
-import numpy as np;
 
 from PIL.Image import Image;
 from ultralytics import YOLO;
@@ -18,11 +17,9 @@ class ObjectID(Block):
       'classes': filter results by class, i.e. classes=0, or classes=[0,2,3] (int|list[int])
 
       SLOTS:
-      frame <- np.ndarray
       image <- PIL.Image
 
       SIGNALS:
-      frame -> np.ndarray
       image -> PIL.Image
       boxes -> object
       """
@@ -52,17 +49,6 @@ class ObjectID(Block):
           return self._model.names;
 
       #-------------------------------------------------------------------------
-      @Block.slot("frame", {np.ndarray}, required=2)
-      def slot_frame(self, slot, data):
-          results = self._model(data, stream=True, verbose=False, **self._params);
-          for r in results:
-              if self.signal_boxes(): self.signal_boxes(r.boxes);
-              if self.signal_frame():
-                 frame = r.plot();
-                 self.signal_frame(frame);
-          self.reset("frame");
-
-      #-------------------------------------------------------------------------
       @Block.slot("image", {Image}, required=2)
       def slot_image(self, slot, data):
           results = self._model(data, stream=False, verbose=False, **self._params);
@@ -70,13 +56,10 @@ class ObjectID(Block):
               if self.signal_boxes(): self.signal_boxes(r.boxes);
               if self.signal_image():
                  image = r.plot();
+                 image = PIL.Image.fromarray(image[..., ::-1]);
+                 assert isinstance(image, Image);
                  self.signal_image(image);
           self.reset("image");
-
-      #-------------------------------------------------------------------------
-      @Block.signal("frame", np.ndarray)
-      def signal_frame(self, data):
-          return data;
 
       #-------------------------------------------------------------------------
       @Block.signal("image", Image)
@@ -100,5 +83,5 @@ class ObjectID(Block):
 
       #-------------------------------------------------------------------------
       def run(self, **kwarg):
-          raise RuntimeError("No tiene sentido invocar el método 'run' de un objeto de clase 'YOLO'.");
+          raise RuntimeError("No tiene sentido invocar el método 'run' de un objeto de clase 'ObjectID'.");
 

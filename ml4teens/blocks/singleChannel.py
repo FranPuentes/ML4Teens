@@ -1,5 +1,4 @@
 import cv2 as cv;
-import numpy as np;
 
 from PIL.Image import Image;
 from PIL.Image import fromarray;
@@ -17,16 +16,6 @@ class SingleChannel(Block):
           assert type(self._channel)==int, f"El parámetro 'channel' debe ser el número del canal (0, ...)";
 
       #-------------------------------------------------------------------------
-      @Block.slot("frame", {np.ndarray}, required=2)
-      def slot_frame(self, slot, data):
-          n=self._channel;
-          _, _, c = data.shape;
-          assert n in range(0,c), f"El canal {n} no puede ser extraído de un frame de {c} canales (recuerda: empieza a contar en 0)";
-          frame = data[:, :, n];
-          self.signal_frame(frame);
-          self.reset("frame");
-
-      #-------------------------------------------------------------------------
       @Block.slot("image", {Image}, required=2)
       def slot_image(self, slot, data):
           assert type(data) is Image;
@@ -36,11 +25,6 @@ class SingleChannel(Block):
           imagen=data.getchannel(n);
           self.signal_image(imagen);
           self.reset("image");
-
-      #-------------------------------------------------------------------------
-      @Block.signal("frame", np.ndarray)
-      def signal_frame(self, data):
-          return data;
 
       #-------------------------------------------------------------------------
       @Block.signal("image", Image)

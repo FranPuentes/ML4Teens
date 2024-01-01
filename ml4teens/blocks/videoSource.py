@@ -1,9 +1,12 @@
-import sys, os;
+import sys, os, copy;
 import time;
 import cv2 as cv;
 import numpy as np;
-
+import PIL;
 import requests;
+
+from PIL.Image import Image;
+
 from tempfile import NamedTemporaryFile;
 
 from ..core import Context;
@@ -14,10 +17,10 @@ class VideoSource(Block):
       #-------------------------------------------------------------------------
       # source
       def __init__(self, **kwargs):
-          super().__init__(**kwargs);
+          super().__init__(**kwargs);          
 
       #-------------------------------------------------------------------------
-      @Block.signal("frame", np.ndarray)
+      @Block.signal("frame", Image)
       def signal_frame(self, frame):
           return frame;
 
@@ -64,15 +67,28 @@ class VideoSource(Block):
                 self.signal_información({"fuente":fuente, "ancho":ancho, "alto":alto, "fps":fps, "frames":frames, "codificador":codificador, "delay":delay });
 
                 ok, frame = fd.read();
+                
+                assert len(frame.shape)==2 or (len(frame.shape)==3 and frame.shape[2] in [3, 4]), "Formato de vídeo no soportado";
+                
                 if ok:
-                   if len(frame.shape) == 3: shape=(alto,ancho,frame.shape[2]);
-                   else:                     shape=(alto,ancho,1);
+                   if len(frame.shape)==3: shape=(alto,ancho,frame.shape[2]);
+                   else:                   shape=(alto,ancho,1);
                    self.signal_dimensiones(shape);
 
                    while ok:
                          timestamp=time.time();
 
+                         if len(frame.shape)==2:
+                            frame=frame;
+                         else:
+                            if frame.shape[2]==3:
+                               frame=cv.cvtColor(frame, cv.COLOR_BGR2RGB);
+                            else:
+                               frame=cv.cvtColor(frame, cv.COLOR_BGRA2RGBA);
+                                   
+                         frame = PIL.Image.fromarray(frame);
                          self.signal_frame(frame);
+                         
                          ok, frame = fd.read();
 
                          diff=int((time.time()-timestamp)*1000);
@@ -87,11 +103,21 @@ class VideoSource(Block):
       #-------------------------------------------------------------------------
       # source
       def run(self, **kwargs):
-          if kwargs and "source" in kwargs: fuente = kwargs     ["source"];
-          else:                             fuente = self._param("source");
+      
+          old_params = copy.deepcopy(self._params);
+
+          for key in kwargs:
+              self._params[key]=kwargs[key];
+          
+          fuente=self._param("source");
 
           if not fuente or type(fuente) is not str:
              raise RuntimeError(f"Necesito que pases como parámetro 'source' el nombre del fichero o la url que contiene el vídeo.");
 
-          Context.instance.emit(self, "source", fuente, check=False);
+          try:
+             Context.instance.emit(self, "source", fuente, check=False);
+             
+          finally:
+             self._params=old_params;
+                
              

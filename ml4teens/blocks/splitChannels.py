@@ -1,6 +1,3 @@
-import cv2 as cv;
-import numpy as np;
-
 import PIL;
 
 from PIL.Image import Image;
@@ -14,55 +11,12 @@ class SplitChannels(Block):
           super().__init__(**kwargs);
 
       #-------------------------------------------------------------------------
-      @Block.slot("frame", {np.ndarray}, required=2)
-      def slot_frame(self, slot, data):
-          _, _, channels = data.shape;
-
-          if 0<channels and self.signal_0():
-             frame = data[:, :, 0];
-             self.signal_0(frame);
-
-          if 1<channels and self.signal_1():
-             frame = data[:, :, 1];
-             self.signal_1(frame);
-
-          if 2<channels and self.signal_2():
-             frame = data[:, :, 2];
-             self.signal_2(frame);
-
-          if 3<channels and self.signal_3():
-             frame = data[:, :, 3];
-             self.signal_3(frame);
-
-          self.reset("frame");
-
-      #-------------------------------------------------------------------------
-      @Block.signal("0", np.ndarray)
-      def signal_0(self, data):
-          return data;
-
-      #-------------------------------------------------------------------------
-      @Block.signal("1", np.ndarray)
-      def signal_1(self, data):
-          return data;
-
-      #-------------------------------------------------------------------------
-      @Block.signal("2", np.ndarray)
-      def signal_2(self, data):
-          return data;
-
-      #-------------------------------------------------------------------------
-      @Block.signal("3", np.ndarray)
-      def signal_3(self, data):
-          return data;
-
-      #-------------------------------------------------------------------------
       @Block.slot("image", {Image}, required=2)
       def slot_frame(self, slot, data):
           mode=data.mode.upper();
           bands=data.getbands();
           channels= data.split();
-          assert len(bands)==len(channels);
+          assert len(bands)==len(channels), "Formato de imagen no soportado: bands!=channels";
           for (band, channel) in zip(bands,channels):
 
               if band=='1' and self.signal_1bit()       and mode=='1':
