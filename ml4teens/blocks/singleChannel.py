@@ -29,6 +29,7 @@ class SingleChannel(Block):
       #-------------------------------------------------------------------------
       @Block.slot("image", {Image}, required=2)
       def slot_image(self, slot, data):
+          assert type(data) is Image;
           c=len(data.getbands());
           n=self._channel;
           assert n in range(0,c), f"El canal {n} no puede ser extraído de una imagen de {c} canales (recuerda: empieza a contar en 0)";
