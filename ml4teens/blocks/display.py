@@ -12,8 +12,11 @@ class Display(Block):
       #-------------------------------------------------------------------------
       # width
       # height
+      # feed = False
       def __init__(self, *args, **kwargs):
           super().__init__(*args, **kwargs);
+          self._feed=False;
+          if "feed" in kwargs: self._feed=bool(kwargs["feed"]);
 
       #-------------------------------------------------------------------------
       @Block.signal("image", Image)
@@ -60,7 +63,8 @@ class Display(Block):
           _, buffer = cv.imencode('.png', frame);
           buffer = BytesIO(buffer);
           imagen=IPython.display.Image(data=buffer.read(), format='png');
-          update_display(imagen, display_id=self._id);
+          if self._feed==False: update_display(imagen, display_id=self._id);
+          else:                 display(imagen);
           self.signal_image(data);
           self.reset("image");
 
@@ -73,7 +77,8 @@ class Display(Block):
           _, buffer = cv.imencode('.png', frame);
           buffer = BytesIO(buffer);
           imagen=IPython.display.Image(data=buffer.read(), format='png');
-          update_display(imagen, display_id=self._id);
+          if self._feed==False: update_display(imagen, display_id=self._id);
+          else:                 display(imagen);
           self.signal_image(imagen);
           self.reset("frame");
 

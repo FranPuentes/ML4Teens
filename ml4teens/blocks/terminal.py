@@ -12,7 +12,8 @@ class Terminal(Block):
       #-------------------------------------------------------------------------
       def __print(self, message, plus_style):
           style =f"border:1px black; padding: 5px; margin: 3px; {plus_style}";
-          if type(message) is str:  display( HTML(f"<div style='width:95%; {style}'>{    message }</div>") );
+          if   type(message) is str:   display( HTML(f"<div style='width:95%; {style}'>{    message }</div>") );
+          elif type(message) is dict:  display( HTML(f"<div style='width:95%; {style}'>{str(message)}</div>") );
           else:
              obj=message;
              message=json.dumps(obj, indent=2, skipkeys=True);

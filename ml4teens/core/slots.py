@@ -1,3 +1,4 @@
+from copy import deepcopy;
 
 from .slotType import SlotType;
 
@@ -69,13 +70,21 @@ class Slots: # name, type, required, value, default, stub
                    rt[r].append(key);
           return rt;
 
-      #--------------------------------------------------------------------------------
+      #--------------------------------------------------------------------------------      
       def iscomplete(self, values):
-          G=self.groups(); #TODO pre-calcular esta variable
+          """
+          'values' es un diccionario {slot_name:data, ...}
+          'G' es un diccionario {group:[slot_name, ...], ...}
+          Quiero saber si estos datos hacen completo algún grupo, y en su caso, cuales slots he de disparar.
+          
+          """
+          G=self.groups();
+          rt=deepcopy(G);
           for idx in G:
-              if   idx==0: continue;
+              if   idx==0:
+                   del rt[idx];
               elif idx==1:
-                   if not all([(values[k] is not None) if k in values else False for k in G[idx]]): return False;
+                   if not all([(values[k] is not None) if k in values else False for k in G[idx]]): del rt[idx];
               else:
-                   if not any([(values[k] is not None) if k in values else False for k in G[idx]]): return False;
-          return True;
+                   if not any([(values[k] is not None) if k in values else False for k in G[idx]]): del rt[idx];
+          return rt;

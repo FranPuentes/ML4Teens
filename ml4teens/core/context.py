@@ -38,6 +38,7 @@ class Context:
         if not cls._instance:
            cls._instance = super(Context, cls).__new__(cls);
            cls._instance.listeners={};
+           cls._instance.stack=[];
            cls.__html__();
         return cls._instance;
 
@@ -67,6 +68,7 @@ class Context:
     #-----------------------------------------------------------------------------------------
     def reset(self):
         self.listeners = {};
+        self.stack = [];
         return self;
 
     #-----------------------------------------------------------------------------------------
@@ -122,7 +124,7 @@ class Context:
     #-----------------------------------------------------------------------------------------
     def emit(self, objeto, sname, data, check=True):
         """
-        Emite una señal, bien como signal o como slot.
+        Emite una señal, bien como *signal* o como una *fake signal* directamente a un slot.
         
         :param objeto: El objeto que recibe/envía la señal o el slot.
         :type  objeto: Block
@@ -132,25 +134,58 @@ class Context:
         :type  data:   Cualquier cosa menos None.
         :param check:  Si True se envía una señal a los 'listeners' de (objeto,sname); si False se simula una señal al slot (objeto,sname).
         """
+        from . import Block;
         if check and (objeto, sname) in self.listeners:
+           #print(f"EMIT: {Block._classNameFrom(objeto.__init__)}({sname})", flush=True);
            for (target, slot_name) in self.listeners[(objeto, sname)]:
                slot=target.slots[slot_name];
+               group=slot["required"];
                data=data if data is not None else slot["default"];
                target._values[slot_name] = data;
-               if target.slots.iscomplete(target._values):
-                  func=slot["stub"];
-                  func(target, slot_name, data);
+               complete_slots=target.slots.iscomplete(target._values);
+               assert group in complete_slots;               
+               if bool(complete_slots) and (slot_name in complete_slots[group]):
+                  #print(" "*5, f"LISTENER: {Block._classNameFrom(target.__init__)}({slot_name})", end=', ', flush=True);
+                  #print(f"data is None:{bool(data is None)}", end=', ', flush=True);
+                  #print(f"COMPLETE: {complete_slots}", flush=True);
+                  if sum([(1 if s is target else 0) for s in self.stack]) < 2:
+                     try:
+                       self.stack.append(target);
+                       func=slot["stub"];
+                       func(target, slot_name, data);
+                     finally:
+                       e=self.stack.pop();
+                       assert e is target;
+                  else:
+                     raise RuntimeError("He alcanzado el máximo de recursividad");   
+               else:   
+                  #print(" "*5, f"LISTENER: {Block._classNameFrom(target.__init__)}({slot_name})", end=', ', flush=True);
+                  #print(f"data is None:{bool(data is None)}", end=', ', flush=True);
+                  #print(f"IS INCOMPLETE!", flush=True);
+                  pass;
         else:
            target=objeto;
            slot=target.slots[sname];
+           group=slot["required"];
            data=data if data is not None else slot["default"];
            target._values[sname] = data;
-           if target.slots.iscomplete(target._values):
-              func=slot["stub"];
-              func(target, sname, data);
+           complete_slots=target.slots.iscomplete(target._values);
+           assert group in complete_slots;               
+           if bool(complete_slots) and (sname in complete_slots[group]):
+              if sum([(1 if s is target else 0) for s in self.stack]) < 2:
+                 try:
+                   self.stack.append(target);
+                   func=slot["stub"];
+                   func(target, sname, data);
+                 finally:
+                   e=self.stack.pop();
+                   assert e is target;
+              else:
+                 raise RuntimeError("He alcanzado el máximo de recursividad");   
 
     #-----------------------------------------------------------------------------------------
     def run(self, objeto, **kwargs):
+        self.stack = [];
         try:
            if hasattr(objeto,"run") and callable(getattr(objeto, "run")):
               objeto.run(**kwargs);
