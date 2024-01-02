@@ -143,12 +143,11 @@ class Context:
                data=data if data is not None else slot["default"];
                target._values[slot_name] = data;
                complete_slots=target.slots.iscomplete(target._values);
-               assert group in complete_slots;               
-               if bool(complete_slots) and (slot_name in complete_slots[group]):
+               if group==False or (bool(complete_slots) and (group in complete_slots) and (slot_name in complete_slots[group])):
                   #print(" "*5, f"LISTENER: {Block._classNameFrom(target.__init__)}({slot_name})", end=', ', flush=True);
                   #print(f"data is None:{bool(data is None)}", end=', ', flush=True);
                   #print(f"COMPLETE: {complete_slots}", flush=True);
-                  if sum([(1 if s is target else 0) for s in self.stack]) < 2:
+                  if sum([(1 if s is target else 0) for s in self.stack]) < 8:
                      try:
                        self.stack.append(target);
                        func=slot["stub"];
@@ -184,13 +183,15 @@ class Context:
                  raise RuntimeError("He alcanzado el máximo de recursividad");   
 
     #-----------------------------------------------------------------------------------------
-    def run(self, objeto, **kwargs):
+    def run(self, *args, **kwargs):
         self.stack = [];
         try:
-           if hasattr(objeto,"run") and callable(getattr(objeto, "run")):
-              objeto.run(**kwargs);
-           else:
-              raise RuntimeError("Error: el objeto que intentas ejecutar no tiene un método 'run'");
+           for objeto in args:
+               if hasattr(objeto,"run") and callable(getattr(objeto, "run")):
+                  objeto.run(**kwargs);
+               else:
+                  raise RuntimeError("Error: el objeto que intentas ejecutar no tiene un método 'run'");
+                  
         except KeyboardInterrupt as e:
            pass;       
 

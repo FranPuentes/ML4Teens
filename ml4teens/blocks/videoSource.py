@@ -15,7 +15,8 @@ from ..core import Block;
 class VideoSource(Block):
 
       #-------------------------------------------------------------------------
-      # source
+      # source:str
+      # speed:float TODO
       def __init__(self, **kwargs):
           super().__init__(**kwargs);          
 
@@ -25,13 +26,18 @@ class VideoSource(Block):
           return frame;
 
       #-------------------------------------------------------------------------
-      @Block.signal("dimensiones", tuple)
-      def signal_dimensiones(self, data):
+      @Block.signal("frames", int)
+      def signal_frames(self, frame):
+          return frame;
+
+      #-------------------------------------------------------------------------
+      @Block.signal("dims", tuple)
+      def signal_dims(self, data):
           return data;
 
       #-------------------------------------------------------------------------
-      @Block.signal("información", dict)
-      def signal_información(self, data):
+      @Block.signal("info", dict)
+      def signal_info(self, data):
           return data;
 
       #-------------------------------------------------------------------------
@@ -64,7 +70,8 @@ class VideoSource(Block):
                 codificador = int(fd.get(cv.CAP_PROP_FOURCC));
                 delay = int(1000/fps);
 
-                self.signal_información({"fuente":fuente, "ancho":ancho, "alto":alto, "fps":fps, "frames":frames, "codificador":codificador, "delay":delay });
+                self.signal_frames(frames);
+                self.signal_info({"fuente":fuente, "ancho":ancho, "alto":alto, "fps":fps, "frames":frames, "codificador":codificador, "delay":delay });
 
                 ok, frame = fd.read();
                 
@@ -73,7 +80,7 @@ class VideoSource(Block):
                 if ok:
                    if len(frame.shape)==3: shape=(alto,ancho,frame.shape[2]);
                    else:                   shape=(alto,ancho,1);
-                   self.signal_dimensiones(shape);
+                   self.signal_dims(shape);
 
                    while ok:
                          timestamp=time.time();
