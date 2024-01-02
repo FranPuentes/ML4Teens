@@ -75,10 +75,9 @@ class ObjectID(Block):
           boxes=[{
                   "class":(int(r),self._model.names[int(r)]),
                   "conf":float(c),
-                  "xywh":[float(_) for _ in p],
                   "xyxy":[float(_) for _ in k] 
                  }
-                 for r,c,p,k in zip(data.cls,data.conf,data.xywhn,data.xyxyn)];
+                 for r,c,k in zip(data.cls,data.conf,data.xyxyn)];
           return boxes;
 
       #-------------------------------------------------------------------------
