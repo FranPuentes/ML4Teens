@@ -5,11 +5,16 @@ from ..core import Block;
 class CropImage(Block):
 
       #-------------------------------------------------------------------------
+      # x1,y1,x2,y2:float
       # n:int
       # conf:float
       # classes:list[str|int]
       def __init__(self, **kwargs):
           super().__init__(**kwargs);
+          assert "x1"      not in self._params or type(self._params["x1"     ]) is float;
+          assert "y1"      not in self._params or type(self._params["y1"     ]) is float;
+          assert "x2"      not in self._params or type(self._params["x2"     ]) is float;
+          assert "y2"      not in self._params or type(self._params["y2"     ]) is float;          
           assert "n"       not in self._params or type(self._params["n"      ]) in [int];
           assert "conf"    not in self._params or type(self._params["conf"   ]) in [float];
           assert "classes" not in self._params or (type(self._params["classes"]) is list and all([type(c) in [int,str] for c in self._params["classes"]]));
@@ -66,13 +71,18 @@ class CropImage(Block):
                   self._values[slot]=rt;
                   self._crop();
 
-          else:  
-             raise ValueError(f"Tipo no manejable e el slot '{slot}' de 'CropImage'");
-
       #-------------------------------------------------------------------------
       @Block.slot("image", {Image}, required=3)
       def slot_image(self, slot, data):
-          self._crop();
+          x1=self._param("x1");
+          y1=self._param("y1");
+          x2=self._param("x2");
+          y2=self._param("y2");
+          if all([(d is not None) for d in [x1,y1,x2,y2]]):
+             self.setValue("boxes",[(x1,y1,x2,y2)]);
+             self._crop();
+          else:
+             self._crop();
 
       #-------------------------------------------------------------------------
       @Block.signal("image", Image)
