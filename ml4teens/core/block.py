@@ -9,6 +9,10 @@ from .slotType   import SlotType
 from .signals    import Signals
 from .slots      import Slots
 
+#TODO considerar hacer una clase Params para manejar los parámetros (incluso con pop, push).
+      
+#TODO considerar hacer una clase Values para manejar los valores de los slots.
+      
 class Block(ABC):
 
       _signals={};
@@ -30,6 +34,23 @@ class Block(ABC):
       def _value(self, key, default=None):
           if key in self._values: return self._values[key];
           else:                   return default;
+          
+      #-------------------------------------------------------------------------
+      def getValue(self, key):
+          rt=None;
+          if key in self._values:
+             rt=self._values[key];
+          if rt==None:
+             rt=self.slots[key]["default"];
+          return rt;
+          
+      #-------------------------------------------------------------------------
+      def setValue(self, key, value):
+          self._values[key]=value;
+      
+      #-------------------------------------------------------------------------
+      def rightValue(self, key):
+          return self.getValue(key) is not None;
 
       #-------------------------------------------------------------------------
       @staticmethod

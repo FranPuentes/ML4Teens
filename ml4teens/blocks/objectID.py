@@ -67,7 +67,7 @@ class ObjectID(Block):
           return data;
 
       #-------------------------------------------------------------------------
-      @Block.signal("boxes", dict)
+      @Block.signal("boxes", list)
       def signal_boxes(self, data):
           """
           A Boxes dictionary containing the detection bounding boxes, classes and confidences.
