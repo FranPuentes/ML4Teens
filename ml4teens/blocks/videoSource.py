@@ -122,7 +122,7 @@ class VideoSource(Block):
              raise RuntimeError(f"Necesito que pases como parámetro 'source' el nombre del fichero o la url que contiene el vídeo.");
 
           try:
-             Context.instance.emit(self, "source", fuente, check=False);
+             Context.instance.accept(self, "source", fuente);
              
           finally:
              self._params=old_params;

@@ -109,5 +109,5 @@ class ImageSource(Block):
           if not fuente or type(fuente) is not str:
              raise RuntimeError(f"Necesito que pases como parámetro 'source' el nombre del fichero o la url que contiene la imagen.");
              
-          Context.instance.emit(self, "source", fuente, check=False);
+          Context.instance.accept(self, "source", fuente);
           

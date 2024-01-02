@@ -122,22 +122,21 @@ class Context:
         return (event in self.listeners and len(self.listeners[event])>0) and (listener is None or listener in self.listeners[event]);
 
     #-----------------------------------------------------------------------------------------
-    def emit(self, objeto, sname, data, check=True):
+    def emit(self, source, sname, data):
         """
-        Emite una señal, bien como *signal* o como una *fake signal* directamente a un slot.
+        Emite una señal directamente a los 'listeners' de (source,sname).
         
-        :param objeto: El objeto que recibe/envía la señal o el slot.
-        :type  objeto: Block
-        :param sname:  Dependiendo de 'check' es el nombre de una señal (check==True) o de un slot (check==False).
+        :param source: El objeto que envía la señal.
+        :type  source: Block
+        :param sname:  El nombre de una señal.
         :type  sname:  str
-        :param data:   El dato que acompaña a la señal o slot.
+        :param data:   El dato que acompaña a la señal.
         :type  data:   Cualquier cosa menos None.
-        :param check:  Si True se envía una señal a los 'listeners' de (objeto,sname); si False se simula una señal al slot (objeto,sname).
         """
-        from . import Block;
-        if check and (objeto, sname) in self.listeners:
-           #print(f"EMIT: {Block._classNameFrom(objeto.__init__)}({sname})", flush=True);
-           for (target, slot_name) in self.listeners[(objeto, sname)]:
+        #from . import Block;
+        if (source, sname) in self.listeners:
+           #print(f"EMIT: {Block._classNameFrom(source.__init__)}({sname})", flush=True);
+           for (target, slot_name) in self.listeners[(source, sname)]:
                slot=target.slots[slot_name];
                group=slot["required"];
                data=data if data is not None else slot["default"];
@@ -157,17 +156,29 @@ class Context:
                        assert e is target;
                   else:
                      raise RuntimeError("He alcanzado el máximo de recursividad");   
-               else:   
+               else:
                   #print(" "*5, f"LISTENER: {Block._classNameFrom(target.__init__)}({slot_name})", end=', ', flush=True);
                   #print(f"data is None:{bool(data is None)}", end=', ', flush=True);
                   #print(f"IS INCOMPLETE!", flush=True);
                   pass;
-        else:
-           target=objeto;
+
+    #-----------------------------------------------------------------------------------------
+    def accept(self, target, sname, data):
+        """
+        Recibe una *fake* señal en el slot indicado.
+        
+        :param target: El objeto que recibe la señal y posee el slot.
+        :type  target: Block
+        :param sname:  El nombre del slot.
+        :type  sname:  str
+        :param data:   El dato que acompaña a la señal y recibe el slot.
+        :type  data:   Cualquier cosa menos None.
+        """
+        if sname in target.slots:
            slot=target.slots[sname];
            group=slot["required"];
            data=data if data is not None else slot["default"];
-           target._values[sname] = data;
+           target._values[sname]=data;
            complete_slots=target.slots.iscomplete(target._values);
            assert group in complete_slots;               
            if bool(complete_slots) and (sname in complete_slots[group]):
