@@ -12,7 +12,8 @@ setup(
                        "Pillow", 
                        "ipycanvas==0.11",
                        "ipyevents",
-                       "pandas>=1.3.4"
+                       "pandas>=1.3.4",
+                       "transformers",
                      ],
     # metadata para publicar en PyPI
     author='Francisco Puentes',
