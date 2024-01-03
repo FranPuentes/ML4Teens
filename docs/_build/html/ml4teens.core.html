@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html  lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1"><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+      <title>ml4teens.core package</title>
+    
+          <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+          <link rel="stylesheet" href="_static/theme.css " type="text/css" />
+      
+      <!-- sphinx script_files -->
+        <script src="_static/documentation_options.js?v=2da97cdc"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="_static/translations.js?v=efdbd0b9"></script>
+
+      
+      <!-- bundled in js (rollup iife) -->
+      <!-- <script src="_static/theme-vendors.js"></script> -->
+      <script src="_static/theme.js" defer></script>
+    
+  <link rel="index" title="Índice" href="genindex.html" />
+  <link rel="search" title="Búsqueda" href="search.html" />
+  <link rel="prev" title="ml4teens.blocks package" href="ml4teens.blocks.html" /> 
+  </head>
+
+  <body>
+    <div id="app">
+    <div class="theme-container" :class="pageClasses"><navbar @toggle-sidebar="toggleSidebar">
+  <router-link to="index.html" class="home-link">
+    
+      <span class="site-name">ML4Teens</span>
+    
+  </router-link>
+
+  <div class="links">
+    <navlinks class="can-hide">
+
+
+
+    </navlinks>
+  </div>
+</navbar>
+
+      
+      <div class="sidebar-mask" @click="toggleSidebar(false)">
+      </div>
+        <sidebar @toggle-sidebar="toggleSidebar">
+          
+          <navlinks>
+            
+
+
+
+            
+          </navlinks><div id="searchbox" class="searchbox" role="search">
+  <div class="caption"><span class="caption-text">Búsqueda rápida</span>
+    <div class="searchformwrapper">
+      <form class="search" action="search.html" method="get">
+        <input type="text" name="q" />
+        <input type="submit" value="Búsqueda" />
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+    </div>
+  </div>
+</div><div class="sidebar-links" role="navigation" aria-label="main navigation">
+  
+    <div class="sidebar-group">
+      <p class="caption">
+        <span class="caption-text"><a href="index.html#como-lo-hacemos">¿cómo lo hacemos?</a></span>
+      </p>
+      <ul class="current">
+        
+          <li class="toctree-l1 ">
+            
+              <a href="ml4teens.html" class="reference internal ">ml4teens package</a>
+            
+
+            
+          </li>
+
+        
+          <li class="toctree-l1 current">
+            
+              <a href="#" class="reference internal current">ml4teens.core package</a>
+            
+
+            
+              <ul>
+                
+                  <li class="toctree-l2"><a href="#submodules" class="reference internal">Submodules</a></li>
+                
+                  <li class="toctree-l2"><a href="#module-ml4teens.core.block" class="reference internal">ml4teens.core.block module</a></li>
+                
+                  <li class="toctree-l2"><a href="#module-ml4teens.core.context" class="reference internal">ml4teens.core.context module</a></li>
+                
+                  <li class="toctree-l2"><a href="#module-ml4teens.core.signalType" class="reference internal">ml4teens.core.signalType module</a></li>
+                
+                  <li class="toctree-l2"><a href="#module-ml4teens.core.signals" class="reference internal">ml4teens.core.signals module</a></li>
+                
+                  <li class="toctree-l2"><a href="#module-ml4teens.core.slotType" class="reference internal">ml4teens.core.slotType module</a></li>
+                
+                  <li class="toctree-l2"><a href="#module-ml4teens.core.slots" class="reference internal">ml4teens.core.slots module</a></li>
+                
+                  <li class="toctree-l2"><a href="#module-ml4teens.core.type" class="reference internal">ml4teens.core.type module</a></li>
+                
+                  <li class="toctree-l2"><a href="#module-ml4teens.core" class="reference internal">Module contents</a></li>
+                
+              </ul>
+            
+          </li>
+
+        
+          <li class="toctree-l1 ">
+            
+              <a href="ml4teens.blocks.html" class="reference internal ">ml4teens.blocks package</a>
+            
+
+            
+          </li>
+
+        
+      </ul>
+    </div>
+  
+</div>
+        </sidebar>
+
+      <page>
+          <div class="body-header" role="navigation" aria-label="navigation">
+  
+  <ul class="breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+    
+      <li><a href="ml4teens.html">ml4teens package</a> &raquo;</li>
+    
+    <li>ml4teens.core package</li>
+  </ul>
+  
+
+  <ul class="page-nav">
+  <li class="prev">
+    <a href="ml4teens.blocks.html"
+       title="capítulo anterior">← ml4teens.blocks package</a>
+  </li>
+</ul>
+  
+</div>
+<hr>
+          <div class="content" role="main" v-pre>
+            
+  <section id="ml4teens-core-package">
+<h1>ml4teens.core package<a class="headerlink" href="#ml4teens-core-package" title="Link to this heading">¶</a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading">¶</a></h2>
+</section>
+<section id="module-ml4teens.core.block">
+<span id="ml4teens-core-block-module"></span><h2>ml4teens.core.block module<a class="headerlink" href="#module-ml4teens.core.block" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="ml4teens.core.block.Block">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml4teens.core.block.</span></span><span class="sig-name descname"><span class="pre">Block</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ml4teens.core.block.Block" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ml4teens.core.block.Block.checkSignalUsage">
+<span class="sig-name descname"><span class="pre">checkSignalUsage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ml4teens.core.block.Block.checkSignalUsage" title="Link to this definition">¶</a></dt>
+<dd><p>Comprueba si el evento (<em>signal</em>) está asociado a un <em>slot</em>.
+Es equivalente a invocar el método (decorado) correspondente al evento, pero con <em>data=None</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parámetros<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>name</strong> (<em>str</em>) – Nombre del evento (<em>signal</em>)</p>
+</dd>
+<dt class="field-even">Devuelve<span class="colon">:</span></dt>
+<dd class="field-even"><p>True si la señal está asocida a un <em>slot</em>, False en caso contrario.</p>
+</dd>
+<dt class="field-odd">Tipo del valor devuelto<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ml4teens.core.block.Block.getValue">
+<span class="sig-name descname"><span class="pre">getValue</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ml4teens.core.block.Block.getValue" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ml4teens.core.block.Block.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ml4teens.core.block.Block.reset" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ml4teens.core.block.Block.rightValue">
+<span class="sig-name descname"><span class="pre">rightValue</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ml4teens.core.block.Block.rightValue" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ml4teens.core.block.Block.run">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwarg</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ml4teens.core.block.Block.run" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ml4teens.core.block.Block.setValue">
+<span class="sig-name descname"><span class="pre">setValue</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ml4teens.core.block.Block.setValue" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ml4teens.core.block.Block.signal">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">signal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">typedecl</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ml4teens.core.block.Block.signal" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ml4teens.core.block.Block.signals">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">signals</span></span><a class="headerlink" href="#ml4teens.core.block.Block.signals" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ml4teens.core.block.Block.slot">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">slot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">typedecl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">required</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ml4teens.core.block.Block.slot" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ml4teens.core.block.Block.slots">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">slots</span></span><a class="headerlink" href="#ml4teens.core.block.Block.slots" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-ml4teens.core.context">
+<span id="ml4teens-core-context-module"></span><h2>ml4teens.core.context module<a class="headerlink" href="#module-ml4teens.core.context" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="ml4teens.core.context.Context">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml4teens.core.context.</span></span><span class="sig-name descname"><span class="pre">Context</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ml4teens.core.context.Context" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py class">
+<dt class="sig sig-object py" id="ml4teens.core.context.Context.Linker">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Linker</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">block</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sname</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ml4teens.core.context.Context.Linker" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ml4teens.core.context.Context.accept">
+<span class="sig-name descname"><span class="pre">accept</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ml4teens.core.context.Context.accept" title="Link to this definition">¶</a></dt>
+<dd><p>Recibe una <em>fake</em> señal en el slot indicado.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parámetros<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>target</strong> (<a class="reference internal" href="#ml4teens.core.block.Block" title="ml4teens.core.block.Block"><em>Block</em></a>) – El objeto que recibe la señal y posee el slot.</p></li>
+<li><p><strong>sname</strong> (<em>str</em>) – El nombre del slot.</p></li>
+<li><p><strong>data</strong> (<em>Cualquier cosa menos None.</em>) – El dato que acompaña a la señal y recibe el slot.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ml4teens.core.context.Context.checkSubscription">
+<span class="sig-name descname"><span class="pre">checkSubscription</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">listener</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ml4teens.core.context.Context.checkSubscription" title="Link to this definition">¶</a></dt>
+<dd><p>Comprueba si se ha registrado la pareja (<em>event</em>, <em>listener</em>) en este contexto.
+Si <em>listener</em> es None, sólo comprueba si está registrado <em>event</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parámetros<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>event</strong> (tupla (<em>block</em>, <em>signal name</em>) | None) – La señal (<em>signal</em>).</p></li>
+<li><p><strong>listener</strong> (tupla (<em>block</em>, <em>slot name</em>)) – El <em>slot</em>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ml4teens.core.context.Context.emit">
+<span class="sig-name descname"><span class="pre">emit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ml4teens.core.context.Context.emit" title="Link to this definition">¶</a></dt>
+<dd><p>Emite una señal directamente a los “listeners” de (source,sname).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parámetros<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>source</strong> (<a class="reference internal" href="#ml4teens.core.block.Block" title="ml4teens.core.block.Block"><em>Block</em></a>) – El objeto que envía la señal.</p></li>
+<li><p><strong>sname</strong> (<em>str</em>) – El nombre de una señal.</p></li>
+<li><p><strong>data</strong> (<em>Cualquier cosa menos None.</em>) – El dato que acompaña a la señal.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ml4teens.core.context.Context.instance">
+<em class="property"><span class="pre">class</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">instance</span></span><a class="headerlink" href="#ml4teens.core.context.Context.instance" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ml4teens.core.context.Context.notify">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">notify</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ml4teens.core.context.Context.notify" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ml4teens.core.context.Context.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ml4teens.core.context.Context.reset" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ml4teens.core.context.Context.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ml4teens.core.context.Context.run" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ml4teens.core.context.Context.subscribe">
+<span class="sig-name descname"><span class="pre">subscribe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">listener</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ml4teens.core.context.Context.subscribe" title="Link to this definition">¶</a></dt>
+<dd><p>Registra la pareja (<em>event</em>, <em>listener</em>) en este contexto.
+Si ya existe esta pareja, no hace nada.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parámetros<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>event</strong> (tupla (<em>block</em>, <em>signal name</em>)) – La señal (<em>signal</em>).</p></li>
+<li><p><strong>listener</strong> (tupla (<em>block</em>, <em>slot name</em>)) – El <em>slot</em>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Devuelve<span class="colon">:</span></dt>
+<dd class="field-even"><p>True si ha añadido la pareja, False si ya existía (y no la ha añadido).</p>
+</dd>
+<dt class="field-odd">Tipo del valor devuelto<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ml4teens.core.context.Context.unsubscribe">
+<span class="sig-name descname"><span class="pre">unsubscribe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">listener</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ml4teens.core.context.Context.unsubscribe" title="Link to this definition">¶</a></dt>
+<dd><p>Elimina la pareja (<em>event</em>, <em>listener</em>) en este contexto.
+Si no existe esta pareja, no hace nada.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parámetros<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>event</strong> (tupla (<em>block</em>, <em>signal name</em>)) – La señal (<em>signal</em>).</p></li>
+<li><p><strong>listener</strong> (tupla (<em>block</em>, <em>slot name</em>)) – El <em>slot</em>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Devuelve<span class="colon">:</span></dt>
+<dd class="field-even"><p>True si ha eliminado la pareja, False si no existía previamente.</p>
+</dd>
+<dt class="field-odd">Tipo del valor devuelto<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-ml4teens.core.signalType">
+<span id="ml4teens-core-signaltype-module"></span><h2>ml4teens.core.signalType module<a class="headerlink" href="#module-ml4teens.core.signalType" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="ml4teens.core.signalType.SignalType">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml4teens.core.signalType.</span></span><span class="sig-name descname"><span class="pre">SignalType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tipo</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ml4teens.core.signalType.SignalType" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ml4teens.core.type.Type" title="ml4teens.core.type.Type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code></a></p>
+</dd></dl>
+
+</section>
+<section id="module-ml4teens.core.signals">
+<span id="ml4teens-core-signals-module"></span><h2>ml4teens.core.signals module<a class="headerlink" href="#module-ml4teens.core.signals" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="ml4teens.core.signals.Signals">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml4teens.core.signals.</span></span><span class="sig-name descname"><span class="pre">Signals</span></span><a class="headerlink" href="#ml4teens.core.signals.Signals" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+</dd></dl>
+
+</section>
+<section id="module-ml4teens.core.slotType">
+<span id="ml4teens-core-slottype-module"></span><h2>ml4teens.core.slotType module<a class="headerlink" href="#module-ml4teens.core.slotType" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="ml4teens.core.slotType.SlotType">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml4teens.core.slotType.</span></span><span class="sig-name descname"><span class="pre">SlotType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">des</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ml4teens.core.slotType.SlotType" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ml4teens.core.type.Type" title="ml4teens.core.type.Type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code></a></p>
+</dd></dl>
+
+</section>
+<section id="module-ml4teens.core.slots">
+<span id="ml4teens-core-slots-module"></span><h2>ml4teens.core.slots module<a class="headerlink" href="#module-ml4teens.core.slots" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="ml4teens.core.slots.Slots">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml4teens.core.slots.</span></span><span class="sig-name descname"><span class="pre">Slots</span></span><a class="headerlink" href="#ml4teens.core.slots.Slots" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ml4teens.core.slots.Slots.groups">
+<span class="sig-name descname"><span class="pre">groups</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ml4teens.core.slots.Slots.groups" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ml4teens.core.slots.Slots.iscomplete">
+<span class="sig-name descname"><span class="pre">iscomplete</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ml4teens.core.slots.Slots.iscomplete" title="Link to this definition">¶</a></dt>
+<dd><p>“values” es un diccionario {slot_name:data, …}
+“G” es un diccionario {group:[slot_name, …], …}
+Quiero saber si estos datos hacen completo algún grupo, y en su caso, cuales slots he de disparar.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-ml4teens.core.type">
+<span id="ml4teens-core-type-module"></span><h2>ml4teens.core.type module<a class="headerlink" href="#module-ml4teens.core.type" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="ml4teens.core.type.Type">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ml4teens.core.type.</span></span><span class="sig-name descname"><span class="pre">Type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tipo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clase</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ml4teens.core.type.Type" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+</dd></dl>
+
+</section>
+<section id="module-ml4teens.core">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-ml4teens.core" title="Link to this heading">¶</a></h2>
+</section>
+</section>
+
+
+          </div>
+          <div class="page-nav">
+            <div class="inner"><ul class="page-nav">
+  <li class="prev">
+    <a href="ml4teens.blocks.html"
+       title="capítulo anterior">← ml4teens.blocks package</a>
+  </li>
+</ul><div class="footer" role="contentinfo">
+      &#169; Derechos de autor 2023, Francisco Puentes.
+    <br>
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 7.2.6 with <a href="https://github.com/schettino72/sphinx_press_theme">Press Theme</a> 0.8.0.
+</div>
+            </div>
+          </div>
+      </page>
+    </div></div>
+    
+    
+  </body>
+</html>

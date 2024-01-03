@@ -1,0 +1,19 @@
+ml4teens package
+================
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   ml4teens.blocks
+   ml4teens.core
+
+Module contents
+---------------
+
+.. automodule:: ml4teens
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,0 +1,34 @@
+Bienvenido a la Documentación de ML4Teens
+=========================================
+
+**ML4Teens** (en adelante ML4T) es un paquete que tiene como objetivo ofrecer un entorno *serio* para
+la formación en Aprendizaje Automático (*Machine Learning*, ML).
+
+- En la educación infantil tenemos Scratch (https://scratch.mit.edu/).
+- En educación secundaria contamos con ML for Kids (https://machinelearningforkids.co.uk).
+
+Pero en la educación de alumnos/as de más de 16 años (bachillerato o ciclos medios de FP) no contamos con ninguna herramienta realmente útil que esté
+a medio camino entre ML4Kids y Notebooks Jupyter con Python (con permiso de R, Julia, Rust, ...).
+
+La idea de ML4T es precisamente esa: crear un entorno amigable, pero con la introducción de conceptos más profesionales, para
+la formación práctica en Aprendizaje Automático.
+
+¿Cómo lo hacemos?
+-----------------
+ML4T no elude los notebooks Jupyter y tampoco Python, pero lo hace de tal modo que su aprendizaje no se haga cuesta arriba.
+
+Una posible metodología (basada en proyectos) sería:
+
+* Partiendo de un **problema a resolver**, explicar/entender los procesos implicados.
+* Buscar los **datos de entrada** (imágenes, vídeos, datasets, ...).
+* Elaborar una **red de bloques** (*pipeline*) que satisfaga el problema (en papel).
+* Implementar el *pipeline* **con ML4T**.
+
+Contenidos:
+
+.. toctree::
+   :maxdepth: 2
+
+   ml4teens.rst
+   ml4teens.core.rst
+   ml4teens.blocks.rst
