@@ -80,7 +80,3 @@ class ObjectID(Block):
                  for r,c,k in zip(data.cls,data.conf,data.xyxyn)];
           return boxes;
 
-      #-------------------------------------------------------------------------
-      def run(self, **kwarg):
-          raise RuntimeError("No tiene sentido invocar el método 'run' de un objeto de clase 'ObjectID'.");
-

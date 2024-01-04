@@ -169,7 +169,3 @@ class SplitChannels(Block):
       def signal_F(self, data):
           return data;
 
-      #-------------------------------------------------------------------------
-      def run(self, **kwarg):
-          raise RuntimeError("No tiene sentido invocar el método 'run' de un objeto de clase 'SplitChannels'.");
-

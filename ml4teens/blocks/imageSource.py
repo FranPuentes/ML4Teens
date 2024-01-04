@@ -79,35 +79,25 @@ class ImageSource(Block):
                        istemp=True;
 
           try:
-            imagen = PIL.Image.open(fuente);
+            with PIL.Image.open(fuente) as imagen:
+            
+                 imagen.load();
 
-            if self.signal_info():
-               info={"format":imagen.format, "size":imagen.size, "mode":imagen.mode, "palette":imagen.palette, "exif":imagen._getexif(), "info":imagen.info };
-               self.signal_info(info);
+                 if self.signal_info():
+                    info={"format":imagen.format, "size":imagen.size, "mode":imagen.mode, "palette":imagen.palette, "exif":imagen._getexif(), "info":imagen.info };
+                    self.signal_info(info);
 
-            if self.signal_dims():
-               shape=shapeof(imagen);
-               self.signal_dims(shape);
+                 if self.signal_dims():
+                    shape=shapeof(imagen);
+                    self.signal_dims(shape);
 
-            if self.signal_histogram():
-               self.signal_histogram(histogramas(imagen));
-
-            if self.signal_image():
-               self.signal_image(imagen);
+                 if self.signal_histogram():
+                    self.signal_histogram(histogramas(imagen));
+ 
+                 if self.signal_image():
+                    self.signal_image(imagen);
 
           finally:
             self.reset("source");
             if istemp:
                os.remove(fuente);
-
-      #-------------------------------------------------------------------------
-      def run(self, **kwargs):
-      
-          if kwargs and "source" in kwargs: fuente = kwargs     ["source"];
-          else:                             fuente = self._param("source");
-
-          if not fuente or type(fuente) is not str:
-             raise RuntimeError(f"Necesito que pases como parámetro 'source' el nombre del fichero o la url que contiene la imagen.");
-             
-          Context.instance.accept(self, "source", fuente);
-          

@@ -16,9 +16,9 @@ class VideoSource(Block):
 
       #-------------------------------------------------------------------------
       # source:str
-      # speed:float TODO
+      # speed:float [0,10]
       def __init__(self, **kwargs):
-          super().__init__(**kwargs);          
+          super().__init__(**kwargs);
 
       #-------------------------------------------------------------------------
       @Block.signal("frame", Image)
@@ -43,6 +43,8 @@ class VideoSource(Block):
       #-------------------------------------------------------------------------
       @Block.slot("source", {str}, required=True)
       def slot_source(self, slot, fuente):
+
+          # TODO 'fuente' puede ser un número de dispositivo!
 
           istemp=False;
           if fuente.startswith("http"):
@@ -69,6 +71,9 @@ class VideoSource(Block):
                 frames = fd.get(cv.CAP_PROP_FRAME_COUNT);
                 codificador = int(fd.get(cv.CAP_PROP_FOURCC));
                 delay = int(1000/fps);
+                
+                speed=self._params.get("speed",1);
+                delay=delay*speed;
 
                 self.signal_frames(frames);
                 self.signal_info({"fuente":fuente, "ancho":ancho, "alto":alto, "fps":fps, "frames":frames, "codificador":codificador, "delay":delay });
@@ -106,25 +111,3 @@ class VideoSource(Block):
           finally:
             fd.release();
             if istemp: os.remove(fuente);
-      
-      #-------------------------------------------------------------------------
-      # source
-      def run(self, **kwargs):
-      
-          old_params = copy.deepcopy(self._params);
-
-          for key in kwargs:
-              self._params[key]=kwargs[key];
-          
-          fuente=self._param("source");
-
-          if not fuente or type(fuente) is not str:
-             raise RuntimeError(f"Necesito que pases como parámetro 'source' el nombre del fichero o la url que contiene el vídeo.");
-
-          try:
-             Context.instance.accept(self, "source", fuente);
-             
-          finally:
-             self._params=old_params;
-                
-             

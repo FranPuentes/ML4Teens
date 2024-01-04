@@ -288,6 +288,3 @@ class ImageOp(Block):
       def signal_image(self, data):
           return data;
 
-      #-------------------------------------------------------------------------
-      def run(self, **kwarg):
-          raise RuntimeError("No tiene sentido invocar el método 'run' de un objeto de clase 'ImageOp'.");

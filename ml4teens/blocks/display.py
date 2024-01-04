@@ -14,8 +14,7 @@ class Display(Block):
       # feed = False
       def __init__(self, *args, **kwargs):
           super().__init__(*args, **kwargs);
-          self._feed=False;
-          if "feed" in kwargs: self._feed=bool(kwargs["feed"]);
+          self._feed=bool(kwargs.get("feed",False));
 
       #-------------------------------------------------------------------------
       @Block.signal("image", Image)
@@ -51,7 +50,3 @@ class Display(Block):
           self.signal_image(data);
           self.reset("image");
 
-      #-------------------------------------------------------------------------
-      def run(self, **kwarg):
-          raise RuntimeError("No tiene sentido invocar el método 'run' de un objeto de clase 'Pantalla'.");
-          
