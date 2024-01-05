@@ -10,68 +10,81 @@ Cada uno de ellos genera *signal*s y posee *slot*s.
 
 Un objeto (*singleton*) se encarga de emparejar los signals con slots (con control de tipos).
 
+>[!WARNING]
+>Actualmente la rama publicada en Pypi (pip) es **main**, pero la buena es **develop**.
+>Cuando sea estable, **main** será la publicada.
+
 El código que sigue, muestra un ejemplo de lo que puede hacer el paquete.
 
 ```python
 import ml4teens as ml;
 
-context  = ml.core.Context.instance.reset();
+context   = ml.core.Context.instance.reset();
 
-vídeo    = ml.blocks.VideoSource(source="https://cdn.pixabay.com/vimeo/188704568/parque-6096.mp4?width=640&hash=112e5fd94cb9090c07f4472a41d182d344db647b");
-objid    = ml.blocks.ObjectID();
-pantalla = ml.blocks.Display(width=640);
+imagen   = ml.blocks.ImageSource();
+img2text = ml.blocks.ImageToText(caption="A photo of an");
 terminal = ml.blocks.Terminal();
+salida   = ml.blocks.Display(width=300);
 
-vídeo["info"] >> terminal["stdout"];
-vídeo["dims"] >> terminal["stdout"];
+imagen  ["image"] >> img2text["image" ];
+imagen  ["image"] >> salida  ["image" ];
+img2text["text" ] >> terminal["stdout"];
 
-(vídeo["frame"] >> objid["frame"])["frame"] >> pantalla["frame"];
+source="https://img.freepik.com/foto-gratis/mujer-tiro-completo-bicicleta-al-aire-libre_23-2149413735.jpg?w=1380&t=st=1704297833~exp=1704298433~hmac=433c68f72fc841cbb094d598521f8b72dad100a383f59b39de5f490cce7c7b99";
 
-context.run(vídeo);
-
+context.emit(target=imagen, sname="source", data=source);
+context.wait();
 ```
 
-+ Carga la librería.
-+ Define los objetos: vídeo, objid, terminal y display. Cada uno de ellos es un bloque.
-+ Establece las conexiones entre *signal*s y *slot*s, mediente el operador **>>**
-+ Ejecuta el objeto 'vídeo', dado que es el punto de entrada.
-
-Por otro lado, hacer un bloque es sencillo, uno básico que -por ejemplo- convierte una imagen a tono de grises es:
+Por otro lado, hacer un bloque es sencillo, uno básico que -por ejemplo- se queda con un canal de una imagen:
 
 ```python
-import cv2 as cv;
-import numpy as np;
+mport cv2 as cv;
+
+from PIL.Image import Image;
+from PIL.Image import fromarray;
 
 from ml4teens.core import Block;
 
 class SingleChannel(Block):
 
+      #-------------------------------------------------------------------------
+      # channel
       def __init__(self, **kwargs):
           super().__init__(**kwargs);
 
-      @Block.slot("frame", {np.ndarray}, required=True)
-      def slot_frame(self, slot, data):
-          frame = cv.cvtColor(data, cv.COLOR_BGR2GRAY);
-          self.signal_frame(frame);
-          self.reset("frame");
+          if "channel" in kwargs: self._channel=kwargs["channel"];
+          else:                   self._channel=0;
 
-      @Block.signal("frame", np.ndarray)
-      def signal_frame(self, data):
+          assert type(self._channel)==int, f"El parámetro 'channel' debe ser el número del canal (0, ...)";
+
+      #-------------------------------------------------------------------------
+      @Block.slot("image", {Image})
+      def slot_image(self, slot, data):
+          assert type(data) is Image;
+          c=len(data.getbands());
+          n=self._channel;
+          assert n in range(0,c), f"El canal {n} no puede ser extraído de una imagen de {c} canales (recuerda: empieza a contar en 0)";
+          imagen=data.getchannel(n);
+          self.signal_image(imagen);
+          self.reset("image");
+
+      #-------------------------------------------------------------------------
+      @Block.signal("image", Image)
+      def signal_image(self, data):
           return data;
-
-      def run(self, **kwarg):
-          raise RuntimeError("No tiene sentido invocar el método 'run' de un objeto de clase 'SingleChannel'.");
 ```
 
-Este bloque (de tipo *passthru*), puede recibir imágenes en forma de tensor numpy por medio del slot llamado *frame* y reenvía dicho tensor por medio de una señal, igualmente llamada *frame*.
+Este bloque (de tipo *passthru*), puede recibir imágenes en forma de imagen
+PIL por medio del **slot** llamado *image* y reenvía el canal indicado de
+dicha imagen por medio de una señal, igualmente llamada *image*.
 
 Observar:
-* El constructor de la clase puede recibir parámetros de usuario. En este ejemplo no hace uso de ninguno de ellos.
+* El constructor de la clase puede recibir parámetros de usuario.
 * El slot se define mediante un decorador (@Block.slot).
 * La señal (*signal*) se define igualmente mediante un decorador (@Block.signal).
-* El slot, una vez hecha la conversión, pasa el tensor a la señal, invocando al método *signal_frame*.
+* El slot, una vez hecha la conversión, pasa la imagen a la señal, invocando al método *signal_image*.
 * Los métodos decorados por @Block.signal no tienen que hacer nada, salvo devolver el dato que -finalmente- se ha de enviar.
-* El método *run* en este caso no es significativo.
 
 >[!NOTE]
 >El resultado es todavía muy primitivo, pero funcional.
