@@ -5,19 +5,19 @@ from ..core import Block;
 class ResizeImage(Block):
 
       #-------------------------------------------------------------------------
-      # width
-      # height
+      # width : None | int | float
+      # height: None | int | float
       def __init__(self, **kwargs):
           super().__init__(**kwargs);
-          if "width" in kwargs:  self._width=kwargs["width"];
-          else:                  self._width=None;
-          if "height" in kwargs: self._height=kwargs["height"];
-          else:                  self._height=None;
-          assert self._width  is None or type(self._width)  in [int, float], f"El parámetro 'width' debe ser un tamaño (int) o un factor (float)";
-          assert self._height is None or type(self._height) in [int, float], f"El parámetro 'height' debe ser un tamaño (int) o un factor (float)";
+
+          self._width =kwargs.get("width", None);
+          self._height=kwargs.get("height",None);
+
+          assert isinstance(self._width,  (int, float, type(None))), f"El parámetro 'width' debe ser un tamaño (int) o un factor (float)";
+          assert isinstance(self._height, (int, float, type(None))), f"El parámetro 'height' debe ser un tamaño (int) o un factor (float)";
 
       #-------------------------------------------------------------------------
-      @Block.slot("shape", {tuple,list, Image}, required=False)
+      @Block.slot("shape", {tuple,list,Image}, required=False)
       def slot_shape(self, slot, data):
       
           if   type(data) is tuple and len(data)>=2:
@@ -38,8 +38,6 @@ class ResizeImage(Block):
       #-------------------------------------------------------------------------
       @Block.slot("image", {Image}, required=2)
       def slot_image(self, slot, data):
-
-          assert isinstance(data, Image);
 
           if "shape" in self._values:
              width =self._values["shape"][0] if self._values["shape"] else self._width ;

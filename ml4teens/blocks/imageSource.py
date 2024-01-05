@@ -12,6 +12,8 @@ class ImageSource(Block):
 
       def __init__(self, **kwargs):
           super().__init__(**kwargs);
+          self.width =kwargs.get("width" );
+          self.height=kwargs.get("height");
 
       #-------------------------------------------------------------------------
       @Block.signal("image", Image)
@@ -34,6 +36,28 @@ class ImageSource(Block):
           return data;
 
       #-------------------------------------------------------------------------
+      def _resize(self, imagen, width, height):
+      
+          if width is None and height is None:
+             return imagen;
+             
+          else:
+             if width==imagen.width and height==imagen.height:
+                return imagen;
+                
+             if not width:
+                r=height/float(imagen.height);
+                width=int(imagen.width*r);
+
+             if not height:
+                r=width/float(imagen.width);
+                height=int(imagen.height*r);
+
+             return imagen.resize( (width,height) );
+      
+      
+      
+      
       @Block.slot("source", {str}, required=True)
       def slot_source(self, slot, fuente):
       
@@ -62,11 +86,11 @@ class ImageSource(Block):
           def histogramas(imagen):
               modo = imagen.mode;
               histograma_completo = imagen.histogram();
-              if   modo == '1' or modo == 'L' or modo == 'P' or modo == 'I' or modo == 'F': return [histograma_completo];
-              elif modo == 'RGB' or modo == 'YCbCr':                                        return [histograma_completo[i:i+256] for i in range(0, 768, 256)];
-              elif modo == 'RGBA' or modo == 'CMYK':                                        return [histograma_completo[i:i+256] for i in range(0, 1024, 256)];
-              elif modo == 'LAB' or modo == 'HSV':                                          return [histograma_completo[i:i+256] for i in range(0, 768, 256)];
-              else:                                                                         return None;
+              if   modo == '1'    or modo == 'L' or modo == 'P' or modo == 'I' or modo == 'F': return [histograma_completo];
+              elif modo == 'RGB'  or modo == 'YCbCr':                                          return [histograma_completo[i:i+256] for i in range(0, 768,  256)];
+              elif modo == 'RGBA' or modo == 'CMYK':                                           return [histograma_completo[i:i+256] for i in range(0, 1024, 256)];
+              elif modo == 'LAB'  or modo == 'HSV':                                            return [histograma_completo[i:i+256] for i in range(0, 768,  256)];
+              else:                                                                            return None;
 
           istemp=False;
           if fuente.startswith("http"):
@@ -81,8 +105,6 @@ class ImageSource(Block):
           try:
             with PIL.Image.open(fuente) as imagen:
             
-                 imagen.load();
-
                  if self.signal_info():
                     info={"format":imagen.format, "size":imagen.size, "mode":imagen.mode, "palette":imagen.palette, "exif":imagen._getexif(), "info":imagen.info };
                     self.signal_info(info);
@@ -95,7 +117,8 @@ class ImageSource(Block):
                     self.signal_histogram(histogramas(imagen));
  
                  if self.signal_image():
-                    self.signal_image(imagen);
+                    imagen.load();
+                    self.signal_image(self._resize(imagen, self.width, self.height));
 
           finally:
             self.reset("source");
