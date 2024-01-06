@@ -44,16 +44,20 @@ class Block(ABC):
       def __init__(self, **kwargs):
           self._params       ={};
           self._values       ={};
-          self._mods         ={};
           self._counter      ={};
           self._queue        =queue.PriorityQueue();
-          self._earliers     =[];
           self._loopFinish   =True;
           self._loopThread   =None;
           self._lastEventTime=time.time();
           self._fullClassName=Block._classNameFrom(self.__init__);
           self._id="ID"+''.join(random.choice(string.ascii_letters + string.digits) for _ in range(16));
-          for key in kwargs: self._params[key]=kwargs[key];
+
+          for key in kwargs:
+              self._params[key]=kwargs[key];
+
+          for sname in self.slots:
+              self._values [sname]=None;
+              self._counter[sname]=0;
 
       #-------------------------------------------------------------------------
       def _param(self, key, default=None):
@@ -249,89 +253,34 @@ class Block(ABC):
               self._lastEventTime=time.time();
               while not self._loopFinish:
                     try:
-                      if self._queue.empty() and len(self._earliers)>0:
-                         event=self._earliers.pop(0);
-                         tm, sname, data, times, mods = event;
-                      else:   
-                         tm, sname, data, times, mods = self._queue.get(block=True, timeout=1);
-                      
-                      """   
-                      while not self._loopFinish:
-                            tm, sname, data, times, mods = self._queue.get(block=True, timeout=1);
-                            self._lastEventTime=time.time();
-                         
-                            diff=tm-time.time();
-                            if diff>0:
-                               self._queue.put( (tm,sname,data,times,mods) );
-                               time.sleep(min(diff,0.100));
-                            else:
-                               break;
-                      
-                      if self._loopFinish: continue;
-                      """
+                      tm, sname, data, times, mods = self._queue.get(block=True, timeout=1);
                       
                       debug.print(f"{cls}:: nuevo evento '{sname},{type(data)}' con mods={mods}, y times={times}", flush=True);
                       
-                      if sname in Block._slots[cls]:
+                      if sname in self.slots:
                       
-                         if sname not in self._values:  self._values [sname]=None;
-                         if sname not in self._counter: self._counter[sname]=0;
-                         if sname not in self._mods:    self._mods   [sname]={};
-                         
-                         waitFor =mods.get("wait for"              ) if mods is not None else None;
-                         syncWith=mods.get("sync with"             ) if mods is not None else None;
-                         stepTime=mods.get("step time to recall",99) if mods is not None else None;
-                         
-                         if waitFor:
-                            pair = ' '.join([t.strip() for t in waitFor.split()]);
-                            assert pair in self.slots and pair!=sname;
-                            s=self._counter.get(sname,0);
-                            p=self._counter.get(pair, 0);
-                            
-                            if p==0:
-                               ms=stepTime;
-                               self._queue.put( (time.time()+(ms/1000), sname, data, times+1, mods) );
-                               continue;
-                            else:   
-                               del mods["wait for"];
-                         
-                         if syncWith:
-                            pair = ' '.join([t.strip() for t in syncWith.split()]);
-                            assert pair in self.slots and pair!=sname;
-                            s=self._counter.get(sname,0);
-                            p=self._counter.get(pair, 0);
-                            
-                            if s >= p:
-                               self._earliers.append( (tm, sname, data, times, mods) );
-                               time.sleep(stepTime/1000);
-                               raise queue.Empty();
-                            else:
-                               #for event in self._earliers:
-                               #    if event[1]==sname:
-                               #       self._earliers.remove(event);
-                               #       self._queue.put(event);
-                               #       raise queue.Empty();
-                               del mods["sync with"];
-                         
-                         slot=Block._slots[cls][sname];
+                         slot=self.slots[sname];
                          
                          data=data if data is not None else slot["default"];
-                         
-                         self._values [sname]  = data;                         
-                         self._counter[sname] += 1;
-                         self._mods   [sname]  = {} if mods is None else mods;
-                         
-                         #group=slot["required"];
-                         #complete_slots=self.slots.iscomplete(self._values);
-                         #assert int(group)==0 or group in complete_slots;
-                         if True: #int(group)==0 or (bool(complete_slots) and (sname in complete_slots[group])):
-                            try:
-                              func=slot["stub"];
-                              if data:
-                                 func(self,sname,data);
-                            except Exception as e:
-                              debug.print(f"{cls}:: excepción en el slot '{sname}': {str(e)}");
-                              traceback.print_exc(file=sys.stdout);
+
+                         try:
+                           func=slot["stub"];
+                           if data:
+                              func(self,sname,data);
+                              
+                         except Exception as e:
+                           debug.print(f"{cls}:: excepción en el slot '{sname}': {str(e)}");
+                           traceback.print_exc(file=sys.stdout);
+                           
+                         finally:
+                           self._counter[sname] += 1;
+                           
+                           mod_keep =mods.get("keep" ) if mods is not None else False;
+                           mod_clean=mods.get("clean") if mods is not None else False;
+                           
+                           if bool(mod_clean): self._values[sname]=None;
+                           if bool(mod_keep ): self._values[sname]=data;
+                           
                       else:
                          raise RuntimeError(f"{cls}:: '{sname}' no existe como slot");
                     

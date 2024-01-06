@@ -257,29 +257,35 @@ class ImageOp(Block):
                imagen = ImageMath.eval(self._expression, image=data);             
 
           self.signal_image(imagen);
+          self.signal_left (imagen);
+          self.signal_right(imagen);
           self.reset("image");
         
       #-------------------------------------------------------------------------
       # BINARIAS
       #-------------------------------------------------------------------------
       def _binary(self):
-          if self.signal_image():
-             if self.rightValue("left") and self.rightValue("right"):
-                right=self._value("right");
-                left =self._value("left" );                
-                imagen=self._op2(left, right, self._op, self._params);
-                self.signal_image(imagen);
-                self.reset("left","right");
+          if self.rightValue("left") and self.rightValue("right"):
+             right=self._value("right");
+             left =self._value("left" );                
+             imagen=self._op2(left, right, self._op, self._params);
+             self.reset("left","right");
+             return imagen;
+          return None;      
 
       #-------------------------------------------------------------------------
       @Block.slot("left", {Image}, required=4)
       def slot_left(self, slot, data):
-          self._binary();
+          imagen=self._binary();
+          self.signal_image(imagen);
+          self.signal_left(imagen);
 
       #-------------------------------------------------------------------------
       @Block.slot("right", {Image}, required=4)
       def slot_right(self, slot, data):
-          self._binary();
+          imagen=self._binary();
+          self.signal_image(imagen);
+          self.signal_right(imagen);
 
       #-------------------------------------------------------------------------
       # SIGNALS & RUN
@@ -288,3 +294,12 @@ class ImageOp(Block):
       def signal_image(self, data):
           return data;
 
+      #-------------------------------------------------------------------------
+      @Block.signal("left", Image)
+      def signal_left(self, data):
+          return data;
+
+      #-------------------------------------------------------------------------
+      @Block.signal("right", Image)
+      def signal_right(self, data):
+          return data;
