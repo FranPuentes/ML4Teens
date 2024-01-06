@@ -14,6 +14,7 @@ setup(
                        "ipyevents",
                        "pandas>=1.3.4",
                        "transformers",
+                       "face_recognition",
                      ],
     # metadata para publicar en PyPI
     author='Francisco Puentes',

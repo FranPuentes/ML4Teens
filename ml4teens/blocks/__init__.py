@@ -15,3 +15,4 @@ from .imageSource       import ImageSource
 from .objectID          import ObjectID
 from .imageToText       import ImageToText
 from .depthEstimation   import DepthEstimation
+from .faceRecognition   import FaceRecognition
