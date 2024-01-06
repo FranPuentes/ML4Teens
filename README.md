@@ -49,7 +49,7 @@ class SingleChannel(Block):
       def __init__(self, **kwargs):
           super().__init__(**kwargs);
 
-      @Block.slot("frame", {np.ndarray}, required=True)
+      @Block.slot("frame", {np.ndarray})
       def slot_frame(self, slot, data):
           frame = cv.cvtColor(data, cv.COLOR_BGR2GRAY);
           self.signal_frame(frame);
