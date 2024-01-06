@@ -16,7 +16,7 @@ class SingleChannel(Block):
           assert type(self._channel)==int, f"El parámetro 'channel' debe ser el número del canal (0, ...)";
 
       #-------------------------------------------------------------------------
-      @Block.slot("image", {Image}, required=2)
+      @Block.slot("image", {Image})
       def slot_image(self, slot, data):
           assert type(data) is Image;
           c=len(data.getbands());
@@ -24,7 +24,7 @@ class SingleChannel(Block):
           assert n in range(0,c), f"El canal {n} no puede ser extraído de una imagen de {c} canales (recuerda: empieza a contar en 0)";
           imagen=data.getchannel(n);
           self.signal_image(imagen);
-          self.reset("image");
+          del self.tokens["image"];
 
       #-------------------------------------------------------------------------
       @Block.signal("image", Image)

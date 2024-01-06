@@ -11,20 +11,21 @@ class CropImage(Block):
       # classes:list[str|int]
       def __init__(self, **kwargs):
           super().__init__(**kwargs);
-          assert "x1"      not in self._params or type(self._params["x1"     ]) is float;
-          assert "y1"      not in self._params or type(self._params["y1"     ]) is float;
-          assert "x2"      not in self._params or type(self._params["x2"     ]) is float;
-          assert "y2"      not in self._params or type(self._params["y2"     ]) is float;          
-          assert "n"       not in self._params or type(self._params["n"      ]) in [int];
-          assert "conf"    not in self._params or type(self._params["conf"   ]) in [float];
-          assert "classes" not in self._params or (type(self._params["classes"]) is list and all([type(c) in [int,str] for c in self._params["classes"]]));
+          assert isinstance(self.params.x1,      (type(None),float));
+          assert isinstance(self.params.y1,      (type(None),float));
+          assert isinstance(self.params.x2,      (type(None),float));
+          assert isinstance(self.params.y2,      (type(None),float));
+          assert isinstance(self.params.n,       (type(None),int));
+          assert isinstance(self.params.conf,    (type(None),float));
+          assert isinstance(self.params.classes, (type(None),list,tuple));
+          assert self.params.classes is None or all([type(c) in (int,str) for c in self.params.classes]);
 
       #-------------------------------------------------------------------------
       def _crop(self):
-          if self.rightValue("boxes") and self.rightValue("image"):
-             n=self._param("n");
-             boxes=self._values["boxes"];
-             image=self._values["image"];
+          boxes=self.tokens["boxes"].data;
+          image=self.tokens["image"].data;
+          if boxes is not None and image is not None:
+             n=self.params.n or 1;
              for i,box in enumerate(boxes):
                  if n is not None and i+1 > n: break;
                  x1=int(image.width *box[0]);
@@ -33,26 +34,27 @@ class CropImage(Block):
                  y2=int(image.height*box[3]);
                  img=image.crop( (x1,y1,x2,y2) );
                  self.signal_image(img);
-             self.reset("boxes","image"); 
+             del self.tokens["boxes"];
+             del self.tokens["image"];
 
       #-------------------------------------------------------------------------
-      @Block.slot("boxes", {tuple, list}, required=3)
+      @Block.slot("boxes", {tuple, list})
       def slot_boxes(self, slot, data):
 
           if len(data)>0:
 
              if   all([type(d) is float for d in data]) and len(data)>=4:
-                  self._values[slot]=[data];
+                  self.tokens[slot].data=data;
                   self._crop();
 
              elif all([type(d) is int for d in data]) and len(data)>=4:
-                  self._values[slot]=[data];
+                  self.tokens[slot].data=data;
                   self._crop();
 
              elif all([type(d) is dict for d in data]) and all([("xyxy" in d) for d in data]):
                   rt=[];
-                  conf   =self._param("conf");
-                  classes=self._param("classes");
+                  conf   =self.params.conf;
+                  classes=self.params.classes;
                   for d in data:
                       
                       assert len(d["xyxy"])>=4;
@@ -68,16 +70,16 @@ class CropImage(Block):
                          if skip: continue;
 
                       rt.append(d["xyxy"]);
-                  self._values[slot]=rt;
+                  self.tokens[slot].data=rt;
                   self._crop();
 
       #-------------------------------------------------------------------------
-      @Block.slot("image", {Image}, required=3)
+      @Block.slot("image", {Image})
       def slot_image(self, slot, data):
-          x1=self._param("x1");
-          y1=self._param("y1");
-          x2=self._param("x2");
-          y2=self._param("y2");
+          x1=self.params.x1;
+          y1=self.params.y1;
+          x2=self.params.x2;
+          y2=self.params.y2;
           if all([(d is not None) for d in [x1,y1,x2,y2]]):
              self.setValue("boxes",[(x1,y1,x2,y2)]);
              self._crop();

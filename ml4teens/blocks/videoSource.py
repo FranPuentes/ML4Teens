@@ -41,7 +41,7 @@ class VideoSource(Block):
           return data;
 
       #-------------------------------------------------------------------------
-      @Block.slot("source", {str}, required=True)
+      @Block.slot("source", {str})
       def slot_source(self, slot, fuente):
 
           # TODO 'fuente' puede ser un número de dispositivo!
@@ -72,7 +72,7 @@ class VideoSource(Block):
                 codificador = int(fd.get(cv.CAP_PROP_FOURCC));
                 delay = int(1000/fps);
                 
-                speed=self._params.get("speed",1);
+                speed=self.params.speed or 1;
                 delay=delay*speed;
 
                 self.signal_frames(frames);
@@ -111,3 +111,5 @@ class VideoSource(Block):
           finally:
             fd.release();
             if istemp: os.remove(fuente);
+            del self.tokens["source"];
+

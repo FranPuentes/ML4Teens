@@ -7,7 +7,7 @@ import face_recognition as fr;
 
 from ..core import Block;
 
-class FaceRecognition(Block):
+class FaceDetection(Block):
 
       #-------------------------------------------------------------------------
       def __init__(self, **kwargs):
@@ -16,11 +16,11 @@ class FaceRecognition(Block):
       #-------------------------------------------------------------------------
       # SLOTS
       #-------------------------------------------------------------------------
-      @Block.slot("image", {Image}, required=2)
+      @Block.slot("image", {Image})
       def slot_image(self, slot, data):
           #locations = fr.face_locations(data);
           #landmarks = fr.face_landmarks(data);
-          pass;
+          self.signal_image(data);
 
 
       #-------------------------------------------------------------------------

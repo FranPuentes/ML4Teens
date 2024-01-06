@@ -40,7 +40,7 @@ class ObjectID(Block):
               if kwargs["model_name"].lower() in ["xlarge","xl"]: self.model_name="yolov8x.pt";
 
           for key in ["conf","iou","device","max_det","classes"]:
-              if key in kwargs: self._params[key]=kwargs[key];
+              if key in kwargs: self.params[key]=kwargs[key];
 
           self._model = YOLO(self.model_name);
 
@@ -49,9 +49,9 @@ class ObjectID(Block):
           return self._model.names;
 
       #-------------------------------------------------------------------------
-      @Block.slot("image", {Image}, required=2)
+      @Block.slot("image", {Image})
       def slot_image(self, slot, data):
-          results = self._model(data, stream=False, verbose=False, **self._params);
+          results = self._model(data, stream=False, verbose=False,); # **self.params);
           for r in results:
               if self.signal_boxes(): self.signal_boxes(r.boxes);
               if self.signal_image():
@@ -59,7 +59,7 @@ class ObjectID(Block):
                  image = PIL.Image.fromarray(image[..., ::-1]);
                  assert isinstance(image, Image);
                  self.signal_image(image);
-          self.reset("image");
+          del self.tokens["image"];
 
       #-------------------------------------------------------------------------
       @Block.signal("image", Image)
@@ -75,6 +75,7 @@ class ObjectID(Block):
           boxes=[{
                   "class":(int(r),self._model.names[int(r)]),
                   "conf":float(c),
+                  "type":"list[float]",
                   "xyxy":[float(_) for _ in k] 
                  }
                  for r,c,k in zip(data.cls,data.conf,data.xyxyn)];

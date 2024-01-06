@@ -12,8 +12,8 @@ class ImageSource(Block):
 
       def __init__(self, **kwargs):
           super().__init__(**kwargs);
-          self.width =kwargs.get("width" );
-          self.height=kwargs.get("height");
+          self.width =self.params.width;
+          self.height=self.params.height;
 
       #-------------------------------------------------------------------------
       @Block.signal("image", Image)
@@ -58,7 +58,7 @@ class ImageSource(Block):
       
       
       
-      @Block.slot("source", {str}, required=True)
+      @Block.slot("source", {str})
       def slot_source(self, slot, fuente):
       
           #TODO normalizar las imágenes, no podemos manejar tantos 'mode'
@@ -121,6 +121,6 @@ class ImageSource(Block):
                     self.signal_image(self._resize(imagen, self.width, self.height));
 
           finally:
-            self.reset("source");
+            del self.tokens["source"];
             if istemp:
                os.remove(fuente);

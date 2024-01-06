@@ -1,5 +1,3 @@
-import sys, traceback;
-
 import random;
 import string;
 import threading;
@@ -16,20 +14,172 @@ from .slots      import Slots
 
 from ..tools     import debug;
 
-#TODO considerar hacer una clase Params para manejar los parámetros (incluso con pop, push).
+#===============================================================================      
+class Parameters:
       
-#TODO considerar hacer una clase Values para manejar los valores de los slots.
+      def __init__(self, block, args):
+          super().__setattr__('_block', block );
+          super().__setattr__('_data',  dict());                
+          data=self.__dict__.get('_data',None);
+          for key in args:
+              data[key]=args[key];
+          
+      def __setitem__(self, key, value):
+          data=self.__dict__.get('_data',None);
+          if value is not None: data[key]=value;
+          else:                 self.__delitem__(key);
 
-#TODO considerar que Block no herede de ABC, ya no lo necesita.
+      def __getitem__(self, key):
+          data=self.__dict__.get('_data',None);
+          return data[key];
+
+      def __delitem__(self, key):
+          data=self.__dict__.get('_data',None);
+          if key in data: del data[key];
+          
+      def __iter__(self):
+          data=self.__dict__.get('_data',None);
+          return iter(data);
+
+      def __len__(self):
+          data=self.__dict__.get('_data',None);
+          return len(data);
+
+      def __contains__(self, key):
+          data=self.__dict__.get('_data',None);
+          return (key in data) and (data[key] is not None);
+          
+      def __getattr__(self, key):
+          data=self.__dict__.get('_data',None);
+          if key=="keys":   return data.keys;
+          if key=="items":  return data.items;
+          if key=="values": return data.values;
+          if key=="update": return data.update;
+          if key=="pop":    return data.pop;
+          if key=="clear":  return data.clear;
+          return data.get(key,None);
+
+      def __setattr__(self, key, value):
+          data=self.__dict__.get('_data',None);
+          if value is not None: data[key]=value;
+          else:                 del data[key];
+
+      def get(self, key, default=None):
+          data=self.__dict__.get('_data',None);
+          return data.get(key,default);
+          
+      def exists(self, key, types=None):
+          data=self.__dict__.get('_data',None);
+          return (key in data) and (types is None or any([isinstance(data[key],tp) for tp in types]));
       
+#===============================================================================
+class Tokens:
+      
+      #-------------------------------------------------------------------------
+      class Wrapper:
+            def __init__(self, adict):
+                super().__setattr__('_dict', adict);
+                
+            def __setitem__(self, key, value):
+                data=self.__dict__.get('_dict',None);
+                return data.__setitem__(key,value);
+      
+            def __getitem__(self, key):
+                data=self.__dict__.get('_dict',None);
+                return data.__getitem__(key);
+      
+            def __delitem__(self, key):
+                data=self.__dict__.get('_dict',None);
+                return data.__delitem__(key);
+      
+            def __iter__(self):
+                data=self.__dict__.get('_dict',None);
+                return data.__iter__();
+      
+            def __len__(self):
+                data=self.__dict__.get('_dict',None);
+                return data.__len__();
+      
+            def __contains__(self, key):
+                data=self.__dict__.get('_dict',None);
+                return data.__contains__(key);
+
+            def __getattr__(self, key):
+                data=self.__dict__.get('_dict',None);
+                if key=="keys":   return data.keys;
+                if key=="items":  return data.items;
+                if key=="values": return data.values;
+                if key=="update": return data.update;
+                if key=="pop":    return data.pop;
+                if key=="clear":  return data.clear;
+                return data.get(key,None);
+
+            def __setattr__(self, key, value):
+                data=self.__dict__.get('_dict',None);
+                if value is not None: data[key]=value;
+                else:
+                   if key=="data": data.__setitem__(key,None);
+                   else:           data.__delitem__(key     );
+
+            def get(self, key, default=None):
+                data=self.__dict__.get('_dict',None);
+                return data.get(key,default);
+      
+      #-------------------------------------------------------------------------
+      def __init__(self, block):
+          self._block=block ;
+          self._data =dict();
+          for sname in self._block.slots:
+              self._data[sname]={"data":None};
+          
+      #-------------------------------------------------------------------------
+      def __setitem__(self, sname, token):
+          assert sname in self._block.slots, f"{self._block._fullClassName}:: no existe el slot '{sname}'";
+          assert type(token) is dict, f"{self._block._fullClassName}:: los tokens debe ser diccionarios";
+          assert "data" in token, f"{self._block._fullClassName}:: cada token debe tener al menos una clave 'data'";
+          self._data[sname]=token;
+
+      #-------------------------------------------------------------------------
+      def __getitem__(self, sname):
+          assert sname in self._block.slots, f"{self._block._fullClassName}:: no existe el slot '{sname}'";
+          return Tokens.Wrapper(self._data[sname]);
+
+      #-------------------------------------------------------------------------
+      def __delitem__(self, sname):
+          assert sname in self._block.slots, f"{self._block._fullClassName}:: no existe el slot '{sname}'";
+          self._data[sname]={"data":None};
+          
+      #-------------------------------------------------------------------------
+      def __iter__(self):
+          return iter(self._data);
+
+      #-------------------------------------------------------------------------
+      def __len__(self):
+          return len(self._data);
+
+      #-------------------------------------------------------------------------
+      def __contains__(self, sname):
+          return (sname in self._data);
+          
+      #-------------------------------------------------------------------------
+      def reset(self, sname=None):
+          if sname is None:
+             for key in self._data:
+                 self._data.__setitem__(key,{"data":None});
+          else:
+             self._data.__setitem__(sname,{"data":None});
+          
+#===============================================================================      
 class Block(ABC):
       """
       La clase Block, ancestro de todos los bloques y núcleo fundamental del sistema, junto con la clase Context.
       """
       
       _boringTimeToFinish=0;
-      """ Si el thread de un objeto de esta clase lleva '_boringTimeToFinish' segundos sin recibir mensajes, finaliza el thread.
-          Si es cero, esta funcionalidad se deshabilita. """
+      """
+      Si el thread de un objeto de esta clase lleva '_boringTimeToFinish' segundos sin recibir mensajes, finaliza el thread.
+      Si es cero, esta funcionalidad se deshabilita.
+      """
 
       _signals={};
       _slots  ={};
@@ -42,31 +192,33 @@ class Block(ABC):
 
       #-------------------------------------------------------------------------
       def __init__(self, **kwargs):
-          self._params       ={};
-          self._values       ={};
-          self._counter      ={};
+          self._fullClassName=Block._classNameFrom(self.__init__);
+          self._params       =Parameters(block=self, args=kwargs);
+          self._tokens       =Tokens(block=self);
           self._queue        =queue.PriorityQueue();
           self._loopFinish   =True;
           self._loopThread   =None;
           self._lastEventTime=time.time();
-          self._fullClassName=Block._classNameFrom(self.__init__);
           self._id="ID"+''.join(random.choice(string.ascii_letters + string.digits) for _ in range(16));
 
-          for key in kwargs:
-              self._params[key]=kwargs[key];
-
-          for sname in self.slots:
-              self._values [sname]=None;
-              self._counter[sname]=0;
+          if self._fullClassName not in Block._signals: Block._signals[self._fullClassName]=Signals();
+          if self._fullClassName not in Block._slots:   Block._slots  [self._fullClassName]=Slots  ();
 
       #-------------------------------------------------------------------------
-      def _param(self, key, default=None):
-          return self._params.get(key, default);
+      def __hash__(self):
+          return hash(self._id);
 
       #-------------------------------------------------------------------------
-      def _value(self, key, default=None):
-          return self._values.get(key, default);
+      @property
+      def params(self):
+          return self._params;
+
+      #-------------------------------------------------------------------------
+      @property
+      def tokens(self):
+          return self._tokens;
           
+      """    
       #-------------------------------------------------------------------------
       def getValue(self, key):
           rt=self._values.get(key);
@@ -80,30 +232,38 @@ class Block(ABC):
       #-------------------------------------------------------------------------
       def rightValue(self, key):
           return self.getValue(key) is not None;
-
+      """
+      
       #-------------------------------------------------------------------------
       @property
       def signals(self):
-          return Block._signals.get(self._fullClassName,dict());
+          return Block._signals[self._fullClassName];
 
       #-------------------------------------------------------------------------
       @property
       def slots(self):
-          return Block._slots.get(self._fullClassName,dict());
+          return Block._slots[self._fullClassName];
 
       #-------------------------------------------------------------------------
       @staticmethod
-      def slot(name, typedecl, required, default=None):
+      def slot(name, typedecl, default=None):
           def decorador(func):
               cls=Block._classNameFrom(func);
               if cls not in Block._slots:   Block._slots  [cls]=Slots  ();
               if cls not in Block._signals: Block._signals[cls]=Signals();
-              Block._slots[cls][name]={ "type":SlotType(typedecl), "required":required, "default":default };
+              Block._slots[cls][name]={ "type":SlotType(typedecl), "required":0, "default":default };
               Block._slots[cls][name]["name"]=name;
               Block._slots[cls][name]["stub"]=func;
-              def wrapper(self, _slot):
-                  data = self._value(name,Block._slots[cls][name]["default"]);
-                  func(self, _slot, data);
+              def wrapper(self, _slot, data):
+                  try:
+                    assert name == _slot;
+                    debug.print(f"Ejecutando {self._fullClassName}::slot('{_slot}',{type(data).__name__})", flush=True);
+                    func(self, _slot, data);
+                  except Exception as e:
+                    debug.print(f"{cls}:: Excepción: '{e}'", exception=e);
+                  finally:
+                    pass;  
+              Block._slots[cls][name]["stub"]=wrapper;
               return wrapper;
           return decorador;
 
@@ -116,12 +276,12 @@ class Block(ABC):
               if cls not in Block._signals: Block._signals[cls]=Signals();
               Block._signals[cls][name]=SignalType(typedecl);
               def wrapper(self, data=None):
+                  using=self.checkSignalUsage(name);
                   if data is None:
-                     return self.checkSignalUsage(name);
+                     return using;
                   else:
-                     if self.checkSignalUsage(name):
+                     if using:
                         data=func(self,data);
-                        #if data is not None:
                         Context.instance.emit(source=self, sname=name, data=data);
               return wrapper;
           return decorador;
@@ -143,16 +303,10 @@ class Block(ABC):
       #-------------------------------------------------------------------------
       def reset(self, *args):
           if len(args)==0:
-             self._values={};
+             self.tokens.reset();
           else:
              for k in args:
-                 if k in self._values:
-                    self._values [k]=None;
-                    self._counter[k]=0;
-
-      #-------------------------------------------------------------------------
-      def __hash__(self):
-          return hash(self._id);
+                 self.tokens.reset(k);
 
       #-------------------------------------------------------------------------
       def __getitem__(self, decl):
@@ -176,30 +330,37 @@ class Block(ABC):
                  v=True;
               return {k:v};
       
-          if isinstance(decl,(slice)):          
-             start=decl.start;
-             stop =decl.stop;
-             step =decl.step;
+          if isinstance(decl,(slice)):
+             start=decl.start; # nombre de signal/slot
+             stop =decl.stop;  # modificadores
+             step =decl.step;  # no usado, por ahora ...
              
              assert isinstance(start,(str)) and bool(start);
-             assert isinstance(stop,(str,tuple,list,type(None)));
-             assert isinstance(step,(int,float,type(None)));
+             assert isinstance(stop,(str,tuple,list,dict,type(None)));
+             #assert isinstance(step,(int,float,type(None)));
              
              sname=start;
              
              mods={};
              
              if stop: # modificadores del signal/slot
+             
                 if   type(stop) is str:
                      v=split_mods(stop);
                      mods.update(v);
+                     
                 elif isinstance(stop,(tuple,list)):
                      for m in stop:
                          assert type(m) is str;
                          v=split_mods(m);
                          mods.update(v);
+                         
+                elif isinstance(stop,dict):
+                     mods.update(stop);
              
-             if step: # milisegundos para volver a intentar un evento
+             """
+             # no usado por ahora
+             if step: # ...
                 if type(step) is int:
                    if step <0:    step=0   /1000;
                    if step >1000: step=1000/1000;
@@ -207,8 +368,9 @@ class Block(ABC):
                    if step <0.0:  step=0.0;
                    if step >1.0:  step=1.0;
                 mods.update({"step time to recall":step});
+             """   
                              
-          else:
+          else:             
              sname=decl;
              mods=None;
           
@@ -217,32 +379,36 @@ class Block(ABC):
           return Context.Linker(self, sname, mods);
 
       #-------------------------------------------------------------------------
-      def terminate(self, clear_all=True):
+      def terminate(self):
           if self._loopThread and self._loopThread.is_alive():
              self._loopFinish=True;
              self._loopThread.join();
              self._loopThread=None;
              
+          while not self._queue.empty(): self._queue.get();
+          
           self._loopFinish=True;
           self._loopThread=None;
           
-          if clear_all:
-             self._values ={};
-             while not self._queue.empty(): self._queue.get();
-          
+          self.reset();
+                    
       #-------------------------------------------------------------------------
       def boredTime(self):
+          """
+          Tiempo, en segundos, transcurrido desde el último evento recibido.
+          """
           return (time.time()-self._lastEventTime);
           
       #-------------------------------------------------------------------------
       def running(self):
-          return not (self._loopThread is None or not self._loopThread.is_alive());
+          return (self._loopThread is not None and self._loopThread.is_alive());
           
       #-------------------------------------------------------------------------
       def run(self):
       
           def _loop():
           
+              # si esta clase no tiene slots, no tiene sentido entrar en el bucle.
               cls=self._fullClassName;
               if cls not in Block._slots:
                  self._loopFinish=True;
@@ -253,33 +419,27 @@ class Block(ABC):
               self._lastEventTime=time.time();
               while not self._loopFinish:
                     try:
-                      tm, sname, data, times, mods = self._queue.get(block=True, timeout=1);
+                      tm, sname, token, mods = self._queue.get(block=True, timeout=1);
                       
-                      debug.print(f"{cls}:: nuevo evento '{sname},{type(data)}' con mods={mods}, y times={times}", flush=True);
+                      self.tokens[sname]=token;
+                      
+                      debug.print(f"{cls}:: nuevo evento '{sname}' con data={type(self.tokens[sname].data)}, con mods={mods}");
                       
                       if sname in self.slots:
                       
                          slot=self.slots[sname];
                          
-                         data=data if data is not None else slot["default"];
-
-                         try:
+                         data=self.tokens[sname].data or slot["default"];
+                         
+                         try: 
                            func=slot["stub"];
-                           if data:
-                              func(self,sname,data);
-                              
-                         except Exception as e:
-                           debug.print(f"{cls}:: excepción en el slot '{sname}': {str(e)}");
-                           traceback.print_exc(file=sys.stdout);
+                           func(self,sname,data);
                            
                          finally:
-                           self._counter[sname] += 1;
-                           
                            mod_keep =mods.get("keep" ) if mods is not None else False;
-                           mod_clean=mods.get("clean") if mods is not None else False;
-                           
-                           if bool(mod_clean): self._values[sname]=None;
-                           if bool(mod_keep ): self._values[sname]=data;
+                           mod_clean=mods.get("clean") if mods is not None else False;                           
+                           if bool(mod_clean): del self.tokens[sname];
+                           if bool(mod_keep ): self.tokens[sname]=token;
                            
                       else:
                          raise RuntimeError(f"{cls}:: '{sname}' no existe como slot");
@@ -290,8 +450,7 @@ class Block(ABC):
                          break;
                     
                     except Exception as e:
-                      debug.print(f"{cls}:: se ha producido una excepción: {str(e)}");
-                      traceback.print_exc(file=sys.stdout);
+                      debug.print(f"{cls}:: se ha producido una excepción: {str(e)}", exception=e);
                       
               while not self._queue.empty(): self._queue.get();
               debug.print(f"{cls}:: THREAD finalizado");
@@ -301,6 +460,11 @@ class Block(ABC):
           if self._loopThread is None or not self._loopThread.is_alive():
              self._loopThread=threading.Thread(target=_loop);
              self._loopThread.start();
-          else:   
+          else:
              self._lastEventTime=time.time();
-          
+
+if __name__=="__main__":
+   
+   params=Parameters(block=None, args={"1":1, "2":2, "3":3});
+   
+   
