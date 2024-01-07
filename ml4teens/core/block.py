@@ -404,6 +404,35 @@ class Block(ABC):
           return (self._loopThread is not None and self._loopThread.is_alive());
           
       #-------------------------------------------------------------------------
+      def run_sync(self, tm, sname, token, mods):
+      
+          cls=self._fullClassName;
+          
+          self.tokens[sname]=token;
+          
+          debug.print(f"{cls}:: nuevo evento '{sname}' con data={type(self.tokens[sname].data)}, con mods={mods}");
+          
+          if sname in self.slots:
+          
+             slot=self.slots[sname];
+             
+             data=self.tokens[sname].data or slot["default"];
+             
+             try: 
+               func=slot["stub"];
+               func(self,sname,data);
+               
+             finally:
+               mod_keep =mods.get("keep" ) if mods is not None else False;
+               mod_clean=mods.get("clean") if mods is not None else False;                           
+               if bool(mod_clean): del self.tokens[sname];
+               if bool(mod_keep ): self.tokens[sname]=token;
+               
+          else:
+             raise RuntimeError(f"{cls}:: '{sname}' no existe como slot");
+                    
+          
+      #-------------------------------------------------------------------------
       def run(self):
       
           def _loop():
@@ -421,29 +450,8 @@ class Block(ABC):
                     try:
                       tm, sname, token, mods = self._queue.get(block=True, timeout=1);
                       
-                      self.tokens[sname]=token;
+                      self.run_sync(tm, sname, token, mods);
                       
-                      debug.print(f"{cls}:: nuevo evento '{sname}' con data={type(self.tokens[sname].data)}, con mods={mods}");
-                      
-                      if sname in self.slots:
-                      
-                         slot=self.slots[sname];
-                         
-                         data=self.tokens[sname].data or slot["default"];
-                         
-                         try: 
-                           func=slot["stub"];
-                           func(self,sname,data);
-                           
-                         finally:
-                           mod_keep =mods.get("keep" ) if mods is not None else False;
-                           mod_clean=mods.get("clean") if mods is not None else False;                           
-                           if bool(mod_clean): del self.tokens[sname];
-                           if bool(mod_keep ): self.tokens[sname]=token;
-                           
-                      else:
-                         raise RuntimeError(f"{cls}:: '{sname}' no existe como slot");
-                    
                     except queue.Empty:
                       debug.print(f"{cls}:: Llevo aburriéndome {int(self.boredTime())} segundos");
                       if Block._boringTimeToFinish>0 and self.boredTime()>Block._boringTimeToFinish and self._queue.empty():

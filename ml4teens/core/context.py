@@ -188,9 +188,17 @@ class Context:
            debug.print(f"Ha llegado un evento al slot '{sname}' de {target._fullClassName}::{type(data)}, con mods '{mods}'");
            if sname in target.slots:
               slot=target.slots[sname];
-              if not target.running(): target.run();
               debug.print(f"{target._fullClassName}:: invocando el slot '{sname}' con data={type(data)} y mods='{mods}'");
-              target._queue.put( (time.time(), sname, self.newToken(data), mods) );
+              
+              if mods and mods.get("sync",False):
+                 #if mods: mods["sync"]=None;
+                 target.run_sync(time.time(), sname, self.newToken(data), mods);
+                 
+              else:              
+                 #if mods: mods["sync"]=None;
+                 target._queue.put( (time.time(), sname, self.newToken(data), mods) );
+                 if not target.running(): target.run();
+              
            else:
               raise RuntimeError(f"No existe el slot '{sname}' en {target._fullClassName}");
            
