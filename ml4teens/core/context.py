@@ -156,7 +156,7 @@ class Context:
                   if s==slot: return True;
            return False;
         else:
-           return bool(self.listeners[signal]);
+           return signal in self.listeners and self.listeners[signal];
            
     #-----------------------------------------------------------------------------------------
     def newToken(self, data, **kwargs):
@@ -180,11 +180,7 @@ class Context:
         :param mods:   Los modificadores, si se trata de el envío de un señal a un slot.
         :type  mods:   dict | None.
         """        
-        assert (("source" in kwargs) and ("target" not in kwargs)) # source envía un evento a sus subscriptores
-               or 
-               (("source" not in kwargs) and ("target" in kwargs)) # usuario envía un evento a target
-               or
-               (("source" in kwargs) and ("target" in kwargs));    # source envía un evento a target
+        assert (("source" in kwargs) and ("target" not in kwargs)) or (("source" not in kwargs) and ("target" in kwargs))  or (("source" in kwargs) and ("target" in kwargs));
                
         assert ("sname" in kwargs) or ("signal_name" in kwargs) or ("slot_name" in kwargs);
         
@@ -283,11 +279,13 @@ class Context:
           def __rshift__(self, rlinker):
               assert (self._sname in self._block.signals) and (rlinker._sname in rlinker._block.slots);
               assert self._block.signals[self._sname]["type"] == rlinker._block.slots[rlinker._sname]["type"], f"Tipo incompatibles {self._block.signals[self._sname]['type']} != {rlinker._block.slots[rlinker._sname]['type']}";
+              debug.print(f"Sunscripción: {self._block}:'{self._sname}' >> {rlinker._block}:'{rlinker._sname}'");
               Context.instance.subscribe((self._block,self._sname), (rlinker._block,rlinker._sname), (self._mods|rlinker._mods));
               return rlinker._block;
 
           def __lshift__(self, rlinker):
               assert (self._sname in self._block.slots) and (rlinker._sname in rlinker._block.signals);
               assert self._block.slots[self._sname]["type"] == rlinker._block.signals[rlinker._sname]["type"], f"Tipo incompatibles {self._block.slots[self._sname]['type']} != {rlinker._block.signals[rlinker._sname]['type']}";
+              debug.print(f"Sunscripción: {rlinker._block}:'{rlinker._sname}' >> {self._block}:'{self._sname}'");
               Context.instance.subscribe((rlinker._block,rlinker._sname), (self._block,self._sname), (rlinker._mods|self._mods));
               return self._block;

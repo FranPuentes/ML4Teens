@@ -430,7 +430,7 @@ class Block(ABC):
                  self._loopFinish=True;
                  return;
                  
-              print(f"Iniciando un THREAD ({cls})");
+              debug.print(f"Iniciando un THREAD ({cls})");
               self._loopFinish=False;
               self._lastEventTime=time.time();
               while not self._loopFinish:
