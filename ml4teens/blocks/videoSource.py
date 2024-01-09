@@ -41,6 +41,16 @@ class VideoSource(Block):
           return data;
 
       #-------------------------------------------------------------------------
+      @Block.signal("begin", dict)
+      def signal_begin(self, data):
+          return data;
+
+      #-------------------------------------------------------------------------
+      @Block.signal("end", dict)
+      def signal_end(self, data):
+          return data;
+          
+      #-------------------------------------------------------------------------
       @Block.slot("source", {str})
       def slot_source(self, slot, fuente):
 
@@ -87,6 +97,8 @@ class VideoSource(Block):
                    else:                   shape=(alto,ancho,1);
                    self.signal_dims(shape);
 
+                   self.signal_begin(frames);
+                   
                    while ok:
                          timestamp=time.time();
 
@@ -108,6 +120,13 @@ class VideoSource(Block):
                          max_diff=max(max_diff, diff);
                          if diff>=delay: pass;
                          else:           time.sleep((delay-diff)/1000);
+                         
+                   self.signal_end(True);
+                   
+          except Exception as e:
+            self.signal_end(False);
+            raise e;
+            
           finally:
             fd.release();
             if istemp: os.remove(fuente);

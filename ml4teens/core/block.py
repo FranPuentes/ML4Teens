@@ -198,6 +198,7 @@ class Block(ABC):
           self._queue        =queue.PriorityQueue();
           self._loopFinish   =True;
           self._loopThread   =None;
+          self._transitMods  ={};
           self._lastEventTime=time.time();
           self._id="ID"+''.join(random.choice(string.ascii_letters + string.digits) for _ in range(16));
 
@@ -218,22 +219,6 @@ class Block(ABC):
       def tokens(self):
           return self._tokens;
           
-      """    
-      #-------------------------------------------------------------------------
-      def getValue(self, key):
-          rt=self._values.get(key);
-          if rt is None: rt=self.slots[key]["default"];
-          return rt;
-          
-      #-------------------------------------------------------------------------
-      def setValue(self, key, value):
-          self._values[key]=value;
-      
-      #-------------------------------------------------------------------------
-      def rightValue(self, key):
-          return self.getValue(key) is not None;
-      """
-      
       #-------------------------------------------------------------------------
       @property
       def signals(self):
@@ -257,7 +242,7 @@ class Block(ABC):
               def wrapper(self, _slot, data):
                   try:
                     assert name == _slot;
-                    debug.print(f"Ejecutando {self._fullClassName}::slot('{_slot}',{type(data).__name__})", flush=True);
+                    debug.print(f"Ejecutando {self._fullClassName}::slot('{_slot}',{type(data).__name__}) con mods='{self._transitMods}'", flush=True);
                     func(self, _slot, data);
                   except Exception as e:
                     debug.print(f"{cls}:: Excepción: '{e}'", exception=e);
@@ -282,7 +267,7 @@ class Block(ABC):
                   else:
                      if using:
                         data=func(self,data);
-                        Context.instance.emit(source=self, sname=name, data=data);
+                        Context.instance.emit(source=self, sname=name, data=data, mods=self._transitMods);
               return wrapper;
           return decorador;
 
@@ -389,7 +374,7 @@ class Block(ABC):
           
           self._loopFinish=True;
           self._loopThread=None;
-          
+        
           self.reset();
                     
       #-------------------------------------------------------------------------
@@ -404,7 +389,7 @@ class Block(ABC):
           return (self._loopThread is not None and self._loopThread.is_alive());
           
       #-------------------------------------------------------------------------
-      def run_sync(self, tm, sname, token, mods):
+      def run_sync(self, tm, sname, token, mods:dict):
       
           cls=self._fullClassName;
           
@@ -418,7 +403,8 @@ class Block(ABC):
              
              data=self.tokens[sname].data or slot["default"];
              
-             try: 
+             try:
+               self._transitMods=mods;
                func=slot["stub"];
                func(self,sname,data);
                
@@ -427,6 +413,7 @@ class Block(ABC):
                mod_clean=mods.get("clean") if mods is not None else False;                           
                if bool(mod_clean): del self.tokens[sname];
                if bool(mod_keep ): self.tokens[sname]=token;
+               self._transitMods={};
                
           else:
              raise RuntimeError(f"{cls}:: '{sname}' no existe como slot");
@@ -443,7 +430,7 @@ class Block(ABC):
                  self._loopFinish=True;
                  return;
                  
-              debug.print(f"Iniciando un THREAD ({cls})");
+              print(f"Iniciando un THREAD ({cls})");
               self._loopFinish=False;
               self._lastEventTime=time.time();
               while not self._loopFinish:

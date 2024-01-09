@@ -44,14 +44,14 @@ class Context:
         if not cls._instance:
            cls._instance = super(Context, cls).__new__(cls);
            cls._instance.listeners={};
+           cls._sync=False;
            #cls.__html__();
         return cls._instance;
 
     #-----------------------------------------------------------------------------------------
     def __init__(self):
         """
-        Este es un constructor falso, no hace nada. 
-        
+        Este es un constructor falso, no hace nada.         
         La inicialización del **único** objeto de esta clase se hace en *__new__*.
         """
         pass;
@@ -61,6 +61,17 @@ class Context:
     @property
     def instance(cls):
         return Context() if Context._instance==None else Context._instance;
+        
+    #-----------------------------------------------------------------------------------------
+    @property
+    def sync(self):
+        context = Context._instance;
+        return context._sync;
+        
+    @sync.setter    
+    def sync(self, value):
+        context = Context._instance;
+        context._sync=bool(value);
         
     #-----------------------------------------------------------------------------------------
     #@classmethod
@@ -83,14 +94,14 @@ class Context:
         return list(blocks);
     
     #-----------------------------------------------------------------------------------------
-    def reset(self):        
+    def reset(self):
         for block in self.blocks():
             block.terminate();
         self.listeners={};
         return self;
 
     #-----------------------------------------------------------------------------------------
-    def subscribe(self, signal, slot, mods=None):
+    def subscribe(self, signal, slot, mods={}):
         """
         Registra la pareja (*signal*, *slot*) en este contexto.
         
@@ -100,12 +111,13 @@ class Context:
         :type  signal:   tupla (*block*, *signal name*)
         :param slot:     El *slot*.
         :type  slot:     Tupla (*block*, *slot name*)
-        :param mods:     Modificadores de la instancia *signal*/*slot*.
-        :type  mods:     Cualquier cosa.
+        :param mods:     Modificadores de *signal*/*slot*.
+        :type  mods:     dict
         """
         assert signal is not None and type(signal) is tuple and len(signal)==2;
         assert slot   is not None and type(slot  ) is tuple and len(slot  )==2;
-        if signal not in self.listeners: self.listeners[signal] = [];
+        assert type(mods) is dict;
+        if not signal in self.listeners: self.listeners[signal]=[];
         self.listeners[signal]=[(s,m) for s,m in self.listeners[signal] if s!=slot];
         self.listeners[signal].append((slot,mods));
 
@@ -138,11 +150,10 @@ class Context:
         :return:       Si *slot* no es None, devuelve si la pareja (*signal*,*slot*) está registrada. Si *slot* es None, devuelve si *signal* tiene *slot*s escuchando.
         :rtype:        True/False
         """
-        if signal not in self.listeners: return False;
-        
         if slot is not None:
-           for s,m in self.listeners[signal]:
-               if s==slot: return True;
+           if signal in self.listeners:        
+              for s,m in self.listeners[signal]:
+                  if s==slot: return True;
            return False;
         else:
            return bool(self.listeners[signal]);
@@ -169,52 +180,81 @@ class Context:
         :param mods:   Los modificadores, si se trata de el envío de un señal a un slot.
         :type  mods:   dict | None.
         """        
-        def combine_mods(a, b):
-            assert isinstance(a,(type(None),dict)), ValueError(f"Context:emit:: Los 'mods' deben ser dict o None: {a}");
-            assert isinstance(b,(type(None),dict)), ValueError(f"Context:emit:: Los 'mods' deben ser dict o None: {b}");
-            if a is None: return b;
-            if b is None: return a;
-            return (a|b);
-        
-        assert (("source" in kwargs) and ("target" not in kwargs)) or (("source" not in kwargs) and ("target" in kwargs));
+        assert (("source" in kwargs) and ("target" not in kwargs)) # source envía un evento a sus subscriptores
+               or 
+               (("source" not in kwargs) and ("target" in kwargs)) # usuario envía un evento a target
+               or
+               (("source" in kwargs) and ("target" in kwargs));    # source envía un evento a target
+               
         assert ("sname" in kwargs) or ("signal_name" in kwargs) or ("slot_name" in kwargs);
+        
         assert ("data"  in kwargs) or ("value" in kwargs);
         
-        if "target" in kwargs:
+        if ("target" in kwargs) and ("source" not in kwargs):
+           # señal enviada desde el espacio del usuario
+           # ha de ejecutarse el slot (sname) correspondiente
            target=kwargs["target"];
            sname=kwargs.get("sname") or kwargs.get("slot_name");
            data =kwargs.get("data" ) or kwargs.get("value"    );
-           mods =kwargs.get("mods" );
-           debug.print(f"Ha llegado un evento al slot '{sname}' de {target._fullClassName}::{type(data)}, con mods '{mods}'");
+           mods =kwargs.get("mods" ) or {};
+           assert type(mods) is dict;
+           debug.print(f"Ha llegado un evento del usuario al slot '{sname}' de {target._fullClassName}::{type(data)}, con mods '{mods}'");
            if sname in target.slots:
               slot=target.slots[sname];
-              debug.print(f"{target._fullClassName}:: invocando el slot '{sname}' con data={type(data)} y mods='{mods}'");
               
-              if mods and mods.get("sync",False):
-                 #if mods: mods["sync"]=None;
+              if (self._sync or mods.get("sync",False)) and not mods.get("no sync",False):              
+                 debug.print(f"Ejecutando el slot '{sname}' de {target._fullClassName}, con data={type(data)} y mods='{mods}'");
                  target.run_sync(time.time(), sname, self.newToken(data), mods);
                  
               else:              
-                 #if mods: mods["sync"]=None;
+                 debug.print(f"Mandando a {target._fullClassName} una señal al slot '{sname}' con data={type(data)} y mods='{mods}'");
                  target._queue.put( (time.time(), sname, self.newToken(data), mods) );
                  if not target.running(): target.run();
               
            else:
               raise RuntimeError(f"No existe el slot '{sname}' en {target._fullClassName}");
            
-        else:
+        elif ("source" in kwargs) and ("target" in kwargs):
+           # señal enviada por un bloque (source) a otro concreto (target)
+           # ha de ejecutarse el slot (sname) correspondiente
            source=kwargs["source"];
-           sname=kwargs.get("sname") or kwargs.get("signal_name");
-           data =kwargs.get("data" ) or kwargs.get("value"      );
-           mods =kwargs.get("mods" );
-           debug.print(f"{source._fullClassName}:: enviando la señal '{sname}', con data={type(data)}, a todos sus listeners");
+           target=kwargs["target"];
+           sname=kwargs.get("sname") or kwargs.get("slot_name");
+           data =kwargs.get("data" ) or kwargs.get("value"    );
+           mods =kwargs.get("mods" ) or {};
+           assert type(mods) is dict;
+           debug.print(f"Ha llegado un evento al slot '{sname}' de {target._fullClassName}::{type(data)}, con mods '{mods}'");
+           if sname in target.slots:
+              slot=target.slots[sname];              
+              
+              if (self._sync or mods.get("sync",False)) and not mods.get("no sync",False):
+                 debug.print(f"Ejecutando el slot '{sname}' de {target._fullClassName}, con data={type(data)} y mods='{mods}'");
+                 target.run_sync(time.time(), sname, self.newToken(data), mods);
+                 
+              else:              
+                 debug.print(f"Mandando a {target._fullClassName} una señal al slot '{sname}' con data={type(data)} y mods='{mods}'");
+                 target._queue.put( (time.time(), sname, self.newToken(data), mods) );
+                 if not target.running(): target.run();
+              
+           else:
+              raise RuntimeError(f"No existe el slot '{sname}' en {target._fullClassName}");
+           
+        elif ("source" in kwargs) and ("target" not in kwargs):
+           # señal generada en un bloque (source)
+           # ha de enviarse a todos sus subscriptores
+           source=kwargs["source"];
+           sname =kwargs.get("sname") or kwargs.get("signal_name");
+           data  =kwargs.get("data" ) or kwargs.get("value"      );
+           mods  =kwargs.get("mods" ) or {};
+           assert type(mods) is dict;
+           debug.print(f"{source._fullClassName}:: enviando la señal '{sname}', con data={type(data)}, a todos sus subscriptores");
            signal=(source, sname);
            if signal in self.listeners:
-              for slot, slot_mods in self.listeners[signal]:
+              for slot, _mods in self.listeners[signal]:
                   target, slot_name = slot;
-                  mods=combine_mods(slot_mods, mods);
-                  debug.print(f"Enviando la señal '{slot_name}', con data={type(data)}, a {target._fullClassName} y mods='{mods}'");                  
-                  self.emit(target=target, sname=slot_name, data=data, mods=mods);
+                  mods.update(_mods);
+                  debug.print(f"Enviando la señal '{slot_name}', con data={type(data)}, a {target._fullClassName}'");
+                  self.emit(source=source, target=target, sname=slot_name, data=data, mods=mods);
            else:
               raise RuntimeError(f"No existe la señal '{sname}' en {source._fullClassName}");
                
@@ -233,21 +273,21 @@ class Context:
 
           def __init__(self, block, sname, mods=None):
               from .block import Block;
-              assert isinstance(block, Block) and type(sname) is str;
+              assert isinstance(block, Block);
+              assert sname and type(sname) is str;
+              assert mods is None or isinstance(mods, dict);
               self._block=block;
               self._sname=sname;
-              self._mods = {} if mods is None else dict(mods);
+              self._mods=mods or {};
 
           def __rshift__(self, rlinker):
               assert (self._sname in self._block.signals) and (rlinker._sname in rlinker._block.slots);
               assert self._block.signals[self._sname]["type"] == rlinker._block.slots[rlinker._sname]["type"], f"Tipo incompatibles {self._block.signals[self._sname]['type']} != {rlinker._block.slots[rlinker._sname]['type']}";
-              mods=self._mods | rlinker._mods;
-              Context.instance.subscribe((self._block,self._sname), (rlinker._block,rlinker._sname), mods);
+              Context.instance.subscribe((self._block,self._sname), (rlinker._block,rlinker._sname), (self._mods|rlinker._mods));
               return rlinker._block;
 
           def __lshift__(self, rlinker):
               assert (self._sname in self._block.slots) and (rlinker._sname in rlinker._block.signals);
               assert self._block.slots[self._sname]["type"] == rlinker._block.signals[rlinker._sname]["type"], f"Tipo incompatibles {self._block.slots[self._sname]['type']} != {rlinker._block.signals[rlinker._sname]['type']}";
-              mods=self._mods | rlinker._mods;
-              Context.instance.subscribe((rlinker._block,rlinker._sname), (self._block,self._sname), mods);
+              Context.instance.subscribe((rlinker._block,rlinker._sname), (self._block,self._sname), (rlinker._mods|self._mods));
               return self._block;
