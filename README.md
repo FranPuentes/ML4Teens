@@ -14,7 +14,13 @@ Un objeto (*singleton*) se encarga de emparejar los signals con slots (con contr
 >Actualmente la rama publicada en Pypi (pip) es **main**, pero la buena es **develop**.
 >Cuando sea estable, **main** será la publicada.
 
-El código que sigue, muestra un ejemplo de lo que puede hacer el paquete.
+>[!NOTE]
+>En breve crearé la rama 'stable' desde 'develop'.
+
+>[!CAUTION]
+>El submódulo core todavía **no está en estado *estable* **, por lo que puede sufrir cambios en un futuro. Igualmente el submódulo *blocks*.
+
+El código que sigue, muestra un ejemplo de lo que puede hacer el paquete (en 'develop').
 
 ```python
 import ml4teens as ml;
@@ -39,7 +45,7 @@ context.wait();
 Por otro lado, hacer un bloque es sencillo, uno básico que -por ejemplo- se queda con un canal de una imagen:
 
 ```python
-mport cv2 as cv;
+import cv2 as cv;
 
 from PIL.Image import Image;
 from PIL.Image import fromarray;
@@ -61,7 +67,6 @@ class SingleChannel(Block):
       #-------------------------------------------------------------------------
       @Block.slot("image", {Image})
       def slot_image(self, slot, data):
-          assert type(data) is Image;
           c=len(data.getbands());
           n=self._channel;
           assert n in range(0,c), f"El canal {n} no puede ser extraído de una imagen de {c} canales (recuerda: empieza a contar en 0)";
@@ -85,14 +90,5 @@ Observar:
 * La señal (*signal*) se define igualmente mediante un decorador (@Block.signal).
 * El slot, una vez hecha la conversión, pasa la imagen a la señal, invocando al método *signal_image*.
 * Los métodos decorados por @Block.signal no tienen que hacer nada, salvo devolver el dato que -finalmente- se ha de enviar.
-
->[!NOTE]
->El resultado es todavía muy primitivo, pero funcional.
-
->[!WARNING]
->Este ejemplo va lento en Colab, mejor ejecútalo en un jupyter local.
-
->[!CAUTION]
->El submódulo core todavía **no está en estado *estable* **, por lo que puede sufrir cambios en un futuro. Igualmente el submódulo *blocks*.
 
 
