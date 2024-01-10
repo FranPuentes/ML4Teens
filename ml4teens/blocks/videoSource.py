@@ -19,15 +19,21 @@ class VideoSource(Block):
       # speed:float [0,10]
       def __init__(self, **kwargs):
           super().__init__(**kwargs);
+          self.sync=True;
 
       #-------------------------------------------------------------------------
-      @Block.signal("frame", Image)
+      @Block.signal("source", str)
       def signal_frame(self, frame):
           return frame;
 
       #-------------------------------------------------------------------------
-      @Block.signal("frames", int)
-      def signal_frames(self, frame):
+      @Block.signal("device", int)
+      def signal_frame(self, frame):
+          return frame;
+
+      #-------------------------------------------------------------------------
+      @Block.signal("frame", Image)
+      def signal_frame(self, frame):
           return frame;
 
       #-------------------------------------------------------------------------
@@ -41,20 +47,56 @@ class VideoSource(Block):
           return data;
 
       #-------------------------------------------------------------------------
-      @Block.signal("begin", dict)
+      @Block.signal("begin", int)
       def signal_begin(self, data):
           return data;
 
       #-------------------------------------------------------------------------
-      @Block.signal("end", dict)
+      @Block.signal("end", bool)
       def signal_end(self, data):
           return data;
           
       #-------------------------------------------------------------------------
-      @Block.slot("source", {str})
+      def _resize(self, imagen, width, height):
+      
+          _width, _height = imagen.size;
+
+          if width is None and height is None : return imagen;
+
+          if width==_width and height==_height and not self.params.box: return imagen;
+          
+          if height is None:
+              ratio  = _width / width;
+              height = int(_height / ratio);
+
+          elif width is None:
+              ratio = _height / height;
+              width = int(_width / ratio);
+          
+          # https://pillow.readthedocs.io/en/latest/handbook/concepts.html#filters
+          
+          # TODO (x,y,w,h) puede ser relativo a tamaño de la imagen
+          
+          box=self.params.box; # (x,y,w,h)
+          
+          if self.params.filter:
+             if self.params.filter.upper()=="NEAREST":  return imagen.resize((width, height), PIL.Image.Resampling.NEAREST, box);
+             if self.params.filter.upper()=="BOX":      return imagen.resize((width, height), PIL.Image.Resampling.BOX,     box);
+             if self.params.filter.upper()=="BILINEAR": return imagen.resize((width, height), PIL.Image.Resampling.BILINEAR,box);
+             if self.params.filter.upper()=="HAMMING":  return imagen.resize((width, height), PIL.Image.Resampling.HAMMING, box);
+             if self.params.filter.upper()=="BICUBIC":  return imagen.resize((width, height), PIL.Image.Resampling.BICUBIC, box);
+             if self.params.filter.upper()=="LANCZOS":  return imagen.resize((width, height), PIL.Image.Resampling.LANCZOS, box);
+             
+          return imagen.resize((width, height));
+            
+      #-------------------------------------------------------------------------
+      @Block.slot("source", {str,int})
       def slot_source(self, slot, fuente):
 
-          # TODO 'fuente' puede ser un número de dispositivo!
+          # TODO 'fuente' puede ser un número de dispositivo! Y lo será.
+          
+          # TODO mandar la señal 'source'
+          # TODO mandar la señal 'device'
 
           istemp=False;
           if fuente.startswith("http"):
@@ -68,25 +110,21 @@ class VideoSource(Block):
 
           if not os.path.exists(fuente): raise RuntimeError(f"El fichero '{fuente}', no existe.");
 
-          min_diff=float("+inf");
-          max_diff=float("-inf");
-          
           fd = cv.VideoCapture(fuente);
           try:
             if not fd.isOpened(): raise RuntimeError(f"Error al abrir el vídeo '{fuente}'");
             else:
-                ancho = fd.get(cv.CAP_PROP_FRAME_WIDTH);
-                alto = fd.get(cv.CAP_PROP_FRAME_HEIGHT);
-                fps = fd.get(cv.CAP_PROP_FPS);
-                frames = fd.get(cv.CAP_PROP_FRAME_COUNT);
+                ancho       = fd.get(cv.CAP_PROP_FRAME_WIDTH);
+                alto        = fd.get(cv.CAP_PROP_FRAME_HEIGHT);
+                fps         = fd.get(cv.CAP_PROP_FPS);
+                frames      = fd.get(cv.CAP_PROP_FRAME_COUNT);
                 codificador = int(fd.get(cv.CAP_PROP_FOURCC));
-                delay = int(1000/fps);
+                delay       = int(1000/fps);
                 
                 speed=self.params.speed or 1;
                 delay=delay*speed;
 
-                self.signal_frames(frames);
-                self.signal_info({"fuente":fuente, "ancho":ancho, "alto":alto, "fps":fps, "frames":frames, "codificador":codificador, "delay":delay });
+                self.signal_info({"source":fuente, "width":ancho, "height":alto, "fps":fps, "frames":frames, "encoder":codificador, "delay":delay });
 
                 ok, frame = fd.read();
                 
@@ -102,6 +140,8 @@ class VideoSource(Block):
                    while ok:
                          timestamp=time.time();
 
+                         # TODO, quedarnos sólo con unos pocos modos: L, RGB, RGBA, ...
+                         
                          if len(frame.shape)==2:
                             frame=frame;
                          else:
@@ -111,13 +151,12 @@ class VideoSource(Block):
                                frame=cv.cvtColor(frame, cv.COLOR_BGRA2RGBA);
                                    
                          frame = PIL.Image.fromarray(frame);
+                         frame = self._resize(frame, self.params.width, self.params.height);
                          self.signal_frame(frame);
                          
                          ok, frame = fd.read();
 
                          diff=int((time.time()-timestamp)*1000);
-                         min_diff=min(min_diff, diff);
-                         max_diff=max(max_diff, diff);
                          if diff>=delay: pass;
                          else:           time.sleep((delay-diff)/1000);
                          

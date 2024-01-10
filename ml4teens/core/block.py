@@ -199,6 +199,7 @@ class Block(ABC):
           self._loopFinish   =True;
           self._loopThread   =None;
           self._transitMods  ={};
+          self._requestSync  =None; # None => me da igual
           self._lastEventTime=time.time();
           self._id="ID"+''.join(random.choice(string.ascii_letters + string.digits) for _ in range(16));
 
@@ -213,6 +214,17 @@ class Block(ABC):
       @property
       def params(self):
           return self._params;
+
+      #-------------------------------------------------------------------------
+      @property
+      def sync(self):
+          return self._requestSync;
+
+      @sync.setter
+      def sync(self, value):
+          if   value is None: self._requestSync=None ;
+          elif bool(value):   self._requestSync=True ;
+          else:               self._requestSync=False;
 
       #-------------------------------------------------------------------------
       @property
@@ -294,6 +306,7 @@ class Block(ABC):
                  self.tokens.reset(k);
 
       #-------------------------------------------------------------------------
+      """
       def __getitem__(self, decl):
       
           def convert_str(v):
@@ -343,7 +356,7 @@ class Block(ABC):
                 elif isinstance(stop,dict):
                      mods.update(stop);
              
-             """
+             " ""
              # no usado por ahora
              if step: # ...
                 if type(step) is int:
@@ -353,7 +366,7 @@ class Block(ABC):
                    if step <0.0:  step=0.0;
                    if step >1.0:  step=1.0;
                 mods.update({"step time to recall":step});
-             """   
+             " ""   
                              
           else:             
              sname=decl;
@@ -362,7 +375,20 @@ class Block(ABC):
           assert bool(sname) and isinstance(sname,(str)), f"{self._fullClassName}:: La señal/slot '{sname}' es incorrecta";
           assert (sname in self.signals) or (sname in self.slots), f"No existe la señal/slot '{sname}' en {self._fullClassName}";
           return Context.Linker(self, sname, mods);
-
+      """
+      
+      def __call__(self, sname, *args, **kwargs):
+          mods={};
+          
+          for arg in args:
+              if type(arg) is str: mods[arg]=True;
+              else:                raise RuntimeError(f"El modificador '{arg}' de '{self._fullClassName}:{sname}', debe ser un string.");   
+              
+          for key in kwargs:
+              mods[key]=kwargs[key];
+              
+          return Context.Linker(self, sname, mods);
+      
       #-------------------------------------------------------------------------
       def terminate(self):
           if self._loopThread and self._loopThread.is_alive():
