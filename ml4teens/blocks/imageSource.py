@@ -12,6 +12,8 @@ class ImageSource(Block):
 
       def __init__(self, **kwargs):
           super().__init__(**kwargs);
+          self.width =self.params.width;
+          self.height=self.params.height;
 
       #-------------------------------------------------------------------------
       @Block.signal("image", Image)
@@ -34,7 +36,29 @@ class ImageSource(Block):
           return data;
 
       #-------------------------------------------------------------------------
-      @Block.slot("source", {str}, required=True)
+      def _resize(self, imagen, width, height):
+      
+          if width is None and height is None:
+             return imagen;
+             
+          else:
+             if width==imagen.width and height==imagen.height:
+                return imagen;
+                
+             if not width:
+                r=height/float(imagen.height);
+                width=int(imagen.width*r);
+
+             if not height:
+                r=width/float(imagen.width);
+                height=int(imagen.height*r);
+
+             return imagen.resize( (width,height) );
+      
+      
+      
+      
+      @Block.slot("source", {str})
       def slot_source(self, slot, fuente):
       
           #TODO normalizar las imágenes, no podemos manejar tantos 'mode'
@@ -62,11 +86,11 @@ class ImageSource(Block):
           def histogramas(imagen):
               modo = imagen.mode;
               histograma_completo = imagen.histogram();
-              if   modo == '1' or modo == 'L' or modo == 'P' or modo == 'I' or modo == 'F': return [histograma_completo];
-              elif modo == 'RGB' or modo == 'YCbCr':                                        return [histograma_completo[i:i+256] for i in range(0, 768, 256)];
-              elif modo == 'RGBA' or modo == 'CMYK':                                        return [histograma_completo[i:i+256] for i in range(0, 1024, 256)];
-              elif modo == 'LAB' or modo == 'HSV':                                          return [histograma_completo[i:i+256] for i in range(0, 768, 256)];
-              else:                                                                         return None;
+              if   modo == '1'    or modo == 'L' or modo == 'P' or modo == 'I' or modo == 'F': return [histograma_completo];
+              elif modo == 'RGB'  or modo == 'YCbCr':                                          return [histograma_completo[i:i+256] for i in range(0, 768,  256)];
+              elif modo == 'RGBA' or modo == 'CMYK':                                           return [histograma_completo[i:i+256] for i in range(0, 1024, 256)];
+              elif modo == 'LAB'  or modo == 'HSV':                                            return [histograma_completo[i:i+256] for i in range(0, 768,  256)];
+              else:                                                                            return None;
 
           istemp=False;
           if fuente.startswith("http"):
@@ -79,35 +103,24 @@ class ImageSource(Block):
                        istemp=True;
 
           try:
-            imagen = PIL.Image.open(fuente);
+            with PIL.Image.open(fuente) as imagen:
+            
+                 if self.signal_info():
+                    info={"format":imagen.format, "size":imagen.size, "mode":imagen.mode, "palette":imagen.palette, "exif":imagen._getexif(), "info":imagen.info };
+                    self.signal_info(info);
 
-            if self.signal_info():
-               info={"format":imagen.format, "size":imagen.size, "mode":imagen.mode, "palette":imagen.palette, "exif":imagen._getexif(), "info":imagen.info };
-               self.signal_info(info);
+                 if self.signal_dims():
+                    shape=shapeof(imagen);
+                    self.signal_dims(shape);
 
-            if self.signal_dims():
-               shape=shapeof(imagen);
-               self.signal_dims(shape);
-
-            if self.signal_histogram():
-               self.signal_histogram(histogramas(imagen));
-
-            if self.signal_image():
-               self.signal_image(imagen);
+                 if self.signal_histogram():
+                    self.signal_histogram(histogramas(imagen));
+ 
+                 if self.signal_image():
+                    imagen.load();
+                    self.signal_image(self._resize(imagen, self.width, self.height));
 
           finally:
-            self.reset("source");
+            del self.tokens["source"];
             if istemp:
                os.remove(fuente);
-
-      #-------------------------------------------------------------------------
-      def run(self, **kwargs):
-      
-          if kwargs and "source" in kwargs: fuente = kwargs     ["source"];
-          else:                             fuente = self._param("source");
-
-          if not fuente or type(fuente) is not str:
-             raise RuntimeError(f"Necesito que pases como parámetro 'source' el nombre del fichero o la url que contiene la imagen.");
-             
-          Context.instance.accept(self, "source", fuente);
-          

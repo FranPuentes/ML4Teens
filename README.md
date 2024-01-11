@@ -58,11 +58,7 @@ class SingleChannel(Block):
       # channel
       def __init__(self, **kwargs):
           super().__init__(**kwargs);
-
-          if "channel" in kwargs: self._channel=kwargs["channel"];
-          else:                   self._channel=0;
-
-          assert type(self._channel)==int, f"El parámetro 'channel' debe ser el número del canal (0, ...)";
+          assert type(self._channel)==int, "El parámetro 'channel' debe ser el número del canal (0, ...)";
 
       #-------------------------------------------------------------------------
       @Block.slot("image", {Image})

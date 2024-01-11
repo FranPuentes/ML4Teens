@@ -11,7 +11,7 @@ class SplitChannels(Block):
           super().__init__(**kwargs);
 
       #-------------------------------------------------------------------------
-      @Block.slot("image", {Image}, required=2)
+      @Block.slot("image", {Image})
       def slot_frame(self, slot, data):
           mode=data.mode.upper();
           bands=data.getbands();
@@ -77,7 +77,7 @@ class SplitChannels(Block):
               if band=='F' and self.signal_F()          and mode in ["F"]:
                  self.signal_F(channel);
 
-          self.reset("image");
+          del self.tokens["image"];
 
 
       #-------------------------------------------------------------------------
@@ -168,8 +168,4 @@ class SplitChannels(Block):
       @Block.signal("float", Image)
       def signal_F(self, data):
           return data;
-
-      #-------------------------------------------------------------------------
-      def run(self, **kwarg):
-          raise RuntimeError("No tiene sentido invocar el método 'run' de un objeto de clase 'SplitChannels'.");
 

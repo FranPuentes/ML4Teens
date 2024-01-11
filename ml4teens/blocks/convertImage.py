@@ -12,88 +12,84 @@ class ConvertImage(Block):
           super().__init__(**kwargs);
 
       #-------------------------------------------------------------------------
-      @Block.slot("1bit", {Image}, required=3)
+      @Block.slot("1bit", {Image})
       def slot_1bit(self, slot, data):
           self.signal_image(data.convert('1'));
-          self.reset(slot);
+          del self.tokens[slot];
 
       #-------------------------------------------------------------------------
-      @Block.slot("L", {Image}, required=4)
+      @Block.slot("L", {Image})
       def slot_L(self, slot, data):
           self.signal_image(data.convert('L'));
-          self.reset(slot);
+          del self.tokens[slot];
 
       #-------------------------------------------------------------------------
-      @Block.slot("LA", {Image}, required=5)
+      @Block.slot("LA", {Image})
       def slot_L(self, slot, data):
           self.signal_image(data.convert('LA'));
-          self.reset(slot);
+          del self.tokens[slot];
 
       #-------------------------------------------------------------------------
-      @Block.slot("P", {Image}, required=6)
+      @Block.slot("P", {Image})
       def slot_P(self, slot, data):
           self.signal_image(data.convert('P'));
-          self.reset(slot);
+          del self.tokens[slot];
 
       #-------------------------------------------------------------------------
-      @Block.slot("PA", {Image}, required=7)
+      @Block.slot("PA", {Image})
       def slot_P(self, slot, data):
           self.signal_image(data.convert('PA'));
-          self.reset(slot);
+          del self.tokens[slot];
 
       #-------------------------------------------------------------------------
-      @Block.slot("RGB", {Image}, required=8)
+      @Block.slot("RGB", {Image})
       def slot_rgb(self, slot, data):
           self.signal_image(data.convert('RGB'));
-          self.reset(slot);
+          del self.tokens[slot];
 
       #-------------------------------------------------------------------------
-      @Block.slot("RGBA", {Image}, required=9)
+      @Block.slot("RGBA", {Image})
       def slot_rgba(self, slot, data):
           self.signal_image(data.convert('RGBA'));
-          self.reset(slot);
+          del self.tokens[slot];
 
       #-------------------------------------------------------------------------
-      @Block.slot("CMYK", {Image}, required=10)
+      @Block.slot("CMYK", {Image})
       def slot_cmyk(self, slot, data):
           self.signal_image(data.convert('CMYK'));
-          self.reset(slot);
+          del self.tokens[slot];
 
       #-------------------------------------------------------------------------
-      @Block.slot("YCbCr", {Image}, required=11)
+      @Block.slot("YCbCr", {Image})
       def slot_ycbcr(self, slot, data):
           self.signal_image(data.convert('YCbCr'));
-          self.reset(slot);
+          del self.tokens[slot];
 
       #-------------------------------------------------------------------------
-      @Block.slot("LAB", {Image}, required=12)
+      @Block.slot("LAB", {Image})
       def slot_lab(self, slot, data):
           self.signal_image(data.convert('LAB'));
-          self.reset(slot);
+          del self.tokens[slot];
 
       #-------------------------------------------------------------------------
-      @Block.slot("HSV", {Image}, required=13)
+      @Block.slot("HSV", {Image})
       def slot_hsv(self, slot, data):
           self.signal_image(data.convert('HSV'));
-          self.reset(slot);
+          del self.tokens[slot];
 
       #-------------------------------------------------------------------------
-      @Block.slot("I", {Image}, required=14)
+      @Block.slot("I", {Image})
       def slot_I(self, slot, data):
           self.signal_image(data.convert('I'));
-          self.reset(slot);
+          del self.tokens[slot];
 
       #-------------------------------------------------------------------------
-      @Block.slot("F", {Image}, required=15)
+      @Block.slot("F", {Image})
       def slot_F(self, slot, data):
           self.signal_image(data.convert('F'));
-          self.reset(slot);
+          del self.tokens[slot];
 
       #-------------------------------------------------------------------------
       @Block.signal("image", Image)
       def signal_image(self, data):
           return data;
-
-      #-------------------------------------------------------------------------
-      def run(self, **kwarg):
-          raise RuntimeError("No tiene sentido invocar el método 'run' de un objeto de clase 'ConvertImage'.");

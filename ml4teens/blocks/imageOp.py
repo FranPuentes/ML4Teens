@@ -13,19 +13,19 @@ class ImageOp(Block):
       def __init__(self, **kwargs):
           super().__init__(**kwargs);
 
-          def param(key, default=None):
-              rt=default;
-              if key in kwargs:
-                 rt=kwargs[key];
-                 del kwargs[key];
-                 del self._params[key];
-              return rt;
+          self._op         = self.params.op;
+          self._autoredim  = self.params.autoredim;
+          self._expression = self.params.expression;
+          self._last       = None;
+          self._kwargs     = kwargs;
+          
+          def delparam(key):
+              if key in self._kwargs: del self._kwargs[key];
 
-          self._op=param("op");
-          self._autoredim=param("autoredim");
-          self._expression=param("expression");
-          self._last=None;
-
+          delparam("op");
+          delparam("autoredim");
+          delparam("expression");
+          
           if self._op is None: raise RuntimeError("Los objetos de la clase ImageOp necesitan el parámetro 'op' con la operación a realizar");
 
           self._op = self._op if self._op is None else (" ".join(self._op.split())).lower();
@@ -130,7 +130,7 @@ class ImageOp(Block):
       #-------------------------------------------------------------------------
       # UNARIAS
       #-------------------------------------------------------------------------
-      @Block.slot("image", {Image}, required=3)
+      @Block.slot("image", {Image})
       def slot_image(self, slot, data):
           
           imagen=None;
@@ -145,7 +145,7 @@ class ImageOp(Block):
                op=" ".join(self._op.split()[:-1]);
                right=self._last;
                left =data;
-               imagen=self._op2(left,right,op,self._params);
+               imagen=self._op2(left,right,op,self._kwargs);
                if tp=="seq": self._last=data;
                if tp=="acc": self._last=imagen;
 
@@ -153,31 +153,31 @@ class ImageOp(Block):
                imagen = ImageOps.invert(data);
 
           elif self._op=="constant":
-               imagen = ImageChops.constant(data, **self._params);
+               imagen = ImageChops.constant(data, **self._kwargs);
 
           elif self._op=="offset":
-               imagen = ImageChops.offset(data, **self._params);
+               imagen = ImageChops.offset(data, **self._kwargs);
 
           elif self._op=="autocontrast":
-               imagen = ImageOps.autocontrast(data, **self._params);
+               imagen = ImageOps.autocontrast(data, **self._kwargs);
 
           elif self._op=="colorize":
-               imagen = ImageOps.colorize(data, **self._params);
+               imagen = ImageOps.colorize(data, **self._kwargs);
 
           elif self._op=="crop":
-               imagen = ImageOps.crop(data, **self._params);
+               imagen = ImageOps.crop(data, **self._kwargs);
 
           elif self._op=="scale":
-               imagen = ImageOps.scale(data, **self._params);
+               imagen = ImageOps.scale(data, **self._kwargs);
 
           elif self._op=="deform":
-               imagen = ImageOps.deform(data, **self._params);
+               imagen = ImageOps.deform(data, **self._kwargs);
 
           elif self._op=="equalize":
-               imagen = ImageOps.equalize(data, **self._params);
+               imagen = ImageOps.equalize(data, **self._kwargs);
 
           elif self._op=="expand":
-               imagen = ImageOps.expand(data, **self._params);
+               imagen = ImageOps.expand(data, **self._kwargs);
 
           elif self._op=="flip":
                imagen = ImageOps.flip(data);
@@ -195,16 +195,16 @@ class ImageOp(Block):
                imagen = ImageOps.grayscale(data);
 
           elif self._op=="contain":
-               imagen = ImageOps.contain(data, **self._params);
+               imagen = ImageOps.contain(data, **self._kwargs);
 
           elif self._op=="cover":
-               imagen = ImageOps.cover(data, **self._params);
+               imagen = ImageOps.cover(data, **self._kwargs);
 
           elif self._op=="fit":
-               imagen = ImageOps.fit(data, **self._params);
+               imagen = ImageOps.fit(data, **self._kwargs);
 
           elif self._op=="pad":
-               imagen = ImageOps.pad(data, **self._params);
+               imagen = ImageOps.pad(data, **self._kwargs);
 
           elif self._op=="filter blur":
                imagen = data.filter(ImageFilter.BLUR);
@@ -228,28 +228,28 @@ class ImageOp(Block):
                imagen = data.filter(ImageFilter.SMOOTH_MORE);
 
           elif self._op=="filter box blur":
-               filter=ImageFilter.BoxBlur(**self._params);
+               filter=ImageFilter.BoxBlur(**self._kwargs);
                imagen = data.filter(filter);
           elif self._op=="filter gaussian blur":
-               filter=ImageFilter.GaussianBlur(**self._params);
+               filter=ImageFilter.GaussianBlur(**self._kwargs);
                imagen = data.filter(filter);
           elif self._op=="filter unsharp mask":
-               filter=ImageFilter.UnsharpMask(**self._params);
+               filter=ImageFilter.UnsharpMask(**self._kwargs);
                imagen = data.filter(filter);
           elif self._op=="filter kernel":
-               filter=ImageFilter.Kernel(**self._params);
+               filter=ImageFilter.Kernel(**self._kwargs);
                imagen = data.filter(filter);
           elif self._op=="filter min":
-               filter=ImageFilter.MinFilter(**self._params);
+               filter=ImageFilter.MinFilter(**self._kwargs);
                imagen = data.filter(filter);
           elif self._op=="filter median":
-               filter=ImageFilter.MedianFilter(**self._params);
+               filter=ImageFilter.MedianFilter(**self._kwargs);
                imagen = data.filter(filter);
           elif self._op=="filter max":
-               filter=ImageFilter.MaxFilter(**self._params);
+               filter=ImageFilter.MaxFilter(**self._kwargs);
                imagen = data.filter(filter);
           elif self._op=="filter mode":
-               filter=ImageFilter.ModeFilter(**self._params);
+               filter=ImageFilter.ModeFilter(**self._kwargs);
                imagen = data.filter(filter);
 
           elif self._op=="eval" and self._expression is not None:
@@ -257,29 +257,36 @@ class ImageOp(Block):
                imagen = ImageMath.eval(self._expression, image=data);             
 
           self.signal_image(imagen);
-          self.reset("image");
+          self.signal_left (imagen);
+          self.signal_right(imagen);
+          del self.tokens["image"];
         
       #-------------------------------------------------------------------------
       # BINARIAS
       #-------------------------------------------------------------------------
       def _binary(self):
-          if self.signal_image():
-             if self.rightValue("left") and self.rightValue("right"):
-                right=self._value("right");
-                left =self._value("left" );                
-                imagen=self._op2(left, right, self._op, self._params);
-                self.signal_image(imagen);
-                self.reset("left","right");
+          right=self.tokens["right"].data;
+          left =self.tokens["left" ].data;
+          if left and right:
+             imagen=self._op2(left, right, self._op, self._kwargs);
+             del self.tokens["left" ];
+             del self.tokens["right"];
+             return imagen;
+          return None;      
 
       #-------------------------------------------------------------------------
-      @Block.slot("left", {Image}, required=4)
+      @Block.slot("left", {Image})
       def slot_left(self, slot, data):
-          self._binary();
+          imagen=self._binary();
+          self.signal_image(imagen);
+          self.signal_left(imagen);
 
       #-------------------------------------------------------------------------
-      @Block.slot("right", {Image}, required=4)
+      @Block.slot("right", {Image})
       def slot_right(self, slot, data):
-          self._binary();
+          imagen=self._binary();
+          self.signal_image(imagen);
+          self.signal_right(imagen);
 
       #-------------------------------------------------------------------------
       # SIGNALS & RUN
@@ -289,5 +296,11 @@ class ImageOp(Block):
           return data;
 
       #-------------------------------------------------------------------------
-      def run(self, **kwarg):
-          raise RuntimeError("No tiene sentido invocar el método 'run' de un objeto de clase 'ImageOp'.");
+      @Block.signal("left", Image)
+      def signal_left(self, data):
+          return data;
+
+      #-------------------------------------------------------------------------
+      @Block.signal("right", Image)
+      def signal_right(self, data):
+          return data;

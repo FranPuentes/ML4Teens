@@ -20,21 +20,18 @@ class Terminal(Block):
              display( HTML(f"<div style='width:95%; {style}'><pre>{message}</pre></div>") );
 
       #-------------------------------------------------------------------------
-      @Block.slot("stdout", {str,list,set,tuple,dict,object}, required=2)
+      @Block.slot("stdout", {str,list,set,tuple,dict,object})
       def slot_stdin(self, slot, data):
           message=data;
           style="background-color: green; color: white";
           self.__print(message,style);
-          self.reset("stdout");
+          del self.tokens["stdout"];
 
       #-------------------------------------------------------------------------
-      @Block.slot("stderr", {str,list,set,tuple,dict,object}, required=2)
+      @Block.slot("stderr", {str,list,set,tuple,dict,object})
       def slot_stderr(self, slot, data):
           message=data;
           style="background-color: brown; color: white";
           self.__print(message,style);
-          self.reset("stderr");
+          del self.tokens["stderr"];
 
-      #-------------------------------------------------------------------------
-      def run(self, **kwarg):
-          raise RuntimeError("No tiene sentido invocar el método 'run' de un objeto de clase 'Pantalla'.");

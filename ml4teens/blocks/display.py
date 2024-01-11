@@ -14,8 +14,7 @@ class Display(Block):
       # feed = False
       def __init__(self, *args, **kwargs):
           super().__init__(*args, **kwargs);
-          self._feed=False;
-          if "feed" in kwargs: self._feed=bool(kwargs["feed"]);
+          self._feed=bool(self.params.get("feed",False));
 
       #-------------------------------------------------------------------------
       @Block.signal("image", Image)
@@ -41,17 +40,13 @@ class Display(Block):
           return imagen;
 
       #-------------------------------------------------------------------------
-      @Block.slot("image", {Image}, required=2)
+      @Block.slot("image", {Image})
       def slot_image(self, slot, data):
-          width =self._param("width" );
-          height=self._param("height");
+          width =self.params.width;
+          height=self.params.height;
           imagen=self._redim(data,width,height);
           if self._feed==False: update_display(imagen, display_id=self._id);
           else:                 display(imagen);
           self.signal_image(data);
-          self.reset("image");
+          del self.tokens["image"];
 
-      #-------------------------------------------------------------------------
-      def run(self, **kwarg):
-          raise RuntimeError("No tiene sentido invocar el método 'run' de un objeto de clase 'Pantalla'.");
-          

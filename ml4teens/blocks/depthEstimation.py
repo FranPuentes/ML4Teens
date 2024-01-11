@@ -18,7 +18,7 @@ class DepthEstimation(Block):
           self.model     = DPTForDepthEstimation.from_pretrained("Intel/dpt-large")
 
       #-------------------------------------------------------------------------
-      @Block.slot("image", {Image}, required=True)
+      @Block.slot("image", {Image})
       def slot_image(self, slot, data):
           inputs = self.processor(images=data, return_tensors="pt");
 
@@ -39,6 +39,3 @@ class DepthEstimation(Block):
       def signal_image(self, data):
           return data;
 
-      #-------------------------------------------------------------------------
-      def run(self, **kwarg):
-          raise RuntimeError("No tiene sentido invocar el método 'run' de un objeto de clase 'DepthEstimation'.");
