@@ -16,4 +16,5 @@ from .imageSource       import ImageSource
 from .objectID          import ObjectID
 from .imageToText       import ImageToText
 from .depthEstimation   import DepthEstimation
-from .faceDetection     import FaceDetection
+from .faceBoxing        import FaceBoxing
+from .faceLandmarks     import FaceLandmarks

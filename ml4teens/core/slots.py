@@ -55,6 +55,7 @@ class Slots: # name, type, required, value, default, stub
           return nombre in self._slots;
 
       #--------------------------------------------------------------------------------
+      """
       def groups(self):
           rt={};
           for key in self._slots:
@@ -69,15 +70,16 @@ class Slots: # name, type, required, value, default, stub
                    if r not in rt: rt[r]=[];
                    rt[r].append(key);
           return rt;
-
+      """
       #--------------------------------------------------------------------------------      
+      """
       def iscomplete(self, values):
-          """
+          " ""
           'values' es un diccionario {slot_name:data, ...}
           'G' es un diccionario {group:[slot_name, ...], ...}
           Quiero saber si estos datos hacen completo algún grupo, y en su caso, cuales slots he de disparar.
           
-          """
+          " ""
           G=self.groups();
           rt=deepcopy(G);
           for idx in G:
@@ -88,3 +90,4 @@ class Slots: # name, type, required, value, default, stub
               else:
                    if not any([(values[k] is not None) if k in values else False for k in G[idx]]): del rt[idx];
           return rt;
+      """

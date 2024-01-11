@@ -97,7 +97,7 @@ class Context:
         return context._gpu;
         
     @gpu.setter    
-    def cpu(self, value):
+    def gpu(self, value):
         context = Context._instance;
         assert (not bool(value)) or (bool(value) and torch.cuda.is_available()), "No diponemos de GPUs, así que no podemos activar esta opción";
         context._gpu=bool(value);
