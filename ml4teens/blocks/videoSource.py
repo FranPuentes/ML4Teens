@@ -15,7 +15,6 @@ from ..core import Block;
 class VideoSource(Block):
 
       #-------------------------------------------------------------------------
-      # source:str
       # speed:float [0,10]
       def __init__(self, **kwargs):
           super().__init__(**kwargs);

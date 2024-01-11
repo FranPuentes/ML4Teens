@@ -213,13 +213,15 @@ class Context:
         
         def _sync(block, mods):
             
-            if block._requestSync==True : return True ;
-            if block._requestSync==False: return False;
+            rt = self._sync if self._sync is not None else False;
+                       
+            #if block._requestSync==True : return True ;
+            #if block._requestSync==False: rt=False;
+            #
+            #if     mods.get("sync",False) and not mods.get("no sync",False): return True;
+            #if not mods.get("sync",False) and     mods.get("no sync",False): return False;
             
-            if     mods.get("sync",False) and not mods.get("no sync",False): return True;
-            if not mods.get("sync",False) and     mods.get("no sync",False): return False;
-            
-            return self._sync;
+            return rt;
             #-------------------
         
         assert (("source" in kwargs) and ("target" not in kwargs)) or (("source" not in kwargs) and ("target" in kwargs))  or (("source" in kwargs) and ("target" in kwargs));
@@ -242,14 +244,14 @@ class Context:
               
               if _sync(target,mods):
                  debug.print(f"Ejecutando el slot '{sname}' de {target._fullClassName}, con data={type(data)} y mods='{mods}'");
-                 mods.pop("sync",None);
-                 mods.pop("no sync",None);
+                 #mods.pop("sync",None);
+                 #mods.pop("no sync",None);
                  target.run_sync(time.time(), sname, self.newToken(data), mods);
                  
               else:              
                  debug.print(f"Mandando a {target._fullClassName} una señal al slot '{sname}' con data={type(data)} y mods='{mods}'");
-                 mods.pop("sync",None);
-                 mods.pop("no sync",None);
+                 #mods.pop("sync",None);
+                 #mods.pop("no sync",None);
                  target._queue.put( (time.time(), sname, self.newToken(data), mods) );
                  if not target.running(): target.run();
               
@@ -325,7 +327,7 @@ class Context:
               self._sname=sname;
               self._mods=mods or {};
 
-          def __rshift__(self, rlinker): # >> no sync
+          def __rshift__(self, rlinker): # a >> b, no sync
               assert (self._sname in self._block.signals) and (rlinker._sname in rlinker._block.slots);
               assert self._block.signals[self._sname]["type"] == rlinker._block.slots[rlinker._sname]["type"], f"Tipo incompatibles {self._block.signals[self._sname]['type']} != {rlinker._block.slots[rlinker._sname]['type']}";
               self._mods.pop("sync", None);
@@ -336,7 +338,7 @@ class Context:
               Context.instance.subscribe((self._block,self._sname), (rlinker._block,rlinker._sname), (self._mods|rlinker._mods));
               return rlinker._block;
 
-          def __lshift__(self, rlinker): # << no sync
+          def __lshift__(self, rlinker): # a << b, no sync
               assert (self._sname in self._block.slots) and (rlinker._sname in rlinker._block.signals);
               assert self._block.slots[self._sname]["type"] == rlinker._block.signals[rlinker._sname]["type"], f"Tipo incompatibles {self._block.slots[self._sname]['type']} != {rlinker._block.signals[rlinker._sname]['type']}";
               self._mods.pop("sync", None);
@@ -347,7 +349,7 @@ class Context:
               Context.instance.subscribe((rlinker._block,rlinker._sname), (self._block,self._sname), (rlinker._mods|self._mods));
               return self._block;
 
-          def __ge__(self, rlinker): # >= sync
+          def __ge__(self, rlinker): # a >= b, sync
               assert (self._sname in self._block.signals) and (rlinker._sname in rlinker._block.slots);
               assert self._block.signals[self._sname]["type"] == rlinker._block.slots[rlinker._sname]["type"], f"Tipo incompatibles {self._block.signals[self._sname]['type']} != {rlinker._block.slots[rlinker._sname]['type']}";
               self._mods.pop("sync", None);
@@ -358,7 +360,7 @@ class Context:
               Context.instance.subscribe((self._block,self._sname), (rlinker._block,rlinker._sname), (self._mods|rlinker._mods));
               return rlinker._block;
 
-          def __ge__(self, rlinker): # >= sync
+          def __ge__(self, rlinker): # a >= b, sync
               assert (self._sname in self._block.slots) and (rlinker._sname in rlinker._block.signals);
               assert self._block.slots[self._sname]["type"] == rlinker._block.signals[rlinker._sname]["type"], f"Tipo incompatibles {self._block.slots[self._sname]['type']} != {rlinker._block.signals[rlinker._sname]['type']}";
               self._mods.pop("sync", None);

@@ -8,6 +8,13 @@ class SignalType(Type):
           super().__init__(tipo,"signal");
 
       def __eq__(self, st):
+      
           from .slotType import SlotType;
+          
           assert isinstance(st, SignalType) or isinstance(st, SlotType);
-          return (isinstance(st, SignalType) and (self._type is st._type)) or (isinstance(st, SlotType) and ((self._type in st._type) if type(st._type) is set else (self._type is st._type)));
+          
+          if type(st._type) is set: # signal, sot
+             return any([(self._type is T or isinstance(self._type, T)) for T in st._type]);
+             
+          else: # signal, signal
+             return (self._type is st._type);

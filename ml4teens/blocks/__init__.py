@@ -1,4 +1,5 @@
 
+from .drain             import Drain
 from .singleChannel     import SingleChannel
 from .splitChannels     import SplitChannels
 from .mergeChannels     import MergeChannels

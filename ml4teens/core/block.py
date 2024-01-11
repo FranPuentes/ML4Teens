@@ -429,6 +429,8 @@ class Block(ABC):
              
              data=self.tokens[sname].data or slot["default"];
              
+             assert any([isinstance(data,tp) for tp in slot["type"]]), f"El slot '{sname}' de {self._fullClassName} no acepta datos de tipo '{type(data)}', sólo estos tipos: {slot['type']}";
+             
              try:
                self._transitMods=mods;
                func=slot["stub"];
