@@ -1,6 +1,5 @@
-import time;
-
 import torch;
+import queue;
 
 from IPython.display import display;
 from IPython.display import HTML, Javascript;
@@ -46,10 +45,10 @@ class Context:
         if not cls._instance:
            cls._instance = super(Context, cls).__new__(cls);
            cls._instance.listeners={};
-           cls._sync=False; # por defecto
            cls._cpu =True;
            cls._gpu =False;
            #cls.__html__();
+           cls._queue=queue.PriorityQueue();
         return cls._instance;
 
     #-----------------------------------------------------------------------------------------
@@ -65,17 +64,6 @@ class Context:
     @property
     def instance(cls):
         return Context() if Context._instance==None else Context._instance;
-        
-    #-----------------------------------------------------------------------------------------
-    @property
-    def sync(self):
-        context = Context._instance;
-        return context._sync;
-        
-    @sync.setter    
-    def sync(self, value):
-        context = Context._instance;
-        context._sync=bool(value);
         
     #-----------------------------------------------------------------------------------------
     @property
@@ -125,9 +113,6 @@ class Context:
     
     #-----------------------------------------------------------------------------------------
     def reset(self):
-        for block in self.blocks():
-            block.terminate();
-        self.listeners={};
         return self;
 
     #-----------------------------------------------------------------------------------------
@@ -189,10 +174,6 @@ class Context:
            return signal in self.listeners and self.listeners[signal];
            
     #-----------------------------------------------------------------------------------------
-    def newToken(self, data, **kwargs):
-        return {"data":data, **kwargs};
-
-    #-----------------------------------------------------------------------------------------
     def emit(self, **kwargs):
         """
         Emite una señal directamente a los 'listeners' de (source,sname) o a un slot (target,sname).
@@ -211,19 +192,6 @@ class Context:
         :type  mods:   dict | None.
         """        
         
-        def _sync(block, mods):
-            
-            rt = self._sync if self._sync is not None else False;
-                       
-            #if block._requestSync==True : return True ;
-            #if block._requestSync==False: rt=False;
-            #
-            #if     mods.get("sync",False) and not mods.get("no sync",False): return True;
-            #if not mods.get("sync",False) and     mods.get("no sync",False): return False;
-            
-            return rt;
-            #-------------------
-        
         assert (("source" in kwargs) and ("target" not in kwargs)) or (("source" not in kwargs) and ("target" in kwargs))  or (("source" in kwargs) and ("target" in kwargs));
                
         assert ("sname" in kwargs) or ("signal_name" in kwargs) or ("slot_name" in kwargs);
@@ -238,23 +206,11 @@ class Context:
            data =kwargs.get("data" ) or kwargs.get("value"    );
            mods =kwargs.get("mods" ) or {};
            assert type(mods) is dict;
-           debug.print(f"Ha llegado un evento del usuario al slot '{sname}' de {target._fullClassName}::{type(data)}, con mods '{mods}'");
+           print(f"Ha llegado un evento del usuario al slot '{sname}' de {target._fullClassName}::{type(data)}", flush=True);
            if sname in target.slots:
-              slot=target.slots[sname];
-              
-              if _sync(target,mods):
-                 debug.print(f"Ejecutando el slot '{sname}' de {target._fullClassName}, con data={type(data)} y mods='{mods}'");
-                 #mods.pop("sync",None);
-                 #mods.pop("no sync",None);
-                 target.run_sync(time.time(), sname, self.newToken(data), mods);
-                 
-              else:              
-                 debug.print(f"Mandando a {target._fullClassName} una señal al slot '{sname}' con data={type(data)} y mods='{mods}'");
-                 #mods.pop("sync",None);
-                 #mods.pop("no sync",None);
-                 target._queue.put( (time.time(), sname, self.newToken(data), mods) );
-                 if not target.running(): target.run();
-              
+              slot=target.slots[sname];              
+              print(f"Encolando: Una señal a {target._fullClassName} en el slot '{sname}' con data={type(data)}", flush=True);
+              self._queue.put( (time.time(), target, sname, data, mods) );
            else:
               raise RuntimeError(f"No existe el slot '{sname}' en {target._fullClassName}");
            
@@ -267,23 +223,11 @@ class Context:
            data =kwargs.get("data" ) or kwargs.get("value"    );
            mods =kwargs.get("mods" ) or {};
            assert type(mods) is dict;
-           debug.print(f"Ha llegado un evento al slot '{sname}' de {target._fullClassName}::{type(data)}, con mods '{mods}'");
+           print(f"Ha llegado un evento al slot '{sname}' de {target._fullClassName}::{type(data)}", flush=True);
            if sname in target.slots:
               slot=target.slots[sname];              
-              
-              if _sync(target,mods):
-                 debug.print(f"Ejecutando el slot '{sname}' de {target._fullClassName}, con data={type(data)} y mods='{mods}'");
-                 mods.pop("sync",None);
-                 mods.pop("no sync",None);
-                 target.run_sync(time.time(), sname, self.newToken(data), mods);
-                 
-              else:              
-                 debug.print(f"Mandando a {target._fullClassName} una señal al slot '{sname}' con data={type(data)} y mods='{mods}'");
-                 mods.pop("sync",None);
-                 mods.pop("no sync",None);
-                 target._queue.put( (time.time(), sname, self.newToken(data), mods) );
-                 if not target.running(): target.run();
-              
+              print(f"Encolando una señal a {target._fullClassName} en el slot '{sname}' con data={type(data)}", flush=True);
+              self._queue.put_nowait( (time.time(), target, sname, data, mods) );              
            else:
               raise RuntimeError(f"No existe el slot '{sname}' en {target._fullClassName}");
            
@@ -300,20 +244,44 @@ class Context:
            if signal in self.listeners:
               for slot, _mods in self.listeners[signal]:
                   target, slot_name = slot;
-                  debug.print(f"Enviando la señal '{slot_name}', con data={type(data)}, a {target._fullClassName}'");
+                  print(f"Enviando la señal '{slot_name}', con data={type(data)}, a {target._fullClassName}'", flush=True);
                   self.emit(source=source, target=target, sname=slot_name, data=data, mods=(mods|_mods));
            else:
               raise RuntimeError(f"No existe la señal '{sname}' en {source._fullClassName}");
                
     #-----------------------------------------------------------------------------------------
-    def wait(self, boredtime=1):
-    
-        while any([(not b._queue.empty() or b.boredTime()<boredtime) for b in self.blocks()]):
-              time.sleep(1);
-              
-        for b in self.blocks():
-            b.terminate();
-            
+    def wait(self):
+        """
+        Inicia el loop asíncrono y procesa los mensajes enviados por medio de la cola del contexto uno a uno.
+        Se supone que el usuario ha colocado en la cola, previamente, mensajes para inicial le red.
+        Si no hay mensajes en la cola, finaliza.
+        Puede volver a invocarse, con nuevos mensajes encolados.
+        """
+        
+        timestamp=time.time();
+        debug.print("Entrando en el bucle de eventos.", flush=True);
+        while True:
+              print("Esperando por un nuevo evento ...", flush=True);
+              event=self._queue.get(True,1);
+              timestamp=time.time();
+              print(f"Nuevo evento: {event}", flush=True);
+              try:
+                 tm, target, sname, data, mods = event;
+                 target.run(sname, data, mods);
+                 
+              except Empty:
+                 diff=(time.time()-timestamp);
+                 if diff>=5.0: break;
+                 
+              except Exception as e:
+                 print(f"Excepción ejecutando un slot: {e}", flush=True);
+                 return False;
+                 
+              finally:   
+                 pass;
+                 
+        return True;
+                        
     #-----------------------------------------------------------------------------------------
     #-----------------------------------------------------------------------------------------
     class Linker:
@@ -327,46 +295,16 @@ class Context:
               self._sname=sname;
               self._mods=mods or {};
 
-          def __rshift__(self, rlinker): # a >> b, no sync
+          def __rshift__(self, rlinker): # a >> b
               assert (self._sname in self._block.signals) and (rlinker._sname in rlinker._block.slots);
               assert self._block.signals[self._sname]["type"] == rlinker._block.slots[rlinker._sname]["type"], f"Tipo incompatibles {self._block.signals[self._sname]['type']} != {rlinker._block.slots[rlinker._sname]['type']}";
-              self._mods.pop("sync", None);
-              self._mods.pop("no sync", None);
-              self._mods["sync"   ]=False;
-              self._mods["no sync"]=True;
               debug.print(f"Sunscripción: {self._block}:'{self._sname}' >> {rlinker._block}:'{rlinker._sname}'");
               Context.instance.subscribe((self._block,self._sname), (rlinker._block,rlinker._sname), (self._mods|rlinker._mods));
               return rlinker._block;
 
-          def __lshift__(self, rlinker): # a << b, no sync
+          def __lshift__(self, rlinker): # a << b
               assert (self._sname in self._block.slots) and (rlinker._sname in rlinker._block.signals);
               assert self._block.slots[self._sname]["type"] == rlinker._block.signals[rlinker._sname]["type"], f"Tipo incompatibles {self._block.slots[self._sname]['type']} != {rlinker._block.signals[rlinker._sname]['type']}";
-              self._mods.pop("sync", None);
-              self._mods.pop("no sync", None);
-              self._mods["sync"   ]=False;
-              self._mods["no sync"]=True;
               debug.print(f"Sunscripción: {rlinker._block}:'{rlinker._sname}' << {self._block}:'{self._sname}'");
-              Context.instance.subscribe((rlinker._block,rlinker._sname), (self._block,self._sname), (rlinker._mods|self._mods));
-              return self._block;
-
-          def __ge__(self, rlinker): # a >= b, sync
-              assert (self._sname in self._block.signals) and (rlinker._sname in rlinker._block.slots);
-              assert self._block.signals[self._sname]["type"] == rlinker._block.slots[rlinker._sname]["type"], f"Tipo incompatibles {self._block.signals[self._sname]['type']} != {rlinker._block.slots[rlinker._sname]['type']}";
-              self._mods.pop("sync", None);
-              self._mods.pop("no sync", None);
-              self._mods["sync"   ]=True;
-              self._mods["no sync"]=False;
-              debug.print(f"Sunscripción: {self._block}:'{self._sname}' >= {rlinker._block}:'{rlinker._sname}'");
-              Context.instance.subscribe((self._block,self._sname), (rlinker._block,rlinker._sname), (self._mods|rlinker._mods));
-              return rlinker._block;
-
-          def __ge__(self, rlinker): # a >= b, sync
-              assert (self._sname in self._block.slots) and (rlinker._sname in rlinker._block.signals);
-              assert self._block.slots[self._sname]["type"] == rlinker._block.signals[rlinker._sname]["type"], f"Tipo incompatibles {self._block.slots[self._sname]['type']} != {rlinker._block.signals[rlinker._sname]['type']}";
-              self._mods.pop("sync", None);
-              self._mods.pop("no sync", None);
-              self._mods["sync"   ]=True;
-              self._mods["no sync"]=False;
-              debug.print(f"Sunscripción: {rlinker._block}:'{rlinker._sname}' <= {self._block}:'{self._sname}'");
               Context.instance.subscribe((rlinker._block,rlinker._sname), (self._block,self._sname), (rlinker._mods|self._mods));
               return self._block;

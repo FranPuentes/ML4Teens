@@ -48,5 +48,4 @@ class Display(Block):
           if self._feed==False: update_display(imagen, display_id=self._id);
           else:                 display(imagen);
           self.signal_image(data);
-          del self.tokens["image"];
 

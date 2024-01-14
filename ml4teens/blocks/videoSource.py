@@ -168,5 +168,4 @@ class VideoSource(Block):
           finally:
             fd.release();
             if istemp: os.remove(fuente);
-            del self.tokens["source"];
 
