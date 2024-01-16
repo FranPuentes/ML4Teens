@@ -29,52 +29,24 @@ class VideoSource(Block):
           
       #-------------------------------------------------------------------------
       def __del__(self):
+          self.reset();
+
+      #-------------------------------------------------------------------------
+      def reset(self):
+      
           if self._fd is not None:
              self._fd.release();
-             self._fd    =None;
-             self._source=None;
-             self._fuente=None;
-             self._istemp=None;
-             self._tm    =None;
-             self._delay =None;                       
+             
+          if self._fuente is not None and self._istemp:
+             os.remove(self._fuente);
+             
+          self._fd    =None;
+          self._source=None;
+          self._fuente=None;
+          self._istemp=None;
+          self._tm    =None;
+          self._delay =None;                       
 
-      #-------------------------------------------------------------------------
-      @Block.signal("source", str)
-      def signal_frame(self, frame):
-          return frame;
-
-      #-------------------------------------------------------------------------
-      """
-      @Block.signal("device", int)
-      def signal_frame(self, frame):
-          return frame;
-      """
-      
-      #-------------------------------------------------------------------------
-      @Block.signal("frame", Image)
-      def signal_frame(self, frame):
-          return frame;
-
-      #-------------------------------------------------------------------------
-      @Block.signal("dims", tuple)
-      def signal_dims(self, data):
-          return data;
-
-      #-------------------------------------------------------------------------
-      @Block.signal("info", dict)
-      def signal_info(self, data):
-          return data;
-
-      #-------------------------------------------------------------------------
-      @Block.signal("begin", int)
-      def signal_begin(self, data):
-          return data;
-
-      #-------------------------------------------------------------------------
-      @Block.signal("end", bool)
-      def signal_end(self, data):
-          return data;
-          
       #-------------------------------------------------------------------------
       def _resize(self, imagen, width, height):
       
@@ -107,85 +79,162 @@ class VideoSource(Block):
              if self.params.filter.upper()=="LANCZOS":  return imagen.resize((width, height), PIL.Image.Resampling.LANCZOS, box);
              
           return imagen.resize((width, height));
-            
+          
+      #-------------------------------------------------------------------------
+      @Block.signal("source", str)
+      def signal_source(self, data):
+          return data;
+
+      #-------------------------------------------------------------------------
+      """
+      @Block.signal("device", int)
+      def signal_frame(self, frame):
+          return frame;
+      """
+      
+      #-------------------------------------------------------------------------
+      @Block.signal("frame", Image)
+      def signal_frame(self, frame):
+          return frame;
+
+      #-------------------------------------------------------------------------
+      @Block.signal("dims", tuple)
+      def signal_dims(self, data):
+          return data;
+
+      #-------------------------------------------------------------------------
+      @Block.signal("info", dict)
+      def signal_info(self, data):
+          return data;
+
+      #-------------------------------------------------------------------------
+      @Block.signal("begin", int)
+      def signal_begin(self, data):
+          return data;
+
+      #-------------------------------------------------------------------------
+      @Block.signal("end", bool)
+      def signal_end(self, data):
+          return data;
+                     
       #-------------------------------------------------------------------------
       @Block.slot("source", {str,int})
-      def slot_source(self, slot, fuente):
+      def slot_source(self, slot, source):
 
           # TODO 'fuente' puede ser un número de dispositivo! Y lo será.
           
           # TODO mandar la señal 'source'
           # TODO mandar la señal 'device'
 
-          istemp=False;
-          if fuente.startswith("http"):
-             with requests.get(fuente, stream=True) as r:
+          self.reset();
+          
+          self._source=source;
+          
+          if self._source.startswith("http"):
+             with requests.get(self._source, stream=True) as r:
                   r.raise_for_status();
                   with NamedTemporaryFile(delete=False, suffix='.mp4') as f:
                        for chunk in r.iter_content(chunk_size=65536//8):
                            f.write(chunk);
-                       fuente = f.name;
-                       istemp=True;
+                       self._fuente = f.name;
+                       self._istemp = True;
+          else:
+             self._fuente = self._source;
+             self._istemp = False;
 
-          if not os.path.exists(fuente): raise RuntimeError(f"El fichero '{fuente}', no existe.");
+          if not os.path.exists(self._fuente): raise RuntimeError(f"El fichero '{self._fuente}', no existe.");
 
-          fd = cv.VideoCapture(fuente);
+          self._fd = cv.VideoCapture(self._fuente);
           try:
-            if not fd.isOpened(): raise RuntimeError(f"Error al abrir el vídeo '{fuente}'");
+            if not self._fd.isOpened():
+               raise RuntimeError(f"Error al abrir el vídeo '{self._fuente}'");
+               
             else:
-                ancho       = fd.get(cv.CAP_PROP_FRAME_WIDTH);
-                alto        = fd.get(cv.CAP_PROP_FRAME_HEIGHT);
-                fps         = fd.get(cv.CAP_PROP_FPS);
-                frames      = fd.get(cv.CAP_PROP_FRAME_COUNT);
-                codificador = int(fd.get(cv.CAP_PROP_FOURCC));
-                delay       = int(1000/fps);
+                ancho       = self._fd.get(cv.CAP_PROP_FRAME_WIDTH);
+                alto        = self._fd.get(cv.CAP_PROP_FRAME_HEIGHT);
+                fps         = self._fd.get(cv.CAP_PROP_FPS);
+                frames      = self._fd.get(cv.CAP_PROP_FRAME_COUNT);
+                codificador = int(self._fd.get(cv.CAP_PROP_FOURCC));
+                
+                self._delay = int(1000/fps);
                 
                 speed=self.params.speed or 1;
-                delay=delay*speed;
+                self._delay=self._delay*speed;
 
-                self.signal_info({"source":fuente, "width":ancho, "height":alto, "fps":fps, "frames":frames, "encoder":codificador, "delay":delay });
+                self.signal_info({"source":self._source, "width":ancho, "height":alto, "fps":fps, "frames":frames, "encoder":codificador, "delay":self._delay });
 
-                ok, frame = fd.read();
+                ok, frame = self._fd.read();
                 
-                assert len(frame.shape)==2 or (len(frame.shape)==3 and frame.shape[2] in [3, 4]), "Formato de vídeo no soportado";
+                if not ok:
+                   self.signal_end(True);
+                   self.reset();
                 
-                if ok:
+                else:
+                   assert len(frame.shape)==2 or (len(frame.shape)==3 and frame.shape[2] in [3, 4]), "Formato de vídeo no soportado";
+
+                   self.signal_begin(frames);
+                
                    if len(frame.shape)==3: shape=(alto,ancho,frame.shape[2]);
                    else:                   shape=(alto,ancho,1);
                    self.signal_dims(shape);
-
-                   self.signal_begin(frames);
                    
-                   while ok:
-                         timestamp=time.time();
+                   self._tm = time.time();
 
-                         # TODO, quedarnos sólo con unos pocos modos: L, RGB, RGBA, ...
-                         
-                         if len(frame.shape)==2:
-                            frame=frame;
-                         else:
-                            if frame.shape[2]==3:
-                               frame=cv.cvtColor(frame, cv.COLOR_BGR2RGB);
-                            else:
-                               frame=cv.cvtColor(frame, cv.COLOR_BGRA2RGBA);
-                                   
-                         frame = PIL.Image.fromarray(frame);
-                         frame = self._resize(frame, self.params.width, self.params.height);
-                         self.signal_frame(frame);
-                         
-                         ok, frame = fd.read();
-
-                         diff=int((time.time()-timestamp)*1000);
-                         if diff>=delay: pass;
-                         else:           time.sleep((delay-diff)/1000);
-                         
-                   self.signal_end(True);
+                   # TODO, quedarnos sólo con unos pocos modos: L, RGB, RGBA, ...
+                   
+                   if len(frame.shape)==2:
+                      frame=frame;
+                   else:
+                      if frame.shape[2]==3:
+                         frame=cv.cvtColor(frame, cv.COLOR_BGR2RGB);
+                      else:
+                         frame=cv.cvtColor(frame, cv.COLOR_BGRA2RGBA);
+                             
+                   frame = PIL.Image.fromarray(frame);
+                   frame = self._resize(frame, self.params.width, self.params.height);
+                   self.signal_frame(frame);
                    
           except Exception as e:
             self.signal_end(False);
+            self.reset();
             raise e;
             
-          finally:
-            fd.release();
-            if istemp: os.remove(fuente);
+      #-------------------------------------------------------------------------
+      @Block.slot("next", {object})
+      def slot_next(self, slot, _):
 
+          if self._fd is None or not fd.isOpened():
+             raise RuntimeError(f"Se ha invocado al slot 'next' de '{self._fullClassName}' sin tener una fuente abierta.");
+             
+          else:
+             ok, frame = fd.read();
+             
+             if not ok:
+                self.signal_end(True);
+                self.reset();
+             
+             else:
+                assert len(frame.shape)==2 or (len(frame.shape)==3 and frame.shape[2] in [3, 4]), "Formato de vídeo no soportado";
+             
+                diff=int((time.time()-self._tm)*1000);
+                if diff>=self._delay: pass;
+                else:                 time.sleep((self._delay-diff)/1000);
+
+                # TODO, quedarnos sólo con unos pocos modos: L, RGB, RGBA, ...
+                
+                if len(frame.shape)==2:
+                   frame=frame;
+                else:
+                   if frame.shape[2]==3:
+                      frame=cv.cvtColor(frame, cv.COLOR_BGR2RGB);
+                   else:
+                      frame=cv.cvtColor(frame, cv.COLOR_BGRA2RGBA);
+                          
+                frame = PIL.Image.fromarray(frame);
+                frame = self._resize(frame, self.params.width, self.params.height);
+                self.signal_frame(frame);
+                      
+          except Exception as e:
+            self.signal_end(False);
+            self.reset();
+            raise e;
