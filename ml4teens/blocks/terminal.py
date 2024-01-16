@@ -25,7 +25,6 @@ class Terminal(Block):
           message=data;
           style="background-color: green; color: white";
           self.__print(message,style);
-          del self.tokens["stdout"];
 
       #-------------------------------------------------------------------------
       @Block.slot("stderr", {str,list,set,tuple,dict,object})
@@ -33,5 +32,4 @@ class Terminal(Block):
           message=data;
           style="background-color: brown; color: white";
           self.__print(message,style);
-          del self.tokens["stderr"];
 

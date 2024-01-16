@@ -17,6 +17,7 @@ class SplitChannels(Block):
           bands=data.getbands();
           channels= data.split();
           assert len(bands)==len(channels), "Formato de imagen no soportado: bands!=channels";
+          
           for (band, channel) in zip(bands,channels):
 
               if band=='1' and self.signal_1bit()       and mode=='1':
@@ -76,9 +77,6 @@ class SplitChannels(Block):
 
               if band=='F' and self.signal_F()          and mode in ["F"]:
                  self.signal_F(channel);
-
-          del self.tokens["image"];
-
 
       #-------------------------------------------------------------------------
       @Block.signal("1bit", Image)

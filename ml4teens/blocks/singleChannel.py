@@ -10,21 +10,19 @@ class SingleChannel(Block):
       #-------------------------------------------------------------------------
       # channel
       def __init__(self, **kwargs):
-          super().__init__(**kwargs);
-          if "channel" in kwargs: self._channel=kwargs["channel"];
-          else:                   self._channel=0;
-          assert type(self._channel)==int, f"El parámetro 'channel' debe ser el número del canal (0, ...)";
+          super().__init__(**kwargs);          
+          self.params.channel= self.params.channel or 0;
+          assert type(self.params.channel)==int, f"El parámetro 'channel' debe ser el número del canal (0, ...)";
 
       #-------------------------------------------------------------------------
       @Block.slot("image", {Image})
       def slot_image(self, slot, data):
           assert type(data) is Image;
           c=len(data.getbands());
-          n=self._channel;
+          n=self.params.channel;
           assert n in range(0,c), f"El canal {n} no puede ser extraído de una imagen de {c} canales (recuerda: empieza a contar en 0)";
           imagen=data.getchannel(n);
           self.signal_image(imagen);
-          del self.tokens["image"];
 
       #-------------------------------------------------------------------------
       @Block.signal("image", Image)

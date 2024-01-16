@@ -16,6 +16,8 @@ class ImageOp(Block):
           self._op         = self.params.op;
           self._autoredim  = self.params.autoredim;
           self._expression = self.params.expression;
+          self._left       = None;
+          self._right      = None;
           self._last       = None;
           self._kwargs     = kwargs;
           
@@ -28,7 +30,7 @@ class ImageOp(Block):
           
           if self._op is None: raise RuntimeError("Los objetos de la clase ImageOp necesitan el parámetro 'op' con la operación a realizar");
 
-          self._op = self._op if self._op is None else (" ".join(self._op.split())).lower();
+          self._op = self._op if self._op is None else (" ".join(self._op.split())).lower();          
 
       #-------------------------------------------------------------------------
       def _redim(self, l,r):
@@ -132,7 +134,7 @@ class ImageOp(Block):
       #-------------------------------------------------------------------------
       @Block.slot("image", {Image})
       def slot_image(self, slot, data):
-          
+
           imagen=None;
 
           if len(self._op.split())>=2 and self._op.split()[-1] in ["seq","acc"]:
@@ -259,24 +261,22 @@ class ImageOp(Block):
           self.signal_image(imagen);
           self.signal_left (imagen);
           self.signal_right(imagen);
-          del self.tokens["image"];
         
       #-------------------------------------------------------------------------
       # BINARIAS
       #-------------------------------------------------------------------------
       def _binary(self):
-          right=self.tokens["right"].data;
-          left =self.tokens["left" ].data;
+          right=self._right;
+          left =self._left;
           if left and right:
              imagen=self._op2(left, right, self._op, self._kwargs);
-             del self.tokens["left" ];
-             del self.tokens["right"];
              return imagen;
           return None;      
 
       #-------------------------------------------------------------------------
       @Block.slot("left", {Image})
       def slot_left(self, slot, data):
+          self._left=data;
           imagen=self._binary();
           self.signal_image(imagen);
           self.signal_left(imagen);
@@ -284,6 +284,7 @@ class ImageOp(Block):
       #-------------------------------------------------------------------------
       @Block.slot("right", {Image})
       def slot_right(self, slot, data):
+          self._right=data;
           imagen=self._binary();
           self.signal_image(imagen);
           self.signal_right(imagen);

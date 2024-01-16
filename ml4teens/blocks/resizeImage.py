@@ -21,15 +21,15 @@ class ResizeImage(Block):
       def slot_shape(self, slot, data):
       
           if   type(data) is tuple and len(data)>=2:
-               self.tokens[slot].data=data[:2];
+               self._width, self._height = data[:2];
                self.signal_shape(tuple(data[:2]));
                
           elif type(data) is list and len(data)>=2:
-               self.tokens[slot].data=data[:2];
+               self._width, self._height = data[:2];
                self.signal_shape(tuple(data[:2]));
                
           elif isinstance(data,Image):
-               self.tokens[slot].data=(data.width,data.height);
+               self._width, self._height = data.width, data.height;
                self.signal_shape((data.width,data.height));
                
           else:
@@ -39,12 +39,8 @@ class ResizeImage(Block):
       @Block.slot("image", {Image})
       def slot_image(self, slot, data):
 
-          if self.tokens["shape"].data:
-             width =self.tokens["shape"].data[0];
-             height=self.tokens["shape"].data[1];
-          else:
-             width =self._width ;
-             height=self._height;
+          width =self._width ;
+          height=self._height;
 
           if width  is not None and type(width ) is float: width =int(data.width *width );
           if height is not None and type(height) is float: height=int(data.height*height);
@@ -62,8 +58,6 @@ class ResizeImage(Block):
                 
              self.signal_image(data.resize( (width,height) ));
              
-          del self.tokens["image"];
-
       #-------------------------------------------------------------------------
       @Block.signal("image", Image)
       def signal_image(self, data):

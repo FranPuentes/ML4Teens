@@ -44,7 +44,6 @@ class Segmentation(Block):
                  image = PIL.Image.fromarray(image[..., ::-1]);
                  assert isinstance(image, Image);
                  self.signal_image(image);
-          del self.tokens["image"];
 
       #-------------------------------------------------------------------------
       @Block.signal("mask", Image)

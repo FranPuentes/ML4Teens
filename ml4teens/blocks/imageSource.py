@@ -121,6 +121,5 @@ class ImageSource(Block):
                     self.signal_image(self._resize(imagen, self.width, self.height));
 
           finally:
-            del self.tokens["source"];
             if istemp:
                os.remove(fuente);
