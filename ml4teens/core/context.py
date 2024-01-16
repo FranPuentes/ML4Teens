@@ -1,5 +1,6 @@
 import torch;
 import queue;
+import time;
 
 from IPython.display import display;
 from IPython.display import HTML, Javascript;
@@ -206,10 +207,10 @@ class Context:
            data =kwargs.get("data" ) or kwargs.get("value"    );
            mods =kwargs.get("mods" ) or {};
            assert type(mods) is dict;
-           print(f"Ha llegado un evento del usuario al slot '{sname}' de {target._fullClassName}::{type(data)}", flush=True);
+           debug.print(f"Ha llegado un evento del usuario al slot '{sname}' de {target._fullClassName}::{type(data)}");
            if sname in target.slots:
               slot=target.slots[sname];              
-              print(f"Encolando: Una señal a {target._fullClassName} en el slot '{sname}' con data={type(data)}", flush=True);
+              debug.print(f"Encolando: Una señal a {target._fullClassName} en el slot '{sname}' con data={type(data)}");
               self._queue.put( (time.time(), target, sname, data, mods) );
            else:
               raise RuntimeError(f"No existe el slot '{sname}' en {target._fullClassName}");
@@ -223,10 +224,10 @@ class Context:
            data =kwargs.get("data" ) or kwargs.get("value"    );
            mods =kwargs.get("mods" ) or {};
            assert type(mods) is dict;
-           print(f"Ha llegado un evento al slot '{sname}' de {target._fullClassName}::{type(data)}", flush=True);
+           debug.print(f"Ha llegado un evento al slot '{sname}' de {target._fullClassName}::{type(data)}");
            if sname in target.slots:
               slot=target.slots[sname];              
-              print(f"Encolando una señal a {target._fullClassName} en el slot '{sname}' con data={type(data)}", flush=True);
+              debug.print(f"Encolando una señal a {target._fullClassName} en el slot '{sname}' con data={type(data)}");
               self._queue.put_nowait( (time.time(), target, sname, data, mods) );              
            else:
               raise RuntimeError(f"No existe el slot '{sname}' en {target._fullClassName}");
@@ -244,13 +245,13 @@ class Context:
            if signal in self.listeners:
               for slot, _mods in self.listeners[signal]:
                   target, slot_name = slot;
-                  print(f"Enviando la señal '{slot_name}', con data={type(data)}, a {target._fullClassName}'", flush=True);
+                  debug.print(f"Enviando la señal '{slot_name}', con data={type(data)}, a {target._fullClassName}'");
                   self.emit(source=source, target=target, sname=slot_name, data=data, mods=(mods|_mods));
            else:
               raise RuntimeError(f"No existe la señal '{sname}' en {source._fullClassName}");
                
     #-----------------------------------------------------------------------------------------
-    def wait(self):
+    def wait(self, timeout=1):
         """
         Inicia el loop asíncrono y procesa los mensajes enviados por medio de la cola del contexto uno a uno.
         Se supone que el usuario ha colocado en la cola, previamente, mensajes para inicial le red.
@@ -261,20 +262,23 @@ class Context:
         timestamp=time.time();
         debug.print("Entrando en el bucle de eventos.", flush=True);
         while True:
-              print("Esperando por un nuevo evento ...", flush=True);
-              event=self._queue.get(True,1);
-              timestamp=time.time();
-              print(f"Nuevo evento: {event}", flush=True);
               try:
+                 try:
+                   debug.print("Esperando por un nuevo evento ...");
+                   event=self._queue.get(True,1);
+                 
+                 except queue.Empty:
+                   diff=(time.time()-timestamp);
+                   if diff>timeout: break;
+                   else:            continue;
+                   
+                 timestamp=time.time();
+                 debug.print(f"Nuevo evento: {event}");
                  tm, target, sname, data, mods = event;
                  target.run(sname, data, mods);
-                 
-              except Empty:
-                 diff=(time.time()-timestamp);
-                 if diff>=5.0: break;
-                 
+                                  
               except Exception as e:
-                 print(f"Excepción ejecutando un slot: {e}", flush=True);
+                 debug.print(f"Excepción ejecutando un slot: {e}");
                  return False;
                  
               finally:   
@@ -296,14 +300,16 @@ class Context:
               self._mods=mods or {};
 
           def __rshift__(self, rlinker): # a >> b
-              assert (self._sname in self._block.signals) and (rlinker._sname in rlinker._block.slots);
+              assert self._sname in self._block.signals,     f"Signal '{self._sname}' no existe en '{self._block._fullClassName}'";
+              assert rlinker._sname in rlinker._block.slots, f"Slot '{rlinker._sname}' no existe en '{rlinker._block._fullClassName}'";
               assert self._block.signals[self._sname]["type"] == rlinker._block.slots[rlinker._sname]["type"], f"Tipo incompatibles {self._block.signals[self._sname]['type']} != {rlinker._block.slots[rlinker._sname]['type']}";
               debug.print(f"Sunscripción: {self._block}:'{self._sname}' >> {rlinker._block}:'{rlinker._sname}'");
               Context.instance.subscribe((self._block,self._sname), (rlinker._block,rlinker._sname), (self._mods|rlinker._mods));
               return rlinker._block;
 
           def __lshift__(self, rlinker): # a << b
-              assert (self._sname in self._block.slots) and (rlinker._sname in rlinker._block.signals);
+              assert self._sname in self._block.signals,     f"Slot '{self._sname}' no existe en '{self._block._fullClassName}'";
+              assert rlinker._sname in rlinker._block.slots, f"Signal '{rlinker._sname}' no existe en '{rlinker._block._fullClassName}'";
               assert self._block.slots[self._sname]["type"] == rlinker._block.signals[rlinker._sname]["type"], f"Tipo incompatibles {self._block.slots[self._sname]['type']} != {rlinker._block.signals[rlinker._sname]['type']}";
               debug.print(f"Sunscripción: {rlinker._block}:'{rlinker._sname}' << {self._block}:'{self._sname}'");
               Context.instance.subscribe((rlinker._block,rlinker._sname), (self._block,self._sname), (rlinker._mods|self._mods));

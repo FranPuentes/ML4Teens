@@ -1,6 +1,7 @@
 import random;
 import string;
 import time;
+import types;
 
 from abc import ABC, abstractmethod;
 
@@ -103,7 +104,7 @@ class Block(ABC):
               else:
                  if self.checkSignalUsage("done"):
                     Context.instance.emit(source=self, sname="done", data=data, mods={});
-          self.signal_done=wrapper;
+          self.signal_done=types.MethodType(wrapper, self);
           
       #-------------------------------------------------------------------------
       def __hash__(self):

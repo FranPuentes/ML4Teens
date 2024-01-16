@@ -19,6 +19,24 @@ class VideoSource(Block):
       def __init__(self, **kwargs):
           super().__init__(**kwargs);
           self.sync=True;
+          
+          self._source=None;
+          self._fuente=None;
+          self._istemp=None;
+          self._fd    =None;
+          self._tm    =None;
+          self._delay =None;
+          
+      #-------------------------------------------------------------------------
+      def __del__(self):
+          if self._fd is not None:
+             self._fd.release();
+             self._fd    =None;
+             self._source=None;
+             self._fuente=None;
+             self._istemp=None;
+             self._tm    =None;
+             self._delay =None;                       
 
       #-------------------------------------------------------------------------
       @Block.signal("source", str)
@@ -26,10 +44,12 @@ class VideoSource(Block):
           return frame;
 
       #-------------------------------------------------------------------------
+      """
       @Block.signal("device", int)
       def signal_frame(self, frame):
           return frame;
-
+      """
+      
       #-------------------------------------------------------------------------
       @Block.signal("frame", Image)
       def signal_frame(self, frame):
