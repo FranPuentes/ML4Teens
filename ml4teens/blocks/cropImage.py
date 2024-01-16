@@ -36,6 +36,8 @@ class CropImage(Block):
                  y2=int(image.height*box[3]);
                  img=image.crop( (x1,y1,x2,y2) );
                  self.signal_image(img);
+             self._boxes=None;
+             self._image=None;
 
       #-------------------------------------------------------------------------
       @Block.slot("boxes", {tuple, list})
@@ -77,16 +79,15 @@ class CropImage(Block):
       #-------------------------------------------------------------------------
       @Block.slot("image", {Image})
       def slot_image(self, slot, data):
+          self._image=data;
           x1=self.params.x1;
           y1=self.params.y1;
           x2=self.params.x2;
           y2=self.params.y2;
           if all([(d is not None) for d in [x1,y1,x2,y2]]):
              self._boxes=[(x1,y1,x2,y2)];
-             self._image=data;
              self._crop();
           else:
-             self._image=data;
              self._crop();
 
       #-------------------------------------------------------------------------

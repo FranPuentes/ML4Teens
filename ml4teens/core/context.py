@@ -258,33 +258,38 @@ class Context:
         Si no hay mensajes en la cola, finaliza.
         Puede volver a invocarse, con nuevos mensajes encolados.
         """
-        
-        timestamp=time.time();
-        debug.print("Entrando en el bucle de eventos.", flush=True);
-        while True:
-              try:
-                 try:
-                   debug.print("Esperando por un nuevo evento ...");
-                   event=self._queue.get(True,1);
-                 
-                 except queue.Empty:
-                   diff=(time.time()-timestamp);
-                   if diff>timeout: break;
-                   else:            continue;
+                
+        try:
+          timestamp=time.time();        
+          debug.print("Entrando en el bucle de eventos.", flush=True);
+          while True:
+                try:
+                   try:
+                     debug.print("Esperando por un nuevo evento ...");
+                     event=self._queue.get(True,1);
                    
-                 timestamp=time.time();
-                 debug.print(f"Nuevo evento: {event}");
-                 tm, target, sname, data, mods = event;
-                 target.run(sname, data, mods);
-                                  
-              except Exception as e:
-                 debug.print(f"Excepción ejecutando un slot: {e}");
-                 return False;
-                 
-              finally:   
-                 pass;
-                 
-        return True;
+                   except queue.Empty:
+                     diff=(time.time()-timestamp);
+                     if diff>timeout: break;
+                     else:            continue;
+                     
+                   timestamp=time.time();
+                   debug.print(f"Nuevo evento: {event}");
+                   tm, target, sname, data, mods = event;
+                   target.run(sname, data, mods);
+                                    
+                except KeyboardInterrupt as e:
+                   debug.print("Interrumpido por el/la usuario/a.", exception=e);
+                   return False;
+                   
+                except Exception as e:
+                   debug.print(f"Excepción ejecutando un slot: {e}");
+                   return False;
+          
+          return True;
+        
+        finally:
+          while not self._queue.empty(): self._queue.get();
                         
     #-----------------------------------------------------------------------------------------
     #-----------------------------------------------------------------------------------------
@@ -308,8 +313,8 @@ class Context:
               return rlinker._block;
 
           def __lshift__(self, rlinker): # a << b
-              assert self._sname in self._block.signals,     f"Slot '{self._sname}' no existe en '{self._block._fullClassName}'";
-              assert rlinker._sname in rlinker._block.slots, f"Signal '{rlinker._sname}' no existe en '{rlinker._block._fullClassName}'";
+              assert self._sname in self._block.slots,         f"Slot '{self._sname}' no existe en '{self._block._fullClassName}'";
+              assert rlinker._sname in rlinker._block.signals, f"Signal '{rlinker._sname}' no existe en '{rlinker._block._fullClassName}'";
               assert self._block.slots[self._sname]["type"] == rlinker._block.signals[rlinker._sname]["type"], f"Tipo incompatibles {self._block.slots[self._sname]['type']} != {rlinker._block.signals[rlinker._sname]['type']}";
               debug.print(f"Sunscripción: {rlinker._block}:'{rlinker._sname}' << {self._block}:'{self._sname}'");
               Context.instance.subscribe((rlinker._block,rlinker._sname), (self._block,self._sname), (rlinker._mods|self._mods));

@@ -14,51 +14,57 @@ class ImageOp(Block):
           super().__init__(**kwargs);
 
           self._op         = self.params.op;
-          self._autoredim  = self.params.autoredim;
+          self._autoredim  = self.params.autoredim or "average";
           self._expression = self.params.expression;
           self._left       = None;
           self._right      = None;
           self._last       = None;
           self._kwargs     = kwargs;
           
+          if self._op is None: raise RuntimeError("Los objetos de la clase ImageOp necesitan el parámetro 'op' con la operación a realizar");
+          
           def delparam(key):
               if key in self._kwargs: del self._kwargs[key];
 
           delparam("op");
           delparam("autoredim");
-          delparam("expression");
-          
-          if self._op is None: raise RuntimeError("Los objetos de la clase ImageOp necesitan el parámetro 'op' con la operación a realizar");
+          delparam("expression");          
 
-          self._op = self._op if self._op is None else (" ".join(self._op.split())).lower();          
+          self._op = (" ".join([t.strip() for t in self._op.split()])).lower();
 
       #-------------------------------------------------------------------------
       def _redim(self, l,r):
           if l.size != r.size:
+          
              if self._autoredim==None or self._autoredim.lower() in ["l","left"]:
                 l = l.resize(r.size);
                 return (l,r);
+                
              if self._autoredim.lower() in ["r","right"]:
                 r = r.resize(l.size);
                 return (l,r);
+                
              if self._autoredim.lower() in ["mn","min"]:
                 width =min(l.width,  r.width );
                 height=min(l.height, r.height);
                 l=l.resize( (width, height) );
                 r=r.resize( (width, height) );
                 return (l,r);
+                
              if self._autoredim.lower() in ["mx","max"]:
                 width =max(l.width,  r.width );
                 height=max(l.height, r.height);
                 l=l.resize( (width, height) );
                 r=r.resize( (width, height) );
                 return (l,r);
+                
              if self._autoredim.lower() in ["a","avg","average"]:
                 width =(l.width +r.width )//2;
                 height=(l.height+r.height)//2;
                 l=l.resize( (width, height) );
                 r=r.resize( (width, height) );
                 return (l,r);
+                
           return (l,r);
 
       #-------------------------------------------------------------------------
@@ -66,7 +72,7 @@ class ImageOp(Block):
           
           left, right = self._redim(left, right);
           
-          imagen=None;
+          imagen=None;          
 
           if   op in ["diff"]:
                imagen = ImageChops.difference(left, right);
@@ -140,17 +146,17 @@ class ImageOp(Block):
           if len(self._op.split())>=2 and self._op.split()[-1] in ["seq","acc"]:
              
              tp=self._op.split()[-1];
-
+             
              if self._last==None:
                 self._last=data;
-             else:
-               op=" ".join(self._op.split()[:-1]);
-               right=self._last;
-               left =data;
-               imagen=self._op2(left,right,op,self._kwargs);
-               if tp=="seq": self._last=data;
-               if tp=="acc": self._last=imagen;
 
+             op=" ".join(self._op.split()[:-1]);
+             left =self._last;
+             right=data;
+             imagen=self._op2(left,right,op,self._kwargs);
+             if tp=="seq": self._last=data;
+             if tp=="acc": self._last=imagen;
+               
           elif self._op=="invert":
                imagen = ImageOps.invert(data);
 
@@ -259,8 +265,8 @@ class ImageOp(Block):
                imagen = ImageMath.eval(self._expression, image=data);             
 
           self.signal_image(imagen);
-          self.signal_left (imagen);
-          self.signal_right(imagen);
+          #self.signal_left (imagen);
+          #self.signal_right(imagen);
         
       #-------------------------------------------------------------------------
       # BINARIAS
