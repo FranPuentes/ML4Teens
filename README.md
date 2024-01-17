@@ -9,11 +9,11 @@ Cada bloque hace algo concreto; cada uno de ellos genera *signal*s y posee *slot
 Un objeto (*singleton*) se encarga de emparejar los signals con slots (con control de tipos) y lanzar la red.
 
 >[!NOTE]
->Versión actual: 0.1.22 en pip.
+>Versión actual: 0.1.23 en pip.
 
->[!CAUTION]
->El submódulo *blocks* todavía **no está en estado *estable* **, por lo que puede sufrir cambios en un futuro.
->El submódulo *core* está en estado estable, pero podría tener errores y sufrir añadidos/mejoras en un futuro.
+>[!NOTE]
+>El submódulo *blocks*/*img* **está en estado *estable* **.
+>El submódulo *core* está en estado estable.
 
 El código que sigue, muestra un ejemplo de lo que puede hacer el paquete (en 'main').
 
@@ -22,8 +22,8 @@ import ml4teens as ml;
 
 context   = ml.core.Context.instance.reset();
 
-imagen   = ml.blocks.ImageSource();
-img2text = ml.blocks.ImageToText(caption="A photo of an");
+imagen   = ml.blocks.img.ImageSource();
+img2text = ml.blocks.img.ImageToText(caption="A photo of an");
 terminal = ml.blocks.Terminal();
 salida   = ml.blocks.Display(width=300);
 
