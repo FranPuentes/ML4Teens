@@ -12,7 +12,7 @@ Un objeto (*singleton*) se encarga de emparejar los signals con slots (con contr
 >Versión actual: 0.1.23 en pip.
 
 >[!NOTE]
->El submódulo *blocks*/*img* **está en estado *estable* **.
+>El submódulo *blocks*/*img* **está en estado *estable** *.
 >
 >El submódulo *core* está en estado estable.
 
