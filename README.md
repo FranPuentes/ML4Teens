@@ -8,6 +8,11 @@ Cada bloque hace algo concreto; cada uno de ellos genera *signal*s y posee *slot
 
 Un objeto (*singleton*) se encarga de emparejar los signals con slots (con control de tipos) y lanzar la red.
 
+>[!WARNING]
+>Hay un error en la versión 0.1.23 que hace que no se pueda importar.
+>
+>Lo soluciono en breve, en la versión 0.1.24.
+
 >[!NOTE]
 >Versión actual: 0.1.23 en pip.
 
