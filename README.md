@@ -13,6 +13,7 @@ Un objeto (*singleton*) se encarga de emparejar los signals con slots (con contr
 
 >[!NOTE]
 >El submódulo *blocks*/*img* **está en estado *estable* **.
+>
 >El submódulo *core* está en estado estable.
 
 El código que sigue, muestra un ejemplo de lo que puede hacer el paquete (en 'main').
