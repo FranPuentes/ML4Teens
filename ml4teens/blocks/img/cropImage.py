@@ -29,7 +29,7 @@ class CropImage(Block):
           if boxes is not None and image is not None:
              n=self.params.n or 1;
              for i,box in enumerate(boxes):
-                 if n is not None and i+1 > n: break;
+                 #if n is not None and i+1 > n: break;
                  x1=int(image.width *box[0]);
                  y1=int(image.height*box[1]);
                  x2=int(image.width *box[2]);

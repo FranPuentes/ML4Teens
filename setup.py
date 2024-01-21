@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='ml4teens',
-    version='0.1.23',
+    version='0.1.25',
     packages=find_packages(),
     install_requires=[ "ipython", 
                        "opencv-python", 
@@ -14,6 +14,7 @@ setup(
                        "ipyevents",
                        "pandas>=1.3.4",
                        "transformers",
+                       "torch",
                        "face_recognition",
                      ],
     # metadata para publicar en PyPI

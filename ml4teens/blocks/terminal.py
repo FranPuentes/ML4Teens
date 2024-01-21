@@ -1,5 +1,8 @@
-from IPython.display import update_display, HTML;
+import io;
+import pprint;
 import json;
+
+from IPython.display import update_display, HTML;
 
 from ..core import Block;
 
@@ -12,12 +15,16 @@ class Terminal(Block):
       #-------------------------------------------------------------------------
       def __print(self, message, plus_style):
           style =f"border:1px black; padding: 5px; margin: 3px; {plus_style}";
-          if   type(message) is str:   display( HTML(f"<div style='width:95%; {style}'>{    message }</div>") );
-          elif type(message) is dict:  display( HTML(f"<div style='width:95%; {style}'>{str(message)}</div>") );
-          else:
-             obj=message;
-             message=json.dumps(obj, indent=2, skipkeys=True);
-             display( HTML(f"<div style='width:95%; {style}'><pre>{message}</pre></div>") );
+          #if   type(message) is str:   display( HTML(f"<div style='width:95%; {style}'>str:{    message }</div>") );
+          #elif type(message) is dict:  display( HTML(f"<div style='width:95%; {style}'>dict:{str(message)}</div>") );
+          #elif type(message) is int:   display( HTML(f"<div style='width:95%; {style}'>int{    message }</div>") );
+          #elif type(message) is bool:  display( HTML(f"<div style='width:95%; {style}'>bool{    message }</div>") );
+          #else:
+          buffer = io.StringIO();
+          pp = pprint.PrettyPrinter(stream=buffer);
+          pp.pprint(message);
+          message = buffer.getvalue();
+          display( HTML(f"<div style='width:95%; {style}'><pre>{message}</pre></div>") );
 
       #-------------------------------------------------------------------------
       @Block.slot("stdout", {str,list,set,tuple,dict,object})

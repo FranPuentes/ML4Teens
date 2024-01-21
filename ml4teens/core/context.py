@@ -117,7 +117,7 @@ class Context:
         return self;
 
     #-----------------------------------------------------------------------------------------
-    def subscribe(self, signal, slot, mods={}):
+    def subscribe(self, signal, slot, mods=({},{})):
         """
         Registra la pareja (*signal*, *slot*) en este contexto.
         
@@ -128,11 +128,11 @@ class Context:
         :param slot:     El *slot*.
         :type  slot:     Tupla (*block*, *slot name*)
         :param mods:     Modificadores de *signal*/*slot*.
-        :type  mods:     dict
+        :type  mods:     dict*
         """
         assert signal is not None and type(signal) is tuple and len(signal)==2;
         assert slot   is not None and type(slot  ) is tuple and len(slot  )==2;
-        assert type(mods) is dict;
+        assert type(mods) in (tuple,list) and len(mods)==2 and all([(type(m) is dict) for m in mods]);
         if not signal in self.listeners: self.listeners[signal]=[];
         self.listeners[signal]=[(s,m) for s,m in self.listeners[signal] if s!=slot];
         self.listeners[signal].append((slot,mods));
@@ -187,31 +187,29 @@ class Context:
         :type  target: Block
         :param sname:  El nombre de una señal/slot (alias: signal_name o slot_name, según sea source/target).
         :type  sname:  str
-        :param data:   El dato que acompaña a la señal (alias: value).
+        :param data:   El dato que acompaña a la señal.
         :type  data:   Cualquier cosa.
         :param mods:   Los modificadores, si se trata de el envío de un señal a un slot.
         :type  mods:   dict | None.
         """        
         
-        assert (("source" in kwargs) and ("target" not in kwargs)) or (("source" not in kwargs) and ("target" in kwargs))  or (("source" in kwargs) and ("target" in kwargs));
-               
-        assert ("sname" in kwargs) or ("signal_name" in kwargs) or ("slot_name" in kwargs);
-        
-        assert ("data"  in kwargs) or ("value" in kwargs);
+        assert (("source" in kwargs) and ("target" not in kwargs)) or (("source" not in kwargs) and ("target" in kwargs))  or (("source" in kwargs) and ("target" in kwargs));               
+        assert ("sname" in kwargs) or ("signal_name" in kwargs) or ("slot_name" in kwargs);        
+        assert ("data"  in kwargs);
         
         if ("target" in kwargs) and ("source" not in kwargs):
            # señal enviada desde el espacio del usuario
            # ha de ejecutarse el slot (sname) correspondiente
            target=kwargs["target"];
            sname=kwargs.get("sname") or kwargs.get("slot_name");
-           data =kwargs.get("data" ) or kwargs.get("value"    );
-           mods =kwargs.get("mods" ) or {};
+           data =kwargs.get("data" );
+           mods =kwargs.get("mods" ) or {}; # signal mods
            assert type(mods) is dict;
            debug.print(f"Ha llegado un evento del usuario al slot '{sname}' de {target._fullClassName}::{type(data)}");
            if sname in target.slots:
-              slot=target.slots[sname];              
+              slot=target.slots[sname];
               debug.print(f"Encolando: Una señal a {target._fullClassName} en el slot '{sname}' con data={type(data)}");
-              self._queue.put( (time.time(), target, sname, data, mods) );
+              self._queue.put( (time.time(), target, sname, data, (mods,{})) );
            else:
               raise RuntimeError(f"No existe el slot '{sname}' en {target._fullClassName}");
            
@@ -221,14 +219,15 @@ class Context:
            source=kwargs["source"];
            target=kwargs["target"];
            sname=kwargs.get("sname") or kwargs.get("slot_name");
-           data =kwargs.get("data" ) or kwargs.get("value"    );
-           mods =kwargs.get("mods" ) or {};
-           assert type(mods) is dict;
+           data =kwargs.get("data" );
+           mods =kwargs.get("mods" ) or ({},{});
+           assert type(mods) in (tuple,list) and len(mods)==2 and all([(type(m) is dict) for m in mods]);
            debug.print(f"Ha llegado un evento al slot '{sname}' de {target._fullClassName}::{type(data)}");
            if sname in target.slots:
-              slot=target.slots[sname];              
+              slot=target.slots[sname];
+              signal_mods, slot_mods = mods;
               debug.print(f"Encolando una señal a {target._fullClassName} en el slot '{sname}' con data={type(data)}");
-              self._queue.put_nowait( (time.time(), target, sname, data, mods) );              
+              self._queue.put_nowait( (time.time(), target, sname, data, (signal_mods,slot_mods)) );
            else:
               raise RuntimeError(f"No existe el slot '{sname}' en {target._fullClassName}");
            
@@ -237,16 +236,17 @@ class Context:
            # ha de enviarse a todos sus subscriptores
            source=kwargs["source"];
            sname =kwargs.get("sname") or kwargs.get("signal_name");
-           data  =kwargs.get("data" ) or kwargs.get("value"      );
-           mods  =kwargs.get("mods" ) or {};
+           data  =kwargs.get("data" );
+           mods  =kwargs.get("mods" ) or {}; # signal mods
            assert type(mods) is dict;
            debug.print(f"{source._fullClassName}:: enviando la señal '{sname}', con data={type(data)}, a todos sus subscriptores");
            signal=(source, sname);
            if signal in self.listeners:
               for slot, _mods in self.listeners[signal]:
                   target, slot_name = slot;
+                  signal_mods, slot_mods = _mods;
                   debug.print(f"Enviando la señal '{slot_name}', con data={type(data)}, a {target._fullClassName}'");
-                  self.emit(source=source, target=target, sname=slot_name, data=data, mods=(mods|_mods));
+                  self.emit(source=source, target=target, sname=slot_name, data=data, mods=(mods|signal_mods,slot_mods));
            else:
               raise RuntimeError(f"No existe la señal '{sname}' en {source._fullClassName}");
                
@@ -295,7 +295,7 @@ class Context:
     #-----------------------------------------------------------------------------------------
     class Linker:
 
-          def __init__(self, block, sname, mods=None):
+          def __init__(self, block, sname, mods=None): # TODO indidicar signal o slot
               from .block import Block;
               assert isinstance(block, Block);
               assert sname and type(sname) is str;
@@ -309,7 +309,7 @@ class Context:
               assert rlinker._sname in rlinker._block.slots, f"Slot '{rlinker._sname}' no existe en '{rlinker._block._fullClassName}'";
               assert self._block.signals[self._sname]["type"] == rlinker._block.slots[rlinker._sname]["type"], f"Tipo incompatibles {self._block.signals[self._sname]['type']} != {rlinker._block.slots[rlinker._sname]['type']}";
               debug.print(f"Sunscripción: {self._block}:'{self._sname}' >> {rlinker._block}:'{rlinker._sname}'");
-              Context.instance.subscribe((self._block,self._sname), (rlinker._block,rlinker._sname), (self._mods|rlinker._mods));
+              Context.instance.subscribe((self._block,self._sname), (rlinker._block,rlinker._sname), (self._mods,rlinker._mods));
               return rlinker._block;
 
           def __lshift__(self, rlinker): # a << b
@@ -317,5 +317,5 @@ class Context:
               assert rlinker._sname in rlinker._block.signals, f"Signal '{rlinker._sname}' no existe en '{rlinker._block._fullClassName}'";
               assert self._block.slots[self._sname]["type"] == rlinker._block.signals[rlinker._sname]["type"], f"Tipo incompatibles {self._block.slots[self._sname]['type']} != {rlinker._block.signals[rlinker._sname]['type']}";
               debug.print(f"Sunscripción: {rlinker._block}:'{rlinker._sname}' << {self._block}:'{self._sname}'");
-              Context.instance.subscribe((rlinker._block,rlinker._sname), (self._block,self._sname), (rlinker._mods|self._mods));
+              Context.instance.subscribe((rlinker._block,rlinker._sname), (self._block,self._sname), (rlinker._mods,self._mods));
               return self._block;

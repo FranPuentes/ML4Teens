@@ -77,6 +77,7 @@ class MergeChannels(Block):
       #-------------------------------------------------------------------------
       @Block.slot("red", {Image})
       def slot_red(self, slot, data):
+          if data is None: return;
           assert len(data.getbands())==1, "RED debería recibir una imagen de un sólo canal";
           self._red=data;
           self._rgb();
@@ -84,6 +85,7 @@ class MergeChannels(Block):
       #-------------------------------------------------------------------------
       @Block.slot("green", {Image})
       def slot_green(self, slot, data):
+          if data is None: return;
           assert len(data.getbands())==1, "GREEN debería recibir una imagen de un sólo canal";
           self._green=data;
           self._rgb();
@@ -91,6 +93,7 @@ class MergeChannels(Block):
       #-------------------------------------------------------------------------
       @Block.slot("blue", {Image})
       def slot_blue(self, slot, data):
+          if data is None: return;
           assert len(data.getbands())==1, "BLUE debería recibir una imagen de un sólo canal";
           self._blue=data;
           self._rgb();
@@ -112,6 +115,7 @@ class MergeChannels(Block):
       #-------------------------------------------------------------------------
       @Block.slot("cyan", {Image})
       def slot_cyan(self, slot, data):
+          if data is None: return;
           assert len(data.getbands())==1, "CYAN debería recibir una imagen de un sólo canal";
           self._cyan=data;
           self._cmyk();
@@ -119,6 +123,7 @@ class MergeChannels(Block):
       #-------------------------------------------------------------------------
       @Block.slot("magenta", {Image})
       def slot_magenta(self, slot, data):
+          if data is None: return;
           assert len(data.getbands())==1, "MAGENTA debería recibir una imagen de un sólo canal";
           self._magenta=data;
           self._cmyk();
@@ -126,6 +131,7 @@ class MergeChannels(Block):
       #-------------------------------------------------------------------------
       @Block.slot("yellow", {Image})
       def slot_yellow(self, slot, data):
+          if data is None: return;
           assert len(data.getbands())==1, "YELLOW debería recibir una imagen de un sólo canal";
           self._yellow=data;
           self._cmyk();
@@ -133,6 +139,7 @@ class MergeChannels(Block):
       #-------------------------------------------------------------------------
       @Block.slot("black", {Image})
       def slot_black(self, slot, data):
+          if data is None: return;
           assert len(data.getbands())==1, "BLACK debería recibir una imagen de un sólo canal";
           self._black=data;
           self._cmyk();
@@ -152,6 +159,7 @@ class MergeChannels(Block):
       #-------------------------------------------------------------------------
       @Block.slot("luminance", {Image})
       def slot_luminance(self, slot, data):
+          if data is None: return;
           assert len(data.getbands())==1, "LUMINANCE debería recibir una imagen de un sólo canal";
           self._luminance=data;
           self._ycbcr();
@@ -159,6 +167,7 @@ class MergeChannels(Block):
       #-------------------------------------------------------------------------
       @Block.slot("bdiff", {Image})
       def slot_bdiff(self, slot, data):
+          if data is None: return;
           assert len(data.getbands())==1, "BDIF debería recibir una imagen de un sólo canal";
           self._bdiff=data;
           self._ycbcr();
@@ -166,6 +175,7 @@ class MergeChannels(Block):
       #-------------------------------------------------------------------------
       @Block.slot("rdiff", {Image})
       def slot_rdiff(self, slot, data):
+          if data is None: return;
           assert len(data.getbands())==1, "RDIFF debería recibir una imagen de un sólo canal";
           self._rdiff=data;
           self._ycbcr();
@@ -185,6 +195,7 @@ class MergeChannels(Block):
       #-------------------------------------------------------------------------
       @Block.slot("lab l", {Image})
       def slot_LAB_l(self, slot, data):
+          if data is None: return;
           assert len(data.getbands())==1, "LAB-L debería recibir una imagen de un sólo canal";
           self._lab_l=data;
           self._lab();
@@ -192,6 +203,7 @@ class MergeChannels(Block):
       #-------------------------------------------------------------------------
       @Block.slot("lab a", {Image})
       def slot_LAB_a(self, slot, data):
+          if data is None: return;
           assert len(data.getbands())==1, "LAB-A debería recibir una imagen de un sólo canal";
           self._lab_a=data;
           self._lab();
@@ -199,6 +211,7 @@ class MergeChannels(Block):
       #-------------------------------------------------------------------------
       @Block.slot("lab b", {Image})
       def slot_LAB_b(self, slot, data):
+          if data is None: return;
           assert len(data.getbands())==1, "LAB-B debería recibir una imagen de un sólo canal";
           self._lab_b=data;
           self._lab();
@@ -218,6 +231,7 @@ class MergeChannels(Block):
       #-------------------------------------------------------------------------
       @Block.slot("hue", {Image})
       def slot_hub(self, slot, data):
+          if data is None: return;
           assert len(data.getbands())==1, "HUE debería recibir una imagen de un sólo canal";
           self._hue=data;
           self._hsv();
@@ -225,6 +239,7 @@ class MergeChannels(Block):
       #-------------------------------------------------------------------------
       @Block.slot("saturation", {Image})
       def slot_saturation(self, slot, data):
+          if data is None: return;
           assert len(data.getbands())==1, "SATURATION debería recibir una imagen de un sólo canal";
           self._saturation=data;
           self._hsv();
@@ -232,6 +247,7 @@ class MergeChannels(Block):
       #-------------------------------------------------------------------------
       @Block.slot("value", {Image})
       def slot_value(self, slot, data):
+          if data is None: return;
           assert len(data.getbands())==1, "VALUE debería recibir una imagen de un sólo canal";
           self._value=data;
           self._hsv();

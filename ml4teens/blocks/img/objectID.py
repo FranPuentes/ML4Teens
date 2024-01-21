@@ -46,6 +46,7 @@ class ObjectID(Block):
               if key in kwargs: self.params[key]=kwargs[key];
 
           self._model = YOLO(self.model_name);
+          assert self._model is not None;
 
       #-------------------------------------------------------------------------
       def classes(self):
@@ -54,14 +55,15 @@ class ObjectID(Block):
       #-------------------------------------------------------------------------
       @Block.slot("image", {Image})
       def slot_image(self, slot, data):
-          results = self._model(data, stream=False, verbose=False, **self.params);
-          for r in results:
-              if self.signal_boxes(): self.signal_boxes(r.boxes);
-              if self.signal_image():
-                 image = r.plot();
-                 image = PIL.Image.fromarray(image[..., ::-1]);
-                 assert isinstance(image, Image);
-                 self.signal_image(image);
+          if data is not None:
+             results = self._model(data, stream=False, verbose=False); #, **self.params);
+             for r in results:
+                 if self.signal_boxes(): self.signal_boxes(r.boxes);
+                 if self.signal_image():
+                    image = r.plot();
+                    image = PIL.Image.fromarray(image[..., ::-1]);
+                    assert isinstance(image, Image);
+                    self.signal_image(image);
 
       #-------------------------------------------------------------------------
       @Block.signal("image", Image)

@@ -5,6 +5,8 @@ import types;
 
 from abc import ABC, abstractmethod;
 
+import secrets;
+
 from .context    import Context
 from .signalType import SignalType
 from .slotType   import SlotType
@@ -15,10 +17,66 @@ from ..tools     import debug;
 
 #===============================================================================      
 class Parameters:
+
+      class StackedDicts:
+            
+            def __init__(self):
+                self._data=[dict()];
+                
+            def begin(self, _dict=dict()):
+                self._data.append(_dict);
+                
+            def commit(self):
+                if len(self._data) > 1:
+                   topdict=self._data.pop();
+                   for key in topdict:
+                       self._data[-1][key]=topdict[key];
+                       
+            def rollback(self):
+                if len(self._data) > 1:
+                   topdict=self._data.pop();
+                   del topdict;
+                       
+            def __getitem__(self, key):
+                for d in reversed(self._data):
+                    if key in d: return d[key];
+                raise KeyError(f"No encuentro '{key}' en el diccionario.");    
       
+            def __setitem__(self, key, value):
+                self._data[-1][key]=value;
+      
+            def __delitem__(self, key):
+                for d in reversed(self._data):
+                    if key in d: del d[key];
+                raise KeyError(f"No encuentro '{key}' en el diccionario.");    
+                
+            def __iter__(self):
+                rt={};
+                for d in reversed(self._data):
+                    rt |= {d.keys()};
+                return iter(rt);
+                
+            def __len__(self):
+                rt={};
+                for d in reversed(self._data):
+                    rt |= {d.keys()};
+                return len(rt);
+                
+            def __contains__(self, key):
+                rt={};
+                for d in reversed(self._data):
+                    rt |= {d.keys()};
+                return (key in rt);
+                
+            def get(self, key, default=None):
+                for d in reversed(self._data):
+                    if key in d: return d[key];
+                return default;
+          
+      #-------------------------------------------------------------------------
       def __init__(self, block, args):
-          super().__setattr__('_block', block );
-          super().__setattr__('_data',  dict());                
+          super().__setattr__('_block', block  );
+          super().__setattr__('_data', Parameters.StackedDicts());
           data=self.__dict__.get('_data',None);
           for key in args:
               data[key]=args[key];
@@ -50,18 +108,18 @@ class Parameters:
           
       def __getattr__(self, key):
           data=self.__dict__.get('_data',None);
-          if key=="keys":   return data.keys;
-          if key=="items":  return data.items;
-          if key=="values": return data.values;
-          if key=="update": return data.update;
-          if key=="pop":    return data.pop;
-          if key=="clear":  return data.clear;
+          #if key=="keys":   return data.keys;
+          #if key=="items":  return data.items;
+          #if key=="values": return data.values;
+          #if key=="update": return data.update;
+          #if key=="pop":    return data.pop;
+          #if key=="clear":  return data.clear;
           return data.get(key,None);
 
-      def __setattr__(self, key, value):
-          data=self.__dict__.get('_data',None);
-          if value is not None: data[key]=value;
-          else:                 del data[key];
+      #def __setattr__(self, key, value):
+      #    data=self.__dict__.get('_data',None);
+      #    if value is not None: data[key]=value;
+      #    else:                 del data[key];
 
       def get(self, key, default=None):
           data=self.__dict__.get('_data',None);
@@ -70,6 +128,18 @@ class Parameters:
       def exists(self, key, types=None):
           data=self.__dict__.get('_data',None);
           return (key in data) and (types is None or any([isinstance(data[key],tp) for tp in types]));
+      
+      def begin(self, _dict=dict()):
+          data=self.__dict__.get('_data',None);
+          data.begin(_dict);
+      
+      def commit(self):
+          data=self.__dict__.get('_data',None);
+          data.commit();
+      
+      def rollback(self):
+          data=self.__dict__.get('_data',None);
+          data.rollback();
       
 #===============================================================================      
 class Block(ABC):
@@ -89,6 +159,7 @@ class Block(ABC):
       #-------------------------------------------------------------------------
       def __init__(self, **kwargs):
           self._fullClassName=Block._classNameFrom(self.__init__);
+          self._signal_mods  ={};
           self._params       =Parameters(block=self, args=kwargs);
           self._id="ID"+''.join(random.choice(string.ascii_letters + string.digits) for _ in range(16));
 
@@ -98,12 +169,14 @@ class Block(ABC):
           if self._fullClassName not in Block._slots:   Block._slots  [cls]=Slots  ();
           
           Block._signals[cls]["done"]=SignalType(str);
-          def wrapper(self, data:str=None):
-              if data is None:
-                 return self.checkSignalUsage("done");
+          _unique_ = secrets.token_hex(32);
+          def wrapper(self, data=_unique_):
+              using=self.checkSignalUsage("done");
+              if data is _unique_:
+                 return using;
               else:
-                 if self.checkSignalUsage("done"):
-                    Context.instance.emit(source=self, sname="done", data=data, mods={});
+                 if using:
+                    Context.instance.emit(source=self, sname="done", data=data, mods=self._signal_mods);
           self.signal_done=types.MethodType(wrapper, self);
           
       #-------------------------------------------------------------------------
@@ -139,11 +212,13 @@ class Block(ABC):
                   try:
                     assert name == _slot;
                     debug.print(f"Ejecutando {self._fullClassName}::slot('{_slot}',{type(data).__name__})'");
-                    func(self, _slot, data);
+                    assert func is not None;
+                    assert callable(func);
+                    func(self, _slot, data if data is not None else default);
                   except Exception as e:
                     debug.print(f"{cls}:: Excepción: '{e}'", exception=e);
                   finally:
-                    self.signal_done(_slot);
+                    self.signal_done(f"{self._fullClassName}::{_slot}");
               Block._slots[cls][name]["stub"]=wrapper;
               return wrapper;
           return decorador;
@@ -156,14 +231,15 @@ class Block(ABC):
               if cls not in Block._slots:   Block._slots  [cls]=Slots  ();
               if cls not in Block._signals: Block._signals[cls]=Signals();
               Block._signals[cls][name]=SignalType(typedecl);
-              def wrapper(self, data=None):
+              _unique_ = secrets.token_hex(32);
+              def wrapper(self, data=_unique_):
                   using=self.checkSignalUsage(name);
-                  if data is None:
+                  if data is _unique_:
                      return using;
                   else:
                      if using:
                         data=func(self,data);
-                        Context.instance.emit(source=self, sname=name, data=data);
+                        Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
               return wrapper;
           return decorador;
 
@@ -182,8 +258,14 @@ class Block(ABC):
           return context.checkSubscription((self,name));
 
       #-------------------------------------------------------------------------
-      # TODO comprobar que (self,decl) es un slot
+      # TODO comprobar que (self,decl) es un slot      
       """
+      
+      xx[slot]
+      xx[slot:{mods}:¿?]
+      xx[slot,{mods}]
+      
+      
       def __getitem__(self, decl):
       
           def convert_str(v):
@@ -279,16 +361,24 @@ class Block(ABC):
           
              slot=self.slots[sname];
              
-             data=data or slot["default"];
+             # TODO: ¿realmente necesitamos un valor por defecto?
+             #data=data if data is not None else slot["default"];
              
              assert data is None or any([isinstance(data,tp) for tp in slot["type"]]), f"El slot '{sname}' de {self._fullClassName} no acepta datos de tipo '{type(data)}', sólo estos tipos: {slot['type']} o None";
              
+             assert type(mods) in (tuple,list) and len(mods)==2 and all([(type(m) is dict) for m in mods]);
+             
+             signal_mods, slot_mods = mods;
+             
              try:
+               self._signal_mods=signal_mods;
+               self.params.begin(signal_mods|slot_mods);
                func=slot["stub"];
-               func(self,sname,data);
-               
+               assert callable(func);
+               func(self,sname,data);               
              finally:
-               pass;
+               self._signal_mods={};
+               self.params.rollback();
                
           else:
              raise RuntimeError(f"{cls}:: '{sname}' no existe como slot");
