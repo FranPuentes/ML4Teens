@@ -6,6 +6,6 @@ from .timer    import Timer;
 from .ifElse   import IfElse;
 
 from .         import img;
-from .         import text;
+from .         import txt;
 from .         import ds;
 
