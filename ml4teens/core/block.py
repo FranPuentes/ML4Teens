@@ -16,131 +16,103 @@ from .slots      import Slots
 from ..tools     import debug;
 
 #===============================================================================      
-class Parameters:
-
-      class StackedDicts:
-            
-            def __init__(self):
-                self._data=[dict()];
-                
-            def begin(self, _dict=dict()):
-                self._data.append(_dict);
-                
-            def commit(self):
-                if len(self._data) > 1:
-                   topdict=self._data.pop();
-                   for key in topdict:
-                       self._data[-1][key]=topdict[key];
-                       
-            def rollback(self):
-                if len(self._data) > 1:
-                   topdict=self._data.pop();
-                   del topdict;
-                       
-            def __getitem__(self, key):
-                for d in reversed(self._data):
-                    if key in d: return d[key];
-                raise KeyError(f"No encuentro '{key}' en el diccionario.");    
+class StackedDicts:
       
-            def __setitem__(self, key, value):
-                self._data[-1][key]=value;
+      def __all__(self):
+          rt=dict();
+          for d in self._data: rt.update(d);
+          return rt;
       
-            def __delitem__(self, key):
-                for d in reversed(self._data):
-                    if key in d: del d[key];
-                raise KeyError(f"No encuentro '{key}' en el diccionario.");    
-                
-            def __iter__(self):
-                rt={};
-                for d in reversed(self._data):
-                    rt |= {d.keys()};
-                return iter(rt);
-                
-            def __len__(self):
-                rt={};
-                for d in reversed(self._data):
-                    rt |= {d.keys()};
-                return len(rt);
-                
-            def __contains__(self, key):
-                rt={};
-                for d in reversed(self._data):
-                    rt |= {d.keys()};
-                return (key in rt);
-                
-            def get(self, key, default=None):
-                for d in reversed(self._data):
-                    if key in d: return d[key];
-                return default;
+      #···································································    
+      def __init__(self, **kwargs):
+          self._data=[dict(**kwargs)];
           
-      #-------------------------------------------------------------------------
-      def __init__(self, block, args):
-          super().__setattr__('_block', block  );
-          super().__setattr__('_data', Parameters.StackedDicts());
-          data=self.__dict__.get('_data',None);
-          for key in args:
-              data[key]=args[key];
-          
-      def __setitem__(self, key, value):
-          data=self.__dict__.get('_data',None);
-          if value is not None: data[key]=value;
-          else:                 self.__delitem__(key);
-
-      def __getitem__(self, key):
-          data=self.__dict__.get('_data',None);
-          return data[key];
-
-      def __delitem__(self, key):
-          data=self.__dict__.get('_data',None);
-          if key in data: del data[key];
-          
-      def __iter__(self):
-          data=self.__dict__.get('_data',None);
-          return iter(data);
-
-      def __len__(self):
-          data=self.__dict__.get('_data',None);
-          return len(data);
-
-      def __contains__(self, key):
-          data=self.__dict__.get('_data',None);
-          return (key in data) and (data[key] is not None);
-          
-      def __getattr__(self, key):
-          data=self.__dict__.get('_data',None);
-          #if key=="keys":   return data.keys;
-          #if key=="items":  return data.items;
-          #if key=="values": return data.values;
-          #if key=="update": return data.update;
-          #if key=="pop":    return data.pop;
-          #if key=="clear":  return data.clear;
-          return data.get(key,None);
-
-      #def __setattr__(self, key, value):
-      #    data=self.__dict__.get('_data',None);
-      #    if value is not None: data[key]=value;
-      #    else:                 del data[key];
-
-      def get(self, key, default=None):
-          data=self.__dict__.get('_data',None);
-          return data.get(key,default);
-          
-      def exists(self, key, types=None):
-          data=self.__dict__.get('_data',None);
-          return (key in data) and (types is None or any([isinstance(data[key],tp) for tp in types]));
-      
+      #···································································    
       def begin(self, _dict=dict()):
-          data=self.__dict__.get('_data',None);
-          data.begin(_dict);
-      
+          self._data.append(_dict);
+          
+      #···································································    
       def commit(self):
-          data=self.__dict__.get('_data',None);
-          data.commit();
-      
+          if len(self._data) > 1:
+             rt=self._data.pop();
+             for key in rt:
+                 self._data[-1][key]=rt[key];
+                 
+      #···································································    
       def rollback(self):
-          data=self.__dict__.get('_data',None);
-          data.rollback();
-      
+          if len(self._data) > 1:
+             rt=self._data.pop();
+             del rt;
+                 
+      #···································································    
+      def __getitem__(self, key):
+          for d in reversed(self._data):
+              if key in d: return d[key];
+          return None; # cuidado! rompe el estándar.
+
+      #···································································    
+      def __setitem__(self, key, value):
+          self._data[-1][key]=value;
+
+      #···································································    
+      def __delitem__(self, key):
+          self._data[-1][key]=None; # cuidado! rompe el estándar.
+          
+      #···································································    
+      def __iter__(self):
+          rt=self.__all__();
+          return iter(rt);
+          
+      #···································································    
+      def __len__(self):
+          rt=self.__all__();
+          return len(rt);
+          
+      #···································································    
+      def __contains__(self, key):
+          rt=self.__all__();
+          return (key in rt);
+          
+      #···································································    
+      def __str__(self):
+          return str(self.__all__());
+
+      #···································································    
+      def __repr__(self):
+          return (self.__all__()).__repr__();
+
+      #···································································    
+      def get(self, key, default=None):
+          rt=self.__all__();
+          return rt.get(key,default);
+    
+      #···································································    
+      def keys(self):
+          rt=self.__all__();
+          return rt.keys();
+          
+      #···································································    
+      def items(self):
+          rt=self.__all__();
+          return rt.items();
+          
+      #···································································    
+      def values(self):
+          rt=self.__all__();
+          return rt.values();
+          
+      #···································································    
+      def update(self, *args, **kwargs):
+          return self._data[-1].update(*args, **kwargs);
+          
+      #···································································    
+      def pop(self, *args, **kwargs):
+          return self._data[-1].pop(*args, **kwargs);
+
+      #-------------------------------------------------------------------------
+      def __getattr__(self, name):
+          return self.__getitem__(name);
+
 #===============================================================================      
 class Block(ABC):
       """
@@ -160,7 +132,7 @@ class Block(ABC):
       def __init__(self, **kwargs):
           self._fullClassName=Block._classNameFrom(self.__init__);
           self._signal_mods  ={};
-          self._params       =Parameters(block=self, args=kwargs);
+          self._params       =StackedDicts(**kwargs);
           self._id="ID"+''.join(random.choice(string.ascii_letters + string.digits) for _ in range(16));
 
           cls=self._fullClassName;
@@ -258,16 +230,9 @@ class Block(ABC):
           return context.checkSubscription((self,name));
 
       #-------------------------------------------------------------------------
-      # TODO comprobar que (self,decl) es un slot      
-      """
-      
-      xx[slot]
-      xx[slot:{mods}:¿?]
-      xx[slot,{mods}]
-      
-      
       def __getitem__(self, decl):
-      
+          
+          #·····································································
           def convert_str(v):
               try:
                 return int(v);
@@ -275,26 +240,36 @@ class Block(ABC):
                 try:
                   return float(v);
                 except ValueError:
+                  if v.lower()=="null":  return None;
+                  if v.lower()=="none":  return None;
+                  if v.lower()=="true":  return True;
+                  if v.lower()=="false": return False;
                   return v;
           
-          def split_mods(mod:str) -> dict:
-              if '=' in mod:
-                 t=[m.strip() for m in mod.split('=',maxsplit=1)];
-                 k=" ".join(t[0].split());
-                 v=convert_str(t[1]);
-              else:
-                 k=" ".join(mod.split());
-                 v=True;
-              return {k:v};
+          #·····································································
+          def split_mods(mods:str) -> dict:
+              rt=dict();
+              for mod in [m.strip() for m in mods.split(',')]:
+                  if '=' in mod:
+                     t=[m.strip() for m in mod.split('=',maxsplit=1)];
+                     k=" ".join(t[0].split());
+                     v=convert_str(t[1]);
+                  else:
+                     k=" ".join(mod.split());
+                     v=True;
+                  rt.update({k:v});
+              return rt;
+              
+          #·····································································
+          assert isinstance(decl,(str,slice));
       
           if isinstance(decl,(slice)):
-             start=decl.start; # nombre de signal/slot
+             start=decl.start; # nombre del slot
              stop =decl.stop;  # modificadores
-             step =decl.step;  # no usado, por ahora ...
+             step =decl.step;
              
              assert isinstance(start,(str)) and bool(start);
              assert isinstance(stop,(str,tuple,list,dict,type(None)));
-             #assert isinstance(step,(int,float,type(None)));
              
              sname=start;
              
@@ -314,30 +289,16 @@ class Block(ABC):
                          
                 elif isinstance(stop,dict):
                      mods.update(stop);
-             
-             " ""
-             # no usado por ahora
-             if step: # ...
-                if type(step) is int:
-                   if step <0:    step=0   /1000;
-                   if step >1000: step=1000/1000;
-                if type(step) is float:
-                   if step <0.0:  step=0.0;
-                   if step >1.0:  step=1.0;
-                mods.update({"step time to recall":step});
-             " ""   
-                             
-          else:             
+                     
+          else:
              sname=decl;
              mods=None;
           
-          assert bool(sname) and isinstance(sname,(str)), f"{self._fullClassName}:: La señal/slot '{sname}' es incorrecta";
-          assert (sname in self.signals) or (sname in self.slots), f"No existe la señal/slot '{sname}' en {self._fullClassName}";
+          assert bool(sname) and isinstance(sname,(str,)), f"{self._fullClassName}:: La señal/slot '{sname}' es incorrecta";
+          assert sname in self.slots, f"No existe el slot '{sname}' en {self._fullClassName}";
           return Context.Linker(self, sname, mods);
-      """
       
       #-------------------------------------------------------------------------
-      # TODO comprobar que (self,sname) es un signal
       def __call__(self, sname, *args, **kwargs):
           mods={};
           
@@ -382,4 +343,6 @@ class Block(ABC):
                
           else:
              raise RuntimeError(f"{cls}:: '{sname}' no existe como slot");
+
+
              

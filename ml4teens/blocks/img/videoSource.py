@@ -202,39 +202,40 @@ class VideoSource(Block):
       @Block.slot("next", {object})
       def slot_next(self, slot, _):
 
+          if self._fd is None or not self._fd.isOpened():
+             self.reset();
+             return
+             #raise RuntimeError(f"Se ha invocado al slot 'next' de '{self._fullClassName}' sin tener una fuente abierta.");
+             
           try:
-            if self._fd is None or not self._fd.isOpened():
-               raise RuntimeError(f"Se ha invocado al slot 'next' de '{self._fullClassName}' sin tener una fuente abierta.");
-               
+            ok, frame = self._fd.read();
+            
+            if not ok:
+               self.signal_end(True);
+               self.reset();
+           
             else:
-               ok, frame = self._fd.read();
-               
-               if not ok:
-                  self.signal_end(True);
-                  self.reset();
-               
-               else:
-                  assert len(frame.shape)==2 or (len(frame.shape)==3 and frame.shape[2] in [3, 4]), "Formato de vídeo no soportado";
-               
-                  diff=(time.time()-self._tm);
-                  if diff>=self._delay: pass;
-                  else:                 time.sleep(self._delay-diff);
+               assert len(frame.shape)==2 or (len(frame.shape)==3 and frame.shape[2] in [3, 4]), "Formato de vídeo no soportado";
+           
+               diff=(time.time()-self._tm);
+               if diff>=self._delay: pass;
+               else:                 time.sleep(self._delay-diff);
 
-                  self._tm = time.time();
-                  
-                  # TODO, quedarnos sólo con unos pocos modos: L, RGB, RGBA, ...
-                  
-                  if len(frame.shape)==2:
-                     frame=frame;
+               self._tm = time.time();
+              
+               # TODO, quedarnos sólo con unos pocos modos: L, RGB, RGBA, ...
+              
+               if len(frame.shape)==2:
+                  frame=frame;
+               else:
+                  if frame.shape[2]==3:
+                     frame=cv.cvtColor(frame, cv.COLOR_BGR2RGB);
                   else:
-                     if frame.shape[2]==3:
-                        frame=cv.cvtColor(frame, cv.COLOR_BGR2RGB);
-                     else:
-                        frame=cv.cvtColor(frame, cv.COLOR_BGRA2RGBA);
-                            
-                  frame = PIL.Image.fromarray(frame);
-                  frame = self._resize(frame, self.params.width, self.params.height);
-                  self.signal_frame(frame);
+                     frame=cv.cvtColor(frame, cv.COLOR_BGRA2RGBA);
+                        
+               frame = PIL.Image.fromarray(frame);
+               frame = self._resize(frame, self.params.width, self.params.height);
+               self.signal_frame(frame);
                       
           except Exception as e:
             self.signal_end(False);

@@ -32,6 +32,9 @@ class Terminal(Block):
           message=data;
           style="background-color: green; color: white";
           self.__print(message,style);
+          if self.params.dump:
+             style="background-color: blue; color: white";
+             self.__print(self.params,style);
 
       #-------------------------------------------------------------------------
       @Block.slot("stderr", {str,list,set,tuple,dict,object})
@@ -39,4 +42,7 @@ class Terminal(Block):
           message=data;
           style="background-color: brown; color: white";
           self.__print(message,style);
+          if self.params.dump:
+             style="background-color: blue; color: white";
+             self.__print(self.params,style);
 

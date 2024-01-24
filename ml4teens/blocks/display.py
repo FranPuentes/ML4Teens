@@ -14,7 +14,7 @@ class Display(Block):
       # feed = False
       def __init__(self, *args, **kwargs):
           super().__init__(*args, **kwargs);
-          self._feed=bool(self.params.get("feed",False));
+          #self._feed=bool(self.params.get("feed",False));
 
       #-------------------------------------------------------------------------
       @Block.signal("image", Image)
@@ -42,10 +42,12 @@ class Display(Block):
       #-------------------------------------------------------------------------
       @Block.slot("image", {Image})
       def slot_image(self, slot, data):
-          width =self.params.width;
-          height=self.params.height;
-          imagen=self._redim(data,width,height);
-          if self._feed==False: update_display(imagen, display_id=self._id);
-          else:                 display(imagen);
+          if data:
+             width =self.params.width;
+             height=self.params.height;
+             imagen=self._redim(data,width,height);
+             #TODO motrar 'title', si hay ...
+             if not self.params.feed: update_display(imagen, display_id=self._id);
+             else:                    display(imagen);
           self.signal_image(data);
 

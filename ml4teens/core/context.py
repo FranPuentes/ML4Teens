@@ -37,10 +37,8 @@ class Context:
     #---------------------------------------------------------------------------
     def __new__(cls, *args, **kwargs):
         """
-        Crea la única instancia de esta clase.
-        
-        Si ya existe previamente simplemente devuelve la instancia creada con antelación.
-        
+        Crea la única instancia de esta clase.        
+        Si ya existe previamente simplemente devuelve la instancia creada con antelación.        
         Esto permite que sólo exista una instanca de esta clase, aunque se llame en varias ocasiones.
         """
         if not cls._instance:
@@ -113,7 +111,11 @@ class Context:
         return list(blocks);
     
     #-----------------------------------------------------------------------------------------
-    def reset(self):
+    def reset(self, all=False):
+        self._instance.listeners={};
+        if all:
+           # TODO ¿enviar un reset a todos los bloques?
+           pass;
         return self;
 
     #-----------------------------------------------------------------------------------------
@@ -240,13 +242,33 @@ class Context:
            mods  =kwargs.get("mods" ) or {}; # signal mods
            assert type(mods) is dict;
            debug.print(f"{source._fullClassName}:: enviando la señal '{sname}', con data={type(data)}, a todos sus subscriptores");
+           
+           onlyThese=set();
+           if "slot" in mods:
+               if  isinstance(mods["slot"],str):
+                   onlyThese={mods["slot"]};
+               else:
+                   raise RuntimeError("El modificador 'slot' tiene que ser de tipo 'str'");    
+               del mods["slot"];
+
+           if "slots" in mods:
+               if  isinstance(mods["slots"],(tuple,list)):
+                   onlyThese|=set(mods["slots"]);
+               else:
+                   raise RuntimeError("El modificador 'slots' tiene que ser de tipo 'tuple' o 'list'");    
+               del mods["slots"];
+               
+           assert all([(type(m) is str and bool(m)) for m in onlyThese]), f"Referencia al nombre de un slot errónea: {onlyThese}";
+           
            signal=(source, sname);
            if signal in self.listeners:
               for slot, _mods in self.listeners[signal]:
                   target, slot_name = slot;
                   signal_mods, slot_mods = _mods;
                   debug.print(f"Enviando la señal '{slot_name}', con data={type(data)}, a {target._fullClassName}'");
-                  self.emit(source=source, target=target, sname=slot_name, data=data, mods=(mods|signal_mods,slot_mods));
+                  
+                  if not onlyThese or slot_name in onlyThese:
+                     self.emit(source=source, target=target, sname=slot_name, data=data, mods=(mods|signal_mods,slot_mods));
            else:
               raise RuntimeError(f"No existe la señal '{sname}' en {source._fullClassName}");
                

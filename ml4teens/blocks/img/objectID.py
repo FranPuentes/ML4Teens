@@ -6,7 +6,7 @@ from ...core import Block;
 
 class ObjectID(Block):
       """
-      Recibe una imagen (slot 'frame' o 'image') en forma de tensor numpy o PIL.Image, y emite la misma imagen, pero con elementos identificados.
+      Recibe una imagen (slot 'frame' o 'image') en forma de PIL.Image, y emite la misma imagen, pero con los elementos identificados.
       URL: https://docs.ultralytics.com/modes/predict
 
       Parámetos del objeto:
@@ -44,7 +44,7 @@ class ObjectID(Block):
 
           for key in ["conf","iou","device","max_det","classes"]:
               if key in kwargs: self.params[key]=kwargs[key];
-
+ 
           self._model = YOLO(self.model_name);
           assert self._model is not None;
 
@@ -56,7 +56,7 @@ class ObjectID(Block):
       @Block.slot("image", {Image})
       def slot_image(self, slot, data):
           if data is not None:
-             results = self._model(data, stream=False, verbose=False); #, **self.params);
+             results = self._model(data, stream=False, verbose=False, **self.params);
              for r in results:
                  if self.signal_boxes(): self.signal_boxes(r.boxes);
                  if self.signal_image():
@@ -79,7 +79,6 @@ class ObjectID(Block):
           boxes=[{
                   "class":(int(r),self._model.names[int(r)]),
                   "conf":float(c),
-                  "type":"list[float]",
                   "xyxy":[float(_) for _ in k] 
                  }
                  for r,c,k in zip(data.cls,data.conf,data.xyxyn)];
