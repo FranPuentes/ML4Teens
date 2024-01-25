@@ -193,7 +193,27 @@ class Context:
         :type  data:   Cualquier cosa.
         :param mods:   Los modificadores, si se trata de el envío de un señal a un slot.
         :type  mods:   dict | None.
-        """        
+        """
+        
+        #-----------------------------------------------------------------------
+        def updateOnlyThese(mods, onlyThese=set()):
+        
+            if "slot" in mods:
+                if  isinstance(mods["slot"],str):
+                    onlyThese|=set(mods["slot"]);
+                else:
+                    raise RuntimeError("El modificador 'slot' tiene que ser de tipo 'str'");    
+                del mods["slot"];
+
+            if "slots" in mods:
+                if  isinstance(mods["slots"],(tuple,list)):
+                    onlyThese|=set(mods["slots"]);
+                else:
+                    raise RuntimeError("El modificador 'slots' tiene que ser de tipo 'tuple' o 'list'");    
+                del mods["slots"];
+                
+            return onlyThese;    
+        #-----------------------------------------------------------------------
         
         assert (("source" in kwargs) and ("target" not in kwargs)) or (("source" not in kwargs) and ("target" in kwargs))  or (("source" in kwargs) and ("target" in kwargs));               
         assert ("sname" in kwargs) or ("signal_name" in kwargs) or ("slot_name" in kwargs);        
@@ -244,21 +264,16 @@ class Context:
            debug.print(f"{source._fullClassName}:: enviando la señal '{sname}', con data={type(data)}, a todos sus subscriptores");
            
            onlyThese=set();
-           if "slot" in mods:
-               if  isinstance(mods["slot"],str):
-                   onlyThese={mods["slot"]};
-               else:
-                   raise RuntimeError("El modificador 'slot' tiene que ser de tipo 'str'");    
-               del mods["slot"];
-
-           if "slots" in mods:
-               if  isinstance(mods["slots"],(tuple,list)):
-                   onlyThese|=set(mods["slots"]);
-               else:
-                   raise RuntimeError("El modificador 'slots' tiene que ser de tipo 'tuple' o 'list'");    
-               del mods["slots"];
-               
+           """
+           signal=(source, sname);
+           if signal in self.listeners:
+              for slot, _mods in self.listeners[signal]:
+                  target, slot_name = slot;
+                  signal_mods, _ = _mods;
+                  onlyThese=updateOnlyThese(signal_mods, onlyThese);                  
+                     
            assert all([(type(m) is str and bool(m)) for m in onlyThese]), f"Referencia al nombre de un slot errónea: {onlyThese}";
+           """
            
            signal=(source, sname);
            if signal in self.listeners:
@@ -296,7 +311,7 @@ class Context:
                      else:            continue;
                      
                    timestamp=time.time();
-                   debug.print(f"Nuevo evento: {event}");
+                   #debug.print(f"Nuevo evento: {event}");
                    tm, target, sname, data, mods = event;
                    target.run(sname, data, mods);
                                     

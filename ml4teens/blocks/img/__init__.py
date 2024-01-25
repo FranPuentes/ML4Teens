@@ -3,7 +3,7 @@ from .singleChannel     import SingleChannel
 from .splitChannels     import SplitChannels
 from .mergeChannels     import MergeChannels
 from .convertImage      import ConvertImage
-from .cropImage         import CropImage
+from .trimImage         import TrimImage
 from .resizeImage       import ResizeImage
 from .segmentation      import Segmentation
 from .segmentAll        import SegmentAll
