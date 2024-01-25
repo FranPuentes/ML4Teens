@@ -196,6 +196,7 @@ class Context:
         """
         
         #-----------------------------------------------------------------------
+        """
         def updateOnlyThese(mods, onlyThese=set()):
         
             if "slot" in mods:
@@ -213,6 +214,7 @@ class Context:
                 del mods["slots"];
                 
             return onlyThese;    
+        """    
         #-----------------------------------------------------------------------
         
         assert (("source" in kwargs) and ("target" not in kwargs)) or (("source" not in kwargs) and ("target" in kwargs))  or (("source" in kwargs) and ("target" in kwargs));               
@@ -223,7 +225,7 @@ class Context:
            # señal enviada desde el espacio del usuario
            # ha de ejecutarse el slot (sname) correspondiente
            target=kwargs["target"];
-           sname=kwargs.get("sname") or kwargs.get("slot_name");
+           sname=kwargs.get("sname") or kwargs.get("slot_name") or kwargs.get("slot");
            data =kwargs.get("data" );
            mods =kwargs.get("mods" ) or {}; # signal mods
            assert type(mods) is dict;
@@ -240,7 +242,7 @@ class Context:
            # ha de ejecutarse el slot (sname) correspondiente
            source=kwargs["source"];
            target=kwargs["target"];
-           sname=kwargs.get("sname") or kwargs.get("slot_name");
+           sname=kwargs.get("sname") or kwargs.get("slot_name") or kwargs.get("slot");
            data =kwargs.get("data" );
            mods =kwargs.get("mods" ) or ({},{});
            assert type(mods) in (tuple,list) and len(mods)==2 and all([(type(m) is dict) for m in mods]);
@@ -263,8 +265,8 @@ class Context:
            assert type(mods) is dict;
            debug.print(f"{source._fullClassName}:: enviando la señal '{sname}', con data={type(data)}, a todos sus subscriptores");
            
-           onlyThese=set();
            """
+           onlyThese=set();
            signal=(source, sname);
            if signal in self.listeners:
               for slot, _mods in self.listeners[signal]:
@@ -280,10 +282,11 @@ class Context:
               for slot, _mods in self.listeners[signal]:
                   target, slot_name = slot;
                   signal_mods, slot_mods = _mods;
-                  debug.print(f"Enviando la señal '{slot_name}', con data={type(data)}, a {target._fullClassName}'");
-                  
-                  if not onlyThese or slot_name in onlyThese:
-                     self.emit(source=source, target=target, sname=slot_name, data=data, mods=(mods|signal_mods,slot_mods));
+                  debug.print(f"Enviando la señal '{slot_name}', con data={type(data)}, a {target._fullClassName}'");                 
+                  #if not onlyThese or slot_name in onlyThese:
+                  if "trace" in mods and mods["trace"]:
+                     mods["trace"]={"source":source, "signal":sname, "target":target, "slot":slot_name};
+                  self.emit(source=source, target=target, sname=slot_name, data=data, mods=(mods|signal_mods,slot_mods));
            else:
               raise RuntimeError(f"No existe la señal '{sname}' en {source._fullClassName}");
                
@@ -310,8 +313,6 @@ class Context:
                      if diff>timeout: break;
                      else:            continue;
                      
-                   timestamp=time.time();
-                   #debug.print(f"Nuevo evento: {event}");
                    tm, target, sname, data, mods = event;
                    target.run(sname, data, mods);
                                     
@@ -345,7 +346,7 @@ class Context:
               assert self._sname in self._block.signals,     f"Signal '{self._sname}' no existe en '{self._block._fullClassName}'";
               assert rlinker._sname in rlinker._block.slots, f"Slot '{rlinker._sname}' no existe en '{rlinker._block._fullClassName}'";
               assert self._block.signals[self._sname]["type"] == rlinker._block.slots[rlinker._sname]["type"], f"Tipo incompatibles {self._block.signals[self._sname]['type']} != {rlinker._block.slots[rlinker._sname]['type']}";
-              debug.print(f"Sunscripción: {self._block}:'{self._sname}' >> {rlinker._block}:'{rlinker._sname}'");
+              debug.print(f"Suscripción: {self._block}:'{self._sname}' >> {rlinker._block}:'{rlinker._sname}'");
               Context.instance.subscribe((self._block,self._sname), (rlinker._block,rlinker._sname), (self._mods,rlinker._mods));
               return rlinker._block;
 
@@ -353,6 +354,6 @@ class Context:
               assert self._sname in self._block.slots,         f"Slot '{self._sname}' no existe en '{self._block._fullClassName}'";
               assert rlinker._sname in rlinker._block.signals, f"Signal '{rlinker._sname}' no existe en '{rlinker._block._fullClassName}'";
               assert self._block.slots[self._sname]["type"] == rlinker._block.signals[rlinker._sname]["type"], f"Tipo incompatibles {self._block.slots[self._sname]['type']} != {rlinker._block.signals[rlinker._sname]['type']}";
-              debug.print(f"Sunscripción: {rlinker._block}:'{rlinker._sname}' << {self._block}:'{self._sname}'");
+              debug.print(f"Suscripción: {rlinker._block}:'{rlinker._sname}' << {self._block}:'{self._sname}'");
               Context.instance.subscribe((rlinker._block,rlinker._sname), (self._block,self._sname), (rlinker._mods,self._mods));
               return self._block;
