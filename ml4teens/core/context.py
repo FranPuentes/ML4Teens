@@ -250,8 +250,12 @@ class Context:
            if sname in target.slots:
               slot=target.slots[sname];
               signal_mods, slot_mods = mods;
-              debug.print(f"Encolando una señal a {target._fullClassName} en el slot '{sname}' con data={type(data)}");
-              self._queue.put_nowait( (time.time(), target, sname, data, (signal_mods,slot_mods)) );
+              if "@sync" not in slot_mods or bool(slot_mods["@sync"]) is False:
+                 debug.print(f"Encolando una señal dirigida a {target._fullClassName}::{sname} con type(data)={type(data)}");
+                 self._queue.put_nowait( (time.time(), target, sname, data, (signal_mods,slot_mods)) );
+              else:
+                 debug.print(f"Ejecutando síncronamente una señal dirigida a {target._fullClassName}::{sname} con type(data)={type(data)}");
+                 target.run(sname,data,(signal_mods,slot_mods));                 
            else:
               raise RuntimeError(f"No existe el slot '{sname}' en {target._fullClassName}");
            
@@ -318,14 +322,12 @@ class Context:
                                     
                 except KeyboardInterrupt as e:
                    debug.print("Interrumpido por el/la usuario/a.", exception=e);
-                   return False;
                    
                 except Exception as e:
                    debug.print(f"Excepción ejecutando un slot: {e}");
-                   return False;
           
-          return True;
-        
+          return self;
+          
         finally:
           while not self._queue.empty(): self._queue.get();
                         
@@ -356,4 +358,20 @@ class Context:
               assert self._block.slots[self._sname]["type"] == rlinker._block.signals[rlinker._sname]["type"], f"Tipo incompatibles {self._block.slots[self._sname]['type']} != {rlinker._block.signals[rlinker._sname]['type']}";
               debug.print(f"Suscripción: {rlinker._block}:'{rlinker._sname}' << {self._block}:'{self._sname}'");
               Context.instance.subscribe((rlinker._block,rlinker._sname), (self._block,self._sname), (rlinker._mods,self._mods));
+              return self._block;
+
+          def __ge__(self, rlinker): # a >= b
+              assert self._sname in self._block.signals,     f"Signal '{self._sname}' no existe en '{self._block._fullClassName}'";
+              assert rlinker._sname in rlinker._block.slots, f"Slot '{rlinker._sname}' no existe en '{rlinker._block._fullClassName}'";
+              assert self._block.signals[self._sname]["type"] == rlinker._block.slots[rlinker._sname]["type"], f"Tipo incompatibles {self._block.signals[self._sname]['type']} != {rlinker._block.slots[rlinker._sname]['type']}";
+              debug.print(f"Suscripción: {self._block}:'{self._sname}' >= {rlinker._block}:'{rlinker._sname}'");
+              Context.instance.subscribe((self._block,self._sname), (rlinker._block,rlinker._sname), (self._mods,rlinker._mods|{"@sync":True}));
+              return rlinker._block;
+
+          def __le__(self, rlinker): # a <= b
+              assert self._sname in self._block.slots,         f"Slot '{self._sname}' no existe en '{self._block._fullClassName}'";
+              assert rlinker._sname in rlinker._block.signals, f"Signal '{rlinker._sname}' no existe en '{rlinker._block._fullClassName}'";
+              assert self._block.slots[self._sname]["type"] == rlinker._block.signals[rlinker._sname]["type"], f"Tipo incompatibles {self._block.slots[self._sname]['type']} != {rlinker._block.signals[rlinker._sname]['type']}";
+              debug.print(f"Suscripción: {rlinker._block}:'{rlinker._sname}' <= {self._block}:'{self._sname}'");
+              Context.instance.subscribe((rlinker._block,rlinker._sname), (self._block,self._sname), (rlinker._mods,self._mods|{"@sync":True}));
               return self._block;

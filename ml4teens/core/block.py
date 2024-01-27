@@ -7,6 +7,8 @@ from abc import ABC, abstractmethod;
 
 import secrets;
 
+from jupyter_ui_poll import ui_events;
+
 from .context    import Context
 from .signalType import SignalType
 from .slotType   import SlotType
@@ -186,11 +188,26 @@ class Block(ABC):
                     debug.print(f"Ejecutando {self._fullClassName}::slot('{_slot}',{type(data).__name__})'");
                     assert func is not None;
                     assert callable(func);
-                    func(self, _slot, data if data is not None else default);
+                    
+                    done=func(self, _slot, data);
+                    
+                    if self.params.done is not None:
+                       if callable(self.params.done):
+                          done=self.params.done(data);
+                          self.signal_done(done);
+                       else:
+                          done=self.params.done;
+                          self.signal_done(done);
+                    else:
+                       if bool(done) is True: # SUGGEST: enviar el valor de 'done' si no es None.
+                          self.signal_done(f"{self._fullClassName}::{_slot}");
+                       
                   except Exception as e:
                     debug.print(f"{cls}:: Excepción: '{e}'", exception=e);
+                    
                   finally:
-                    self.signal_done(f"{self._fullClassName}::{_slot}");
+                    pass;
+                    
               Block._slots[cls][name]["stub"]=wrapper;
               return wrapper;
           return decorador;
@@ -229,6 +246,15 @@ class Block(ABC):
           context=Context.instance;
           return context.checkSubscription((self,name));
 
+      #-------------------------------------------------------------------------
+      @staticmethod
+      def waitUntil(finish):
+          assert callable(finish);
+          with ui_events() as poll:
+               while not finish():
+                     poll(10);
+                     time.sleep(0.1);
+      
       #-------------------------------------------------------------------------
       def __getitem__(self, decl):
           
