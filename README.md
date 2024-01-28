@@ -9,7 +9,7 @@ Cada bloque hace algo concreto; cada uno de ellos genera *signal*s y posee *slot
 Un objeto (*singleton*) se encarga de emparejar los signals con slots (con control de tipos) y lanzar la red.
 
 >[!NOTE]
->Versión actual: 0.1.24 en pip.
+>Versión actual: 0.1.25 en pip.
 
 >[!NOTE]
 >El submódulo *blocks*/*img* **está en estado estable**.
