@@ -126,7 +126,6 @@ class FaceRecognition(Block):
              for idx, face_encoding in enumerate(face_encodings):
                  _match = fr.compare_faces(self._encodings, face_encoding);
                  y1,x2,y2,x1 = face_locations[idx];
-                 print(_match)
                  if any(_match): # _match es un array de True/False
                     draw.rectangle([x1,y1,x2,y2], fill=None, outline=(255,0,0), width=5);
                  else:
