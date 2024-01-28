@@ -22,6 +22,8 @@ class IfElse(Block):
       @Block.slot("event",{object})
       def slot_event(self, slot, data:object):
 
+          #print(f"IfELSE: data={data}", flush=True);
+          
           if self.params.expression is not None:
              if   type(self.params.expression) is str:
                   value=bool(eval(self.params.expression, {}, {"data":data}));
@@ -32,10 +34,11 @@ class IfElse(Block):
           else:
              value=bool(data);
       
+          #print(f"IfELSE: value={value}", flush=True);
           self.signal_bool(value);
 
-          if value: self.signal_true (True);
-          else:     self.signal_false(False);
+          if value: self.signal_true (data);
+          else:     self.signal_false(data);
 
       #-------------------------------------------------------------------------
       # SIGNALS
@@ -46,8 +49,8 @@ class IfElse(Block):
 
       @Block.signal("true",bool)
       def signal_true(self, data):
-          return True;
+          return data;
 
       @Block.signal("false",bool)
       def signal_false(self, data):
-          return False;
+          return data;
