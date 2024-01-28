@@ -1,2 +1,2 @@
 
-from inputText import InputText;
+from .inputText import InputText;
