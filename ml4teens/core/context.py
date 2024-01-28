@@ -1,3 +1,5 @@
+import os;
+
 import torch;
 import queue;
 import time;
@@ -90,6 +92,9 @@ class Context:
         context._gpu=bool(value);
         context._cpu=not context._gpu;
         
+    #-----------------------------------------------------------------------------------------
+    def __getitem__(self, key):
+        return os.environ.get(key, None);
     #-----------------------------------------------------------------------------------------
     #@classmethod
     #def notify(cls, message):

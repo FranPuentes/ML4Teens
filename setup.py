@@ -18,6 +18,7 @@ setup(
                        "torch",
                        "face_recognition",
                        "jupyter_ui_poll",
+                       "openai",
                      ],
     # metadata para publicar en PyPI
     author='Francisco Puentes',

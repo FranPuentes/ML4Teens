@@ -1,10 +1,20 @@
 import io;
 import pprint;
 import json;
+import html;
 
 from IPython.display import update_display, HTML;
 
 from ..core import Block;
+
+def escape(t):
+    return (t.replace("&", "&amp;")
+             .replace("<", "&lt;")
+             .replace(">", "&gt;")
+             .replace("'", "&#39;")
+             .replace('"', "&quot;")
+           );
+
 
 class Terminal(Block):
 
@@ -17,11 +27,6 @@ class Terminal(Block):
       #-------------------------------------------------------------------------
       def __print(self, message, plus_style):
           style =f"border:1px black; padding: 5px; margin: 3px; {plus_style}";
-          #if   type(message) is str:   display( HTML(f"<div style='width:95%; {style}'>str:{    message }</div>") );
-          #elif type(message) is dict:  display( HTML(f"<div style='width:95%; {style}'>dict:{str(message)}</div>") );
-          #elif type(message) is int:   display( HTML(f"<div style='width:95%; {style}'>int{    message }</div>") );
-          #elif type(message) is bool:  display( HTML(f"<div style='width:95%; {style}'>bool{    message }</div>") );
-          #else:
           if isinstance(message, (bool,int,float,str)):
              pass;
           else:
@@ -29,13 +34,14 @@ class Terminal(Block):
              pp = pprint.PrettyPrinter(stream=buffer);
              pp.pprint(message);
              message = buffer.getvalue();
-             
-          display( HTML(f"<div style='{style}'>{message}</div>") );
+          
+          message=escape(str(message));
+          display( HTML(f"<pre style='{style}'>{message}</pre>") );
 
       #-------------------------------------------------------------------------
       @Block.slot("stdout", {str,list,set,tuple,dict,object})
       def slot_stdin(self, slot, data):
-          message=data or self.params.message;
+          message=data if not(data is None or data=='') else self.params.message;
           self.__print(message,self._outstyle);
           if self.params.dump:
              style="background-color: blue; color: white";
@@ -44,7 +50,7 @@ class Terminal(Block):
       #-------------------------------------------------------------------------
       @Block.slot("stderr", {str,list,set,tuple,dict,object})
       def slot_stderr(self, slot, data):
-          message=data or self.params.message;
+          message=data if not(data is None or data=='') else self.params.message;
           self.__print(message,self._errstyle);
           if self.params.dump:
              style="background-color: blue; color: white";
