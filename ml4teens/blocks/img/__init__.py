@@ -15,6 +15,7 @@ from .imageToText       import ImageToText
 from .depthEstimation   import DepthEstimation
 from .faceBoxing        import FaceBoxing
 from .faceLandmarks     import FaceLandmarks
+from .faceRecognition   import FaceRecognition
 from .embedding         import Embedding
 from .distance          import Distance
 from .similarity        import Similarity
