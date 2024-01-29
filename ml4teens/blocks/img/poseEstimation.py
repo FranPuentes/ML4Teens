@@ -32,7 +32,7 @@ class PoseEstimation(Block):
       @Block.slot("image", {Image})
       def slot_image(self, slot, data):
           if data is not None:
-             results = self._model.predict(data, stream=False, **self.params);
+             results = self._model.predict(data, stream=False, verbose=False, **self.params);
              for r in results:
                  if self.signal_boxes():
                     self.signal_boxes((r.boxes,r.keypoints));
