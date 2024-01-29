@@ -4,24 +4,25 @@
 
 Paquete Python (*ml4teens* en pip) que permite crear *arquitecturas basadas en bloques* que lleven a cabo un proceso de ML.
 
-Cada bloque hace algo concreto; cada uno de ellos genera *signal*s y posee *slot*s.
+Cada bloque hace algo concreto, en modo *caja negra*; cada uno de ellos genera *signal*s y posee *slot*s en donde recibir las señales.
 
 Un objeto (*singleton*) se encarga de emparejar los signals con slots (con control de tipos) y lanzar la red.
 
 >[!NOTE]
->Versión actual: 0.1.25 en pip.
+>Versión actual: 0.1.26 en pip.
 
 >[!NOTE]
 >El submódulo *blocks*/*img* **está en estado estable**.
 >
 >El submódulo *core* está en estado estable.
 
-El código que sigue, muestra un ejemplo de lo que puede hacer el paquete (en 'main').
+El código que sigue, muestra un ejemplo -básico- de lo que puede hacer el paquete (en la rama 'main').
 
 ```python
 import ml4teens as ml;
 
-context   = ml.core.Context.instance.reset();
+context = ml.core.Context.instance;
+context.reset(); # no es necesario, pero...
 
 imagen   = ml.blocks.img.ImageSource();
 img2text = ml.blocks.img.ImageToText(caption="A photo of an");
@@ -34,7 +35,7 @@ img2text("text" ) >> terminal("stdout");
 
 source="https://img.freepik.com/foto-gratis/mujer-tiro-completo-bicicleta-al-aire-libre_23-2149413735.jpg?w=1380&t=st=1704297833~exp=1704298433~hmac=433c68f72fc841cbb094d598521f8b72dad100a383f59b39de5f490cce7c7b99";
 
-context.emit(target=imagen, sname="source", data=source);
+context.emit(target=imagen, slot_name="source", data=source);
 context.wait();
 ```
 
@@ -80,5 +81,3 @@ Observar:
 * La señal (*signal*) se define igualmente mediante un decorador (@Block.signal).
 * El slot, una vez hecha la conversión, pasa la imagen a la señal, invocando al método *signal_image*.
 * Los métodos decorados por @Block.signal no tienen que hacer *necesariamente* algo, salvo devolver el dato que finalmente se envíe.
-
-
