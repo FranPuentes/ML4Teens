@@ -3,9 +3,10 @@ import torch;
 
 from PIL.Image import Image;
 
-from transformers import DPTImageProcessor, DPTForDepthEstimation;
+#from transformers import DPTImageProcessor, DPTForDepthEstimation;
+from transformers import pipeline;
 
-import numpy as np;
+#import numpy as np;
 
 from ...core import Block;
 
@@ -13,26 +14,31 @@ class DepthEstimation(Block):
 
       def __init__(self, **kwargs):
           super().__init__(**kwargs);
-
-          self.processor = DPTImageProcessor.from_pretrained("Intel/dpt-large")
-          self.model     = DPTForDepthEstimation.from_pretrained("Intel/dpt-large")
+          #self.processor = DPTImageProcessor.from_pretrained("Intel/dpt-large")
+          #self.model     = DPTForDepthEstimation.from_pretrained("Intel/dpt-large")
+          self._pipeline = pipeline("depth-estimation",model="vinvino02/glpn-nyu");
 
       #-------------------------------------------------------------------------
       @Block.slot("image", {Image})
       def slot_image(self, slot, data):
-          inputs = self.processor(images=data, return_tensors="pt");
 
-          with torch.no_grad():
-              outputs = self.model(**inputs);
-              predicted_depth = outputs.predicted_depth;
+          if data:
+             predictions=self._pipeline(data);
+             imagen=predictions["depth"];
 
-          prediction = torch.nn.functional.interpolate(predicted_depth.unsqueeze(1), size=data.size[::-1], mode="bicubic", align_corners=False);
+             #inputs = self.processor(images=data, return_tensors="pt");
+             #
+             #with torch.no_grad():
+             #    outputs = self.model(**inputs);
+             #    predicted_depth = outputs.predicted_depth;
+             #
+             #prediction = torch.nn.functional.interpolate(predicted_depth.unsqueeze(1), size=data.size[::-1], mode="bicubic", align_corners=False);
+             #
+             #output = prediction.squeeze().cpu().numpy();
+             #formatted = (output * 255 / np.max(output)).astype("uint8");
+             #imagen = PIL.Image.fromarray(formatted);
 
-          output = prediction.squeeze().cpu().numpy();
-          formatted = (output * 255 / np.max(output)).astype("uint8");
-          imagen = PIL.Image.fromarray(formatted);
-
-          self.signal_image(imagen);
+             self.signal_image(imagen);
 
       #-------------------------------------------------------------------------
       @Block.signal("image", Image)
