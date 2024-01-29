@@ -19,7 +19,8 @@ setup(
                        "face_recognition",
                        "jupyter_ui_poll",
                        "openai",
-                       "typing-extensions<4.6.0", # por culpa de: tensorflow-probability 0.22.0
+                       "tensorflow-probability==0.22.1",
+                       "typing-extensions!=4.7.0,>=4.6.0",
                      ],
     # metadata para publicar en PyPI
     author='Francisco Puentes',
