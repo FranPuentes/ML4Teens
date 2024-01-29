@@ -2,9 +2,9 @@ from setuptools import setup, find_packages
 
 setup(
     name='ml4teens',
-    version='0.1.26',
+    version='0.1.27',
     packages=find_packages(),
-    install_requires=[ "ipython>=8.20", 
+    install_requires=[ "ipython", 
                        "opencv-python", 
                        "numpy",
                        "requests", 
@@ -19,6 +19,7 @@ setup(
                        "face_recognition",
                        "jupyter_ui_poll",
                        "openai",
+                       "typing-extensions<4.6.0", # por culpa de: tensorflow-probability 0.22.0
                      ],
     # metadata para publicar en PyPI
     author='Francisco Puentes',
