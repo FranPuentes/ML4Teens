@@ -37,11 +37,11 @@ class ImageToText(Block):
 
           if caption:
              inputs = self.processor(data, caption, return_tensors="pt");
-             out = self.model.generate(**inputs);
+             out = self.model.generate(max_new_tokens=self.params.maxNewTokens or 128, **inputs);
              self.signal_text(self.processor.decode(out[0], skip_special_tokens=True));
           else:
              inputs = self.processor(data, return_tensors="pt");
-             out = self.model.generate(**inputs);
+             out = self.model.generate(max_new_tokens=self.params.maxNewTokens or 128, **inputs);
              self.signal_text(self.processor.decode(out[0], skip_special_tokens=True));
 
       #-------------------------------------------------------------------------

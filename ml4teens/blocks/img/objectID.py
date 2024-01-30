@@ -2,6 +2,7 @@ import PIL;
 
 from PIL.Image import Image;
 from ultralytics import YOLO;
+
 from ...core import Block;
 
 class ObjectID(Block):
