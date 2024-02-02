@@ -11,6 +11,7 @@ from .imageOp           import ImageOp
 from .videoSource       import VideoSource
 from .imageSource       import ImageSource
 from .objectID          import ObjectID
+from .objectCLS         import ObjectCLS
 from .imageToText       import ImageToText
 from .depthEstimation   import DepthEstimation
 from .poseEstimation    import PoseEstimation

@@ -16,7 +16,7 @@ setup(
                        "pandas>=1.3.4",
                        "transformers",
                        "torch",
-                       #"mediapipe>=0.10.9",
+                       "mediapipe>=0.10.9",
                        #"yoloface>=0.0.4",
                        "jupyter_ui_poll",
                        "openai",

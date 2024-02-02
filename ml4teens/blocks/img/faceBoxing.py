@@ -19,10 +19,10 @@ class FaceBoxing(Block):
           super().__init__(**kwargs);
 
           cwd = os.path.dirname(__file__);
-          mwd = os.path.join(cwd, '../../models/yoloface');
+          mwd = os.path.join(cwd, '../../models');
           fwd = os.path.join(cwd, '../../fonts');
           
-          self._model = YOLO(os.path.join(mwd, "yolov8n.pt"));
+          self._model = YOLO(os.path.join(mwd, "yolov8n-faces.pt"));
                
           self._font = PIL.ImageFont.truetype(os.path.join(fwd, self.params.fontname or "Roboto-Bold.ttf"), self.params.fontsize or 12);
 
