@@ -7,7 +7,9 @@ https://github.com/ultralytics/ultralytics
 ---
 
 **Modelo: efficientdet_lite0.tflite**
+
 **Modelo: efficientdet_lite2.tflite**
+
 **Modelo: ssd_mobilenet_v2.tflite**
 
 Copyright 2023 The MediaPipe Authors.
