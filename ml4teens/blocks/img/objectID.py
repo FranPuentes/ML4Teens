@@ -1,3 +1,5 @@
+import os;
+
 import PIL;
 
 from PIL.Image import Image;
@@ -31,6 +33,10 @@ class ObjectID(Block):
           Constructor: puede recibir varios parámetros opcionales.
           """
           super().__init__();
+          
+          cwd = os.path.dirname(__file__);
+          mwd = os.path.join(cwd, '../../models');
+          fwd = os.path.join(cwd, '../../fonts');
 
           self.model_name="yolov8n.pt";
           if "model_name" in kwargs:
@@ -46,7 +52,7 @@ class ObjectID(Block):
           for key in ["conf","iou","device","max_det","classes"]:
               if key in kwargs: self.params[key]=kwargs[key];
  
-          self._model = YOLO(self.model_name);
+          self._model = YOLO(os.path.join(mwd, self.model_name));
           assert self._model is not None;
 
       #-------------------------------------------------------------------------

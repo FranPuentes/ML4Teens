@@ -41,7 +41,7 @@ class Terminal(Block):
       #-------------------------------------------------------------------------
       @Block.slot("stdout", {str,list,set,tuple,dict,object})
       def slot_stdin(self, slot, data):
-          message=data if not(data is None or data=='') else self.params.message;
+          message=data if not(data is None or (type(data)==str and data=='')) else self.params.message;
           self.__print(message,self._outstyle);
           if self.params.dump:
              style="background-color: blue; color: white";

@@ -1,3 +1,5 @@
+import os;
+
 import PIL;
 
 from PIL.Image import Image;
@@ -32,6 +34,10 @@ class ObjectCLS(Block):
           """
           super().__init__();
 
+          cwd = os.path.dirname(__file__);
+          mwd = os.path.join(cwd, '../../models');
+          fwd = os.path.join(cwd, '../../fonts');
+          
           self.model_name="yolov8n-cls.pt";
           if "model_name" in kwargs:
               if kwargs["model_name"].lower() in ["nano",  "xs"]: self.model_name="yolov8n-cls.pt";
@@ -45,7 +51,7 @@ class ObjectCLS(Block):
               if key in kwargs: self.params[key]=kwargs[key];
  
           self._queue=[];
-          self._model = YOLO(self.model_name);
+          self._model = YOLO(os.path.join(mwd,self.model_name));
           assert self._model is not None;
 
       #-------------------------------------------------------------------------
