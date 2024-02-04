@@ -137,6 +137,15 @@ class FaceLandmarks(Block):
                 image = image.numpy_view();
                 if bool(self.params.bb) is True:
                    image = np.zeros_like(image);
+                if self.params.alpha is not None:
+                   alpha=self.params.alpha;
+                   alpha=max(alpha,0.0);
+                   alpha=min(alpha,1.0);
+                   color_fondo = np.array([0, 0, 0]);
+                   color_fondo = np.tile(color_fondo, (image.shape[0], image.shape[1], 1));
+                   image = image.astype(float) * alpha + color_fondo.astype(float) * (1 - alpha);
+                   image = np.clip(image, 0, 255).astype(np.uint8);
+                   
                 salida = FaceLandmarks.draw_landmarks_on_image(image, results, self.params);
                 self.signal_image(PIL.Image.fromarray(salida));
 
