@@ -153,7 +153,7 @@ class FaceLandmarks(Block):
              for idx in range(len(results.face_landmarks)):
                  landmarks   = results.face_landmarks[idx];
                  blendshapes = results.face_blendshapes[idx];
-                 face={"class":f"face::{0}", "conf":0.0, "xy":[], "z":[], "blendshapes":[] };
+                 face={"kind":f"face::{0}", "trust":0.0, "xy":[], "z":[], "blendshapes":[] };
                  for l, lm in enumerate(landmarks):
                      face["xy"        ].append((lm.x, lm.y));
                      face["z"         ].append(lm.z);

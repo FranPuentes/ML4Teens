@@ -1,3 +1,4 @@
+import os;
 import PIL;
 import numpy as np;
 
@@ -12,6 +13,10 @@ class SegmentAll(Block):
       def __init__(self, **kwargs):
           super().__init__();
           
+          cwd = os.path.dirname(__file__);
+          mwd = os.path.join(cwd, '../../models');
+          fwd = os.path.join(cwd, '../../fonts');
+          
           self.model_name="mobile_sam.pt";
           if "model_name" in kwargs:
               if kwargs["model_name"].lower() in ["small", "s" ]: self.model_name="sam_b.pt";
@@ -22,7 +27,7 @@ class SegmentAll(Block):
           for key in ["device", "augment","retina_masks"]:
               if key in kwargs: self.params[key]=kwargs[key];
 
-          self._model = SAM(self.model_name);
+          self._model = SAM(os.path.join(mwd, self.model_name));
 
       #-------------------------------------------------------------------------
       def classes(self):

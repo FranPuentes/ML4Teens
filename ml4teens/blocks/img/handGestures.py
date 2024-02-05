@@ -112,7 +112,7 @@ class HandGestures(Block):
                     hand_landmarks = results.hand_landmarks[idx];
                     handedness = results.handedness[idx];
                      
-                    hand={"class":f"hand::{handedness[0].category_name}", "conf":handedness[0].score, "xy":[], "z":[], "visibility":[], "presence":[], "names":[] };
+                    hand={"kind":f"hand::{handedness[0].category_name}", "trust":handedness[0].score, "xy":[], "z":[], "visibility":[], "presence":[], "names":[] };
                      
                     for l, lm in enumerate(hand_landmarks):
                         hand["xy"        ].append((lm.x, lm.y));

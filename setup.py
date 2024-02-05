@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='ml4teens',
-    version='0.1.27',
+    version='0.1.28',
     packages=find_packages(),
     install_requires=[ "ipython", 
                        "opencv-python>=4.9", 
@@ -14,8 +14,8 @@ setup(
                        "ipyevents",
                        "ipywidgets",
                        "pandas>=1.3.4",
-                       "transformers",
-                       "torch",
+                       "transformers>=4.38.0.dev0",
+                       "torch>=2.2.0",
                        "mediapipe>=0.10.9",
                        #"yoloface>=0.0.4",
                        "jupyter_ui_poll",

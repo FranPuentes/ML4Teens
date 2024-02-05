@@ -1,3 +1,5 @@
+import os;
+
 import PIL;
 
 from PIL.Image import Image;
@@ -10,6 +12,10 @@ class PoseEstimation(Block):
 
       def __init__(self, **kwargs):
           super().__init__();
+          
+          cwd = os.path.dirname(__file__);
+          mwd = os.path.join(cwd, '../../models');
+          fwd = os.path.join(cwd, '../../fonts');
           
           self.model_name="yolov8n-pose.pt";
           if "model_name" in kwargs:
@@ -25,7 +31,7 @@ class PoseEstimation(Block):
           for key in ["conf","iou","device","max_det","classes"]:
               if key in kwargs: self.params[key]=kwargs[key];
 
-          self._model = YOLO(self.model_name);
+          self._model = YOLO(os.path.join(mwd, self.model_name));
           assert self._model is not None;
 
       #-------------------------------------------------------------------------
@@ -53,8 +59,8 @@ class PoseEstimation(Block):
           _boxes, _keypoints = data;
           
           boxes=[{
-                  "class":(int(r),self._model.names[int(r)]),
-                  "conf":float(c),
+                  "kind":(int(r),self._model.names[int(r)]),
+                  "trust":float(c),
                   "xyxy":[float(_) for _ in k],
                   "kp":[[float(_) for _ in l] for l in p],
                  }

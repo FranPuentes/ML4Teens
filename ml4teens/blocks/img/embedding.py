@@ -7,7 +7,7 @@ from tempfile import NamedTemporaryFile;
 
 from PIL.Image import Image;
 
-from transformers import ViTFeatureExtractor, ViTModel;
+from transformers import AutoImageProcessor, ViTModel;
 import torch;
 
 from torch import Tensor;
@@ -37,20 +37,19 @@ class Embedding(Block):
 
       #-------------------------------------------------------------------------
       @staticmethod
-      def embedding(fextr, model, imagen):
-          inputs  = fextr(images=imagen, return_tensors="pt");
+      def embedding(processor, model, imagen):
+          inputs = processor(imagen, return_tensors="pt");
           with torch.no_grad():
                outputs = model(**inputs);
                return outputs.last_hidden_state[0];
-               #return torch.mean(outputs.last_hidden_state[0], dim=0).numpy();
 
       #-------------------------------------------------------------------------
       # Constructor
       #-------------------------------------------------------------------------
       def __init__(self, **kwargs):
           super().__init__(**kwargs);
-          self._fextr = ViTFeatureExtractor.from_pretrained('google/vit-base-patch16-224')
-          self._model = ViTModel.from_pretrained('google/vit-base-patch16-224')
+          self._processor = AutoImageProcessor.from_pretrained("google/vit-base-patch16-224-in21k");
+          self._model     = ViTModel.from_pretrained("google/vit-base-patch16-224-in21k");
 
       #-------------------------------------------------------------------------
       # SLOTS
@@ -66,12 +65,12 @@ class Embedding(Block):
                   try:
                     fuente, istemp = Embedding.download(data);
                     imagen = PIL.Image.open(fuente);
-                    self.signal_embedding(Embedding.embedding(self._fextr, self._model, imagen));
+                    self.signal_embedding(Embedding.embedding(self._processor, self._model, imagen));
                   finally:
                     if istemp: os.remove(fuente);
 
              elif isinstance(data,Image):
-                  self.signal_embedding(Embedding.embedding(self._fextr, self._model, data));
+                  self.signal_embedding(Embedding.embedding(self._processor, self._model, data));
 
       #-------------------------------------------------------------------------
       # SIGNALS

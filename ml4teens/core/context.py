@@ -326,7 +326,7 @@ class Context:
                    target.run(sname, data, mods);
                                     
                 except KeyboardInterrupt as e:
-                   debug.print("Interrumpido por el/la usuario/a.", exception=e);
+                   debug.print("Interrumpido por el/la usuario/a.");
                    
                 except Exception as e:
                    debug.print(f"Excepción ejecutando un slot: {e}");

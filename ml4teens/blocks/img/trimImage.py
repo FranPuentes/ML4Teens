@@ -65,7 +65,7 @@ class TrimImage(Block):
       #-------------------------------------------------------------------------
       @Block.slot("boxes", {tuple, list})
       def slot_boxes(self, slot, data):
-
+      
           if len(data)>0:
 
              if   all([type(d) is float for d in data]) and len(data)>=4:
