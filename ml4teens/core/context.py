@@ -3,6 +3,7 @@ import os;
 import torch;
 import queue;
 import time;
+import json;
 
 from IPython.display import display;
 from IPython.display import HTML, Javascript;
@@ -14,8 +15,18 @@ from .slots      import Slots;
 
 from ..tools     import debug;
 
+# TODO
+"""
+Permitir que -de alguna forma- podamos tener scripts: MetaBlock
+
+Un MetaBlock contiene bloques, links y gestiona su propia cola.
+Un MetaBlock identifica (bloque,slot) de entrada y (bloque,signal) de salida.
+¿Cómo hacerlo sin repetir código?
+
+"""
+
 #-------------------------------------------------------------------------------
-# Es un singleton
+# Es un singleton (ver TODO).
 #-------------------------------------------------------------------------------
 class Context:
 
@@ -95,6 +106,7 @@ class Context:
     #-----------------------------------------------------------------------------------------
     def __getitem__(self, key):
         return os.environ.get(key, None);
+        
     #-----------------------------------------------------------------------------------------
     #@classmethod
     #def notify(cls, message):
@@ -104,6 +116,16 @@ class Context:
     #    #display( Javascript(data=f"""$.notify("{message}");""", lib=["https://rawgit.com/notifyjs/notifyjs/master/dist/notify.js"]) );
     #    pass;
 
+    #-----------------------------------------------------------------------------------------
+    def __enter__(self):
+        debug.print("Entrando en un bloque de contexto");
+        self.reset(all=True);
+        return self;
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        debug.print("Saliendo de un bloque de contexto");
+        self.reset(all=True);
+        
     #-----------------------------------------------------------------------------------------
     def blocks(self):
         blocks=set();
@@ -117,11 +139,64 @@ class Context:
     
     #-----------------------------------------------------------------------------------------
     def reset(self, all=False):
-        self._instance.listeners={};
+        self._queue=queue.PriorityQueue();
         if all:
-           # TODO ¿enviar un reset a todos los bloques?
-           pass;
+           self._instance.listeners={};
         return self;
+
+    #=========================================================================================
+    def save(self, script_name, slots, signals=None):
+        
+        rt={ "version":0, "blocks":[], "links":{}, "slots":[], "signals":[] };
+        
+        refs={};
+        
+        ## blocks
+        for block in self.blocks():
+            b={};
+            b["__class__" ]=type(block).__name__;
+            b["__module__"]=block.__class__.__module__;
+            rt["blocks"].append(b);
+            refs[block]=rt["blocks"].index(b);
+            
+        ## links
+        items={};
+        for signal in self.listeners:
+            _slots = self.listeners[signal];
+            
+            block, sname = signal;
+            block=refs[block];
+            signal=(block,sname);
+            
+            items[json.dumps(signal)]=[ ((refs[slot[0]],slot[1]),mods) for slot, mods in _slots];
+            
+        rt["links"]=items;
+        
+        ## slots    
+        if isinstance(slots,(tuple,list)):
+           for slot in slots:
+               s={"block":refs[slot._block], "slot":slot._sname, "mods":slot._mods };
+               rt["slots"].append(s);
+        else:
+           slot=slots;
+           assert isinstance(slot, Context.Linker), "El parámetro 'slots' de 'save' debe ser un SLOT o una lista de SLOTs";
+           s={"block":refs[slot._block], "slot":slot._sname, "mods":slot._mods };
+           rt["slots"].append(s);
+           
+        ## signals   
+        if isinstance(signals,(tuple,list)):
+           for signal in signals:
+               s={"block":refs[signal._block], "signal":signal._sname, "mods":signal._mods };
+               rt["signals"].append(s);
+        else:
+           signal=signals;
+           assert isinstance(signal, Context.Linker), "El parámetro 'signals' de 'save' debe ser un SIGNAL o una lista de SIGNALs";
+           s={"block":refs[signal._block], "signal":signal._sname, "mods":signal._mods };
+           rt["signals"].append(s);
+        
+        ## saving ...
+        with open(script_name, "wt") as fd:
+             json.dump(rt,fd, indent=4);
 
     #-----------------------------------------------------------------------------------------
     def subscribe(self, signal, slot, mods=({},{})):
@@ -303,11 +378,11 @@ class Context:
     def wait(self, timeout=1):
         """
         Inicia el loop asíncrono y procesa los mensajes enviados por medio de la cola del contexto uno a uno.
-        Se supone que el usuario ha colocado en la cola, previamente, mensajes para inicial le red.
+        Se supone que el usuario ha colocado en la cola, previamente, mensajes para inicial la red.
         Si no hay mensajes en la cola, finaliza.
         Puede volver a invocarse, con nuevos mensajes encolados.
         """
-                
+        
         try:
           timestamp=time.time();        
           debug.print("Entrando en el bucle de eventos.", flush=True);
@@ -365,7 +440,7 @@ class Context:
               Context.instance.subscribe((rlinker._block,rlinker._sname), (self._block,self._sname), (rlinker._mods,self._mods));
               return self._block;
 
-          def __ge__(self, rlinker): # a >= b
+          def __gt__(self, rlinker): # a > b
               assert self._sname in self._block.signals,     f"Signal '{self._sname}' no existe en '{self._block._fullClassName}'";
               assert rlinker._sname in rlinker._block.slots, f"Slot '{rlinker._sname}' no existe en '{rlinker._block._fullClassName}'";
               assert self._block.signals[self._sname]["type"] == rlinker._block.slots[rlinker._sname]["type"], f"Tipo incompatibles {self._block.signals[self._sname]['type']} != {rlinker._block.slots[rlinker._sname]['type']}";
@@ -373,7 +448,7 @@ class Context:
               Context.instance.subscribe((self._block,self._sname), (rlinker._block,rlinker._sname), (self._mods,rlinker._mods|{"@sync":True}));
               return rlinker._block;
 
-          def __le__(self, rlinker): # a <= b
+          def __lt__(self, rlinker): # a < b
               assert self._sname in self._block.slots,         f"Slot '{self._sname}' no existe en '{self._block._fullClassName}'";
               assert rlinker._sname in rlinker._block.signals, f"Signal '{rlinker._sname}' no existe en '{rlinker._block._fullClassName}'";
               assert self._block.slots[self._sname]["type"] == rlinker._block.signals[rlinker._sname]["type"], f"Tipo incompatibles {self._block.slots[self._sname]['type']} != {rlinker._block.signals[rlinker._sname]['type']}";

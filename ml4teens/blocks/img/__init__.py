@@ -23,4 +23,6 @@ from .handGestures      import HandGestures
 from .embedding         import Embedding
 from .distance          import Distance
 from .similarity        import Similarity
+from .threshold         import Threshold
+from .histogram         import Histogram
 
