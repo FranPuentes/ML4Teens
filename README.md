@@ -18,6 +18,7 @@ Un objeto (*singleton*) se encarga de emparejar los signals con slots (con contr
 
 El código que sigue, muestra un ejemplo -básico- de lo que puede hacer el paquete (en la rama 'main').
 
+
 ```python
 import ml4teens as ml;
 
