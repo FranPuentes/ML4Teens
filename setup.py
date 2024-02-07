@@ -22,6 +22,8 @@ setup(
                        #"gdown",
                        "matplotlib>=3.0",
                        "seaborn",
+                       "cohere",
+                       "tiktoken",
                      ],
     # metadata para publicar en PyPI
     author='Francisco Puentes',
