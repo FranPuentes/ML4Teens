@@ -9,12 +9,17 @@ Cada bloque hace algo concreto, en modo *caja negra*; cada uno de ellos genera *
 Un objeto (*singleton*) se encarga de emparejar los signals con slots (con control de tipos) y lanzar la red.
 
 >[!NOTE]
->Versión actual: 0.1.29 en pip.
+>Versión actual: 0.1.30 en pip.
 
 >[!NOTE]
 >El submódulo *blocks*/*img* **está en estado estable**.
 >
 >El submódulo *core* está en estado estable.
+
+>[!WARNING]
+>Por uasr la última versión de Transformers, da un error en varios ejemplos.
+>
+>Habrá que esperar que la rama 'dev' de Transformers sea librerada en 'main'
 
 El código que sigue, muestra un ejemplo -básico- de lo que puede hacer el paquete (en la rama 'main').
 
