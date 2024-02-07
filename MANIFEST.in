@@ -1,0 +1,12 @@
+include  ml4teens/models/README.md
+include  ml4teens/models/face_landmarker.task
+include  ml4teens/models/gesture_recognizer.task
+include  ml4teens/models/hand_landmarker.task
+include  ml4teens/models/yolov8n-faces.pt
+include  ml4teens/models/efficientdet_lite0.tflite
+include  ml4teens/models/efficientdet_lite2.tflite
+include  ml4teens/models/ssd_mobilenet_v2.tflite
+
+include  ml4teens/fonts/README.md
+include  ml4teens/fonts/*.txt
+include  ml4teens/fonts/*.ttf
