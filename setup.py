@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='ml4teens',
-    version='0.1.32',
+    version='0.1.33',
     packages=find_packages(),
     install_requires=[ "ipython",
                        "opencv-python>=4.9",
@@ -25,6 +25,8 @@ setup(
                        "cohere",
                        "tiktoken",
                      ],
+    include_package_data=True,
+    
     # metadata para publicar en PyPI
     author='Francisco Puentes',
     author_email='fran@puentescalvo.com',
