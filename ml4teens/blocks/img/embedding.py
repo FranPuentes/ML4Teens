@@ -71,7 +71,9 @@ class Embedding(Block):
                    inputs = self._processor(imagen, return_tensors="pt");
                    with torch.no_grad():
                         outputs = self._model(**inputs);
-                        return outputs.last_hidden_state[0];
+                        embedding=outputs.last_hidden_state[0];
+                        print(embedding.shape)
+                        return embedding;
                 
                 else:
                    """
@@ -79,7 +81,9 @@ class Embedding(Block):
                    return result.embeddings[0].embedding;
                    """
                    embedding = self._model.to_embeddings(imagen);
-                   return  torch.from_numpy(embedding[0]);
+                   embedding = torch.from_numpy(embedding[0]);
+                   print(embedding.shape)
+                   return embedding;
 
       #-------------------------------------------------------------------------
       @staticmethod
