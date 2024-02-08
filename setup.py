@@ -15,7 +15,7 @@ setup(
                        "ipywidgets",
                        "pandas>=1.3.4",
                        #"transformers>=4.37",
-                       "torch>=2.2.0",
+                       "torch==2.1.0",
                        "mediapipe>=0.10.9",
                        "jupyter_ui_poll",
                        "openai",
