@@ -72,7 +72,7 @@ class Embedding(Block):
                    with torch.no_grad():
                         outputs = self._model(**inputs);
                         embedding=outputs.last_hidden_state[0];
-                        print(embedding.shape)
+                        #print(embedding.shape)
                         return embedding;
                 
                 else:
@@ -82,7 +82,7 @@ class Embedding(Block):
                    """
                    embedding = self._model.to_embeddings(imagen);
                    embedding = torch.from_numpy(embedding[0]);
-                   print(embedding.shape)
+                   #print(embedding.shape)
                    return embedding;
 
       #-------------------------------------------------------------------------
