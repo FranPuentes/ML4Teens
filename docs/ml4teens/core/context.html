@@ -1,0 +1,1504 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.10.0" />
+<title>ml4teens.core.context API documentation</title>
+<meta name="description" content="" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>ml4teens.core.context</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">import os;
+
+import torch;
+import queue;
+import time;
+import json;
+import torch;
+
+from IPython.display import display;
+from IPython.display import HTML, Javascript;
+
+from .signalType import SignalType;
+from .signals    import Signals;
+from .slotType   import SlotType;
+from .slots      import Slots;
+
+from ..tools     import debug;
+
+# TODO
+&#34;&#34;&#34;
+Permitir que -de alguna forma- podamos tener scripts: MetaBlock
+
+Un MetaBlock contiene bloques, links y gestiona su propia cola.
+Un MetaBlock identifica (bloque,slot) de entrada y (bloque,signal) de salida.
+¿Cómo hacerlo sin repetir código?
+
+&#34;&#34;&#34;
+
+#-------------------------------------------------------------------------------
+# Es un singleton (ver TODO).
+#-------------------------------------------------------------------------------
+class Context:
+
+    _instance = None;
+    
+    #---------------------------------------------------------------------------
+    @classmethod
+    def __html__(cls):       
+        display( HTML(
+                      &#34;&#34;&#34;
+                      &lt;!-- JQUERY --&gt;
+                      &lt;script src=&#34;https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js&#34;&gt;&lt;/script&gt;
+                      
+                      &lt;!-- JQUERY UI --&gt;
+                      &lt;link rel=&#34;stylesheet&#34; href=&#34;https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.2/themes/smoothness/jquery-ui.css&#34;&gt;
+                      &lt;script src=&#34;https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js&#34;&gt;&lt;/script&gt;
+                      &#34;&#34;&#34;
+               )     );
+        pass;
+
+    #---------------------------------------------------------------------------
+    def __new__(cls, *args, **kwargs):
+        &#34;&#34;&#34;
+        Crea la única instancia de esta clase.        
+        Si ya existe previamente simplemente devuelve la instancia creada con antelación.        
+        Esto permite que sólo exista una instanca de esta clase, aunque se llame en varias ocasiones.
+        &#34;&#34;&#34;
+        if not cls._instance:
+           cls._instance = super(Context, cls).__new__(cls);
+           cls._instance.listeners={};
+           cls._allowGPU = torch.cuda.is_available();
+           #cls.__html__();
+           cls._queue=queue.PriorityQueue();
+           
+           cwd   = os.path.dirname(__file__);
+           mwd   = os.path.join(cwd, &#39;../models&#39;);
+           cache = os.path.join(mwd,&#34;cache&#34;);
+           os.makedirs(cache, exist_ok=True);
+           os.environ[&#39;TRANSFORMERS_CACHE&#39;] = cache;
+        return cls._instance;
+
+    #-----------------------------------------------------------------------------------------
+    def __init__(self):
+        &#34;&#34;&#34;
+        Este es un constructor falso, no hace nada.         
+        La inicialización del **único** objeto de esta clase se hace en *__new__*.
+        &#34;&#34;&#34;
+        pass;
+
+    #-----------------------------------------------------------------------------------------
+    @classmethod
+    @property
+    def instance(cls):
+        return Context() if Context._instance==None else Context._instance;
+        
+    #-----------------------------------------------------------------------------------------
+    @property
+    def allowGPU(self):
+        return self._allowGPU;
+        
+    #-----------------------------------------------------------------------------------------
+    @allowGPU.setter
+    def allowGPU(self, value):
+        self._allowGPU = bool(value);
+        
+    #-----------------------------------------------------------------------------------------
+    @property
+    def gpu(self):
+        return self._allowGPU and torch.cuda.is_available();
+        
+    #-----------------------------------------------------------------------------------------
+    @property
+    def gpus(self):
+        return torch.cuda.device_count() if (self._allowGPU and torch.cuda.is_available()) else 0;
+        
+    #-----------------------------------------------------------------------------------------
+    @property
+    def mwd(self):
+        cwd = os.path.dirname(__file__);
+        return os.path.join(cwd, &#39;../models&#39;);
+        
+    #-----------------------------------------------------------------------------------------
+    @property
+    def fwd(self):
+        cwd = os.path.dirname(__file__);
+        return os.path.join(cwd, &#39;../fonts&#39;);
+        
+    #-----------------------------------------------------------------------------------------
+    def __getitem__(self, key):
+        return os.environ.get(key, None);
+        
+    #-----------------------------------------------------------------------------------------
+    #@classmethod
+    #def notify(cls, message):
+    #    #https://notifyjs.jpillora.com/
+    #    #https://til.simonwillison.net/jupyter/javascript-in-a-jupyter-notebook
+    #    #message=message.replace(&#39;&#34;&#39;,&#34;&#39;&#34;);
+    #    #display( Javascript(data=f&#34;&#34;&#34;$.notify(&#34;{message}&#34;);&#34;&#34;&#34;, lib=[&#34;https://rawgit.com/notifyjs/notifyjs/master/dist/notify.js&#34;]) );
+    #    pass;
+
+    #-----------------------------------------------------------------------------------------
+    def __enter__(self):
+        debug.print(&#34;Entrando en un bloque de contexto&#34;);
+        self.reset(all=True);
+        return self;
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        debug.print(&#34;Saliendo de un bloque de contexto&#34;);
+        self.reset(all=True);
+        
+    #-----------------------------------------------------------------------------------------
+    def blocks(self):
+        blocks=set();
+        for signal in self.listeners:
+            source, _ = signal;
+            blocks.add(source);
+            for slot, _ in self.listeners[signal]:
+                target, _ = slot;
+                blocks.add(target);
+        return list(blocks);
+    
+    #-----------------------------------------------------------------------------------------
+    def reset(self, all=False):
+        self._queue=queue.PriorityQueue();
+        if all:
+           self._instance.listeners={};
+        return self;
+
+    #=========================================================================================
+    def save(self, script_name, slots, signals=None):
+        
+        rt={ &#34;version&#34;:0, &#34;blocks&#34;:[], &#34;links&#34;:{}, &#34;slots&#34;:[], &#34;signals&#34;:[] };
+        
+        refs={};
+        
+        ## blocks
+        for block in self.blocks():
+            b={};
+            b[&#34;__class__&#34; ]=type(block).__name__;
+            b[&#34;__module__&#34;]=block.__class__.__module__;
+            rt[&#34;blocks&#34;].append(b);
+            refs[block]=rt[&#34;blocks&#34;].index(b);
+            
+        ## links
+        items={};
+        for signal in self.listeners:
+            _slots = self.listeners[signal];
+            
+            block, sname = signal;
+            block=refs[block];
+            signal=(block,sname);
+            
+            items[json.dumps(signal)]=[ ((refs[slot[0]],slot[1]),mods) for slot, mods in _slots];
+            
+        rt[&#34;links&#34;]=items;
+        
+        ## slots    
+        if isinstance(slots,(tuple,list)):
+           for slot in slots:
+               s={&#34;block&#34;:refs[slot._block], &#34;slot&#34;:slot._sname, &#34;mods&#34;:slot._mods };
+               rt[&#34;slots&#34;].append(s);
+        else:
+           slot=slots;
+           assert isinstance(slot, Context.Linker), &#34;El parámetro &#39;slots&#39; de &#39;save&#39; debe ser un SLOT o una lista de SLOTs&#34;;
+           s={&#34;block&#34;:refs[slot._block], &#34;slot&#34;:slot._sname, &#34;mods&#34;:slot._mods };
+           rt[&#34;slots&#34;].append(s);
+           
+        ## signals   
+        if isinstance(signals,(tuple,list)):
+           for signal in signals:
+               s={&#34;block&#34;:refs[signal._block], &#34;signal&#34;:signal._sname, &#34;mods&#34;:signal._mods };
+               rt[&#34;signals&#34;].append(s);
+        else:
+           signal=signals;
+           assert isinstance(signal, Context.Linker), &#34;El parámetro &#39;signals&#39; de &#39;save&#39; debe ser un SIGNAL o una lista de SIGNALs&#34;;
+           s={&#34;block&#34;:refs[signal._block], &#34;signal&#34;:signal._sname, &#34;mods&#34;:signal._mods };
+           rt[&#34;signals&#34;].append(s);
+        
+        ## saving ...
+        with open(script_name, &#34;wt&#34;) as fd:
+             json.dump(rt,fd, indent=4);
+
+    #-----------------------------------------------------------------------------------------
+    def subscribe(self, signal, slot, mods=({},{})):
+        &#34;&#34;&#34;
+        Registra la pareja (*signal*, *slot*) en este contexto.
+        
+        Si ya existe esta pareja, la elimina y la vuelve a añadir (quizá con otros *mods*).
+        
+        :param signal:   La señal (*signal*).
+        :type  signal:   tupla (*block*, *signal name*)
+        :param slot:     El *slot*.
+        :type  slot:     Tupla (*block*, *slot name*)
+        :param mods:     Modificadores de *signal*/*slot*.
+        :type  mods:     dict*
+        &#34;&#34;&#34;
+        assert signal is not None and type(signal) is tuple and len(signal)==2;
+        assert slot   is not None and type(slot  ) is tuple and len(slot  )==2;
+        assert type(mods) in (tuple,list) and len(mods)==2 and all([(type(m) is dict) for m in mods]);
+        if not signal in self.listeners: self.listeners[signal]=[];
+        self.listeners[signal]=[(s,m) for s,m in self.listeners[signal] if s!=slot];
+        self.listeners[signal].append((slot,mods));
+
+    #-----------------------------------------------------------------------------------------
+    def unsubscribe(self, signal, slot):
+        &#34;&#34;&#34;
+        Elimina la pareja (*signal*, *slot*) en este contexto.
+        
+        Si no existe esta pareja, no hace nada.
+        
+        :param signal: La señal (*signal*).
+        :type  signal: tupla (*block*, *signal name*)
+        :param slot:   El *slot*.
+        :type  slot:   tupla (*block*, *slot name*)
+        &#34;&#34;&#34;
+        if signal in self.listeners:
+           self.listeners[signal]=[(s,m) for s,m in self.listeners[signal] if s!=slot];
+           
+    #-----------------------------------------------------------------------------------------
+    def checkSubscription(self, signal, slot=None):
+        &#34;&#34;&#34;
+        Comprueba si se ha registrado la pareja (*signal*, *slot*) en este contexto.
+        
+        Si *slot* es None, sólo comprueba si está registrado *signal*.
+        
+        :param signal: La señal (*signal*).
+        :type  signal: tupla (*block*, *signal name*)
+        :param slot:   El *slot*.
+        :type  slot:   tupla (*block*, *slot name*) | None
+        :return:       Si *slot* no es None, devuelve si la pareja (*signal*,*slot*) está registrada. Si *slot* es None, devuelve si *signal* tiene *slot*s escuchando.
+        :rtype:        True/False
+        &#34;&#34;&#34;
+        if slot is not None:
+           if signal in self.listeners:        
+              for s,m in self.listeners[signal]:
+                  if s==slot: return True;
+           return False;
+        else:
+           return signal in self.listeners and self.listeners[signal];
+           
+    #-----------------------------------------------------------------------------------------
+    def emit(self, **kwargs):
+        &#34;&#34;&#34;
+        Emite una señal directamente a los &#39;listeners&#39; de (source,sname) o a un slot (target,sname).
+        
+        &#39;target&#39; y &#39;source&#39; son exclusivos y obligatorios (por separado).
+        
+        :param source: El objeto que envía la señal.
+        :type  source: Block
+        :param target: El objeto al que se le envía la señal.
+        :type  target: Block
+        :param sname:  El nombre de una señal/slot (alias: signal_name o slot_name, según sea source/target).
+        :type  sname:  str
+        :param data:   El dato que acompaña a la señal.
+        :type  data:   Cualquier cosa.
+        :param mods:   Los modificadores, si se trata de el envío de un señal a un slot.
+        :type  mods:   dict | None.
+        &#34;&#34;&#34;
+        
+        #-----------------------------------------------------------------------
+        &#34;&#34;&#34;
+        def updateOnlyThese(mods, onlyThese=set()):
+        
+            if &#34;slot&#34; in mods:
+                if  isinstance(mods[&#34;slot&#34;],str):
+                    onlyThese|=set(mods[&#34;slot&#34;]);
+                else:
+                    raise RuntimeError(&#34;El modificador &#39;slot&#39; tiene que ser de tipo &#39;str&#39;&#34;);    
+                del mods[&#34;slot&#34;];
+
+            if &#34;slots&#34; in mods:
+                if  isinstance(mods[&#34;slots&#34;],(tuple,list)):
+                    onlyThese|=set(mods[&#34;slots&#34;]);
+                else:
+                    raise RuntimeError(&#34;El modificador &#39;slots&#39; tiene que ser de tipo &#39;tuple&#39; o &#39;list&#39;&#34;);    
+                del mods[&#34;slots&#34;];
+                
+            return onlyThese;    
+        &#34;&#34;&#34;    
+        #-----------------------------------------------------------------------
+        
+        assert ((&#34;source&#34; in kwargs) and (&#34;target&#34; not in kwargs)) or ((&#34;source&#34; not in kwargs) and (&#34;target&#34; in kwargs))  or ((&#34;source&#34; in kwargs) and (&#34;target&#34; in kwargs));               
+        assert (&#34;sname&#34; in kwargs) or (&#34;signal_name&#34; in kwargs) or (&#34;slot_name&#34; in kwargs);        
+        assert (&#34;data&#34;  in kwargs);
+        
+        if (&#34;target&#34; in kwargs) and (&#34;source&#34; not in kwargs):
+           # señal enviada desde el espacio del usuario
+           # ha de ejecutarse el slot (sname) correspondiente
+           target=kwargs[&#34;target&#34;];
+           sname=kwargs.get(&#34;sname&#34;) or kwargs.get(&#34;slot_name&#34;) or kwargs.get(&#34;slot&#34;);
+           data =kwargs.get(&#34;data&#34; );
+           mods =kwargs.get(&#34;mods&#34; ) or {}; # signal mods
+           assert type(mods) is dict;
+           debug.print(f&#34;Ha llegado un evento del usuario al slot &#39;{sname}&#39; de {target._fullClassName}::{type(data)}&#34;);
+           if sname in target.slots:
+              slot=target.slots[sname];
+              debug.print(f&#34;Encolando: Una señal a {target._fullClassName} en el slot &#39;{sname}&#39; con data={type(data)}&#34;);
+              self._queue.put( (time.time(), target, sname, data, (mods,{})) );
+           else:
+              raise RuntimeError(f&#34;No existe el slot &#39;{sname}&#39; en {target._fullClassName}&#34;);
+           
+        elif (&#34;source&#34; in kwargs) and (&#34;target&#34; in kwargs):
+           # señal enviada por un bloque (source) a otro concreto (target)
+           # ha de ejecutarse el slot (sname) correspondiente
+           source=kwargs[&#34;source&#34;];
+           target=kwargs[&#34;target&#34;];
+           sname=kwargs.get(&#34;sname&#34;) or kwargs.get(&#34;slot_name&#34;) or kwargs.get(&#34;slot&#34;);
+           data =kwargs.get(&#34;data&#34; );
+           mods =kwargs.get(&#34;mods&#34; ) or ({},{});
+           assert type(mods) in (tuple,list) and len(mods)==2 and all([(type(m) is dict) for m in mods]);
+           debug.print(f&#34;Ha llegado un evento al slot &#39;{sname}&#39; de {target._fullClassName}::{type(data)}&#34;);
+           if sname in target.slots:
+              slot=target.slots[sname];
+              signal_mods, slot_mods = mods;
+              if &#34;@sync&#34; not in slot_mods or bool(slot_mods[&#34;@sync&#34;]) is False:
+                 debug.print(f&#34;Encolando una señal dirigida a {target._fullClassName}::{sname} con type(data)={type(data)}&#34;);
+                 self._queue.put_nowait( (time.time(), target, sname, data, (signal_mods,slot_mods)) );
+              else:
+                 debug.print(f&#34;Ejecutando síncronamente una señal dirigida a {target._fullClassName}::{sname} con type(data)={type(data)}&#34;);
+                 target.run(sname,data,(signal_mods,slot_mods));                 
+           else:
+              raise RuntimeError(f&#34;No existe el slot &#39;{sname}&#39; en {target._fullClassName}&#34;);
+           
+        elif (&#34;source&#34; in kwargs) and (&#34;target&#34; not in kwargs):
+           # señal generada en un bloque (source)
+           # ha de enviarse a todos sus subscriptores
+           source=kwargs[&#34;source&#34;];
+           sname =kwargs.get(&#34;sname&#34;) or kwargs.get(&#34;signal_name&#34;);
+           data  =kwargs.get(&#34;data&#34; );
+           mods  =kwargs.get(&#34;mods&#34; ) or {}; # signal mods
+           assert type(mods) is dict;
+           debug.print(f&#34;{source._fullClassName}:: enviando la señal &#39;{sname}&#39;, con data={type(data)}, a todos sus subscriptores&#34;);
+           
+           &#34;&#34;&#34;
+           onlyThese=set();
+           signal=(source, sname);
+           if signal in self.listeners:
+              for slot, _mods in self.listeners[signal]:
+                  target, slot_name = slot;
+                  signal_mods, _ = _mods;
+                  onlyThese=updateOnlyThese(signal_mods, onlyThese);                  
+                     
+           assert all([(type(m) is str and bool(m)) for m in onlyThese]), f&#34;Referencia al nombre de un slot errónea: {onlyThese}&#34;;
+           &#34;&#34;&#34;
+           
+           signal=(source, sname);
+           if signal in self.listeners:
+              for slot, _mods in self.listeners[signal]:
+                  target, slot_name = slot;
+                  signal_mods, slot_mods = _mods;
+                  debug.print(f&#34;Enviando la señal &#39;{slot_name}&#39;, con data={type(data)}, a {target._fullClassName}&#39;&#34;);                 
+                  #if not onlyThese or slot_name in onlyThese:
+                  if &#34;trace&#34; in mods and mods[&#34;trace&#34;]:
+                     mods[&#34;trace&#34;]={&#34;source&#34;:source, &#34;signal&#34;:sname, &#34;target&#34;:target, &#34;slot&#34;:slot_name};
+                  self.emit(source=source, target=target, sname=slot_name, data=data, mods=(mods|signal_mods,slot_mods));
+           else:
+              raise RuntimeError(f&#34;No existe la señal &#39;{sname}&#39; en {source._fullClassName}&#34;);
+               
+    #-----------------------------------------------------------------------------------------
+    def wait(self, timeout=1):
+        &#34;&#34;&#34;
+        Inicia el loop asíncrono y procesa los mensajes enviados por medio de la cola del contexto uno a uno.
+        Se supone que el usuario ha colocado en la cola, previamente, mensajes para inicial la red.
+        Si no hay mensajes en la cola, finaliza.
+        Puede volver a invocarse, con nuevos mensajes encolados.
+        &#34;&#34;&#34;
+        
+        try:
+          timestamp=time.time();        
+          debug.print(&#34;Entrando en el bucle de eventos.&#34;, flush=True);
+          while True:
+                try:
+                   try:
+                     debug.print(&#34;Esperando por un nuevo evento ...&#34;);
+                     event=self._queue.get(True,1);
+                   
+                   except queue.Empty:
+                     diff=(time.time()-timestamp);
+                     if diff&gt;timeout: break;
+                     else:            continue;
+                     
+                   tm, target, sname, data, mods = event;
+                   target.run(sname, data, mods);
+                                    
+                except KeyboardInterrupt as e:
+                   debug.print(&#34;Interrumpido por el/la usuario/a.&#34;);
+                   
+                except Exception as e:
+                   debug.print(f&#34;Excepción ejecutando un slot: {e}&#34;);
+          
+          return self;
+          
+        finally:
+          while not self._queue.empty(): self._queue.get();
+                        
+    #-----------------------------------------------------------------------------------------
+    #-----------------------------------------------------------------------------------------
+    class Linker:
+
+          def __init__(self, block, sname, mods=None): # TODO indidicar signal o slot
+              from .block import Block;
+              assert isinstance(block, Block);
+              assert sname and type(sname) is str;
+              assert mods is None or isinstance(mods, dict);
+              self._block=block;
+              self._sname=sname;
+              self._mods=mods or {};
+
+          def __rshift__(self, rlinker): # a &gt;&gt; b
+              assert self._sname in self._block.signals,     f&#34;Signal &#39;{self._sname}&#39; no existe en &#39;{self._block._fullClassName}&#39;&#34;;
+              assert rlinker._sname in rlinker._block.slots, f&#34;Slot &#39;{rlinker._sname}&#39; no existe en &#39;{rlinker._block._fullClassName}&#39;&#34;;
+              assert self._block.signals[self._sname][&#34;type&#34;] == rlinker._block.slots[rlinker._sname][&#34;type&#34;], f&#34;Tipo incompatibles {self._block.signals[self._sname][&#39;type&#39;]} != {rlinker._block.slots[rlinker._sname][&#39;type&#39;]}&#34;;
+              debug.print(f&#34;Suscripción: {self._block}:&#39;{self._sname}&#39; &gt;&gt; {rlinker._block}:&#39;{rlinker._sname}&#39;&#34;);
+              Context.instance.subscribe((self._block,self._sname), (rlinker._block,rlinker._sname), (self._mods,rlinker._mods));
+              return rlinker._block;
+
+          def __lshift__(self, rlinker): # a &lt;&lt; b
+              assert self._sname in self._block.slots,         f&#34;Slot &#39;{self._sname}&#39; no existe en &#39;{self._block._fullClassName}&#39;&#34;;
+              assert rlinker._sname in rlinker._block.signals, f&#34;Signal &#39;{rlinker._sname}&#39; no existe en &#39;{rlinker._block._fullClassName}&#39;&#34;;
+              assert self._block.slots[self._sname][&#34;type&#34;] == rlinker._block.signals[rlinker._sname][&#34;type&#34;], f&#34;Tipo incompatibles {self._block.slots[self._sname][&#39;type&#39;]} != {rlinker._block.signals[rlinker._sname][&#39;type&#39;]}&#34;;
+              debug.print(f&#34;Suscripción: {rlinker._block}:&#39;{rlinker._sname}&#39; &lt;&lt; {self._block}:&#39;{self._sname}&#39;&#34;);
+              Context.instance.subscribe((rlinker._block,rlinker._sname), (self._block,self._sname), (rlinker._mods,self._mods));
+              return self._block;
+
+          def __gt__(self, rlinker): # a &gt; b
+              assert self._sname in self._block.signals,     f&#34;Signal &#39;{self._sname}&#39; no existe en &#39;{self._block._fullClassName}&#39;&#34;;
+              assert rlinker._sname in rlinker._block.slots, f&#34;Slot &#39;{rlinker._sname}&#39; no existe en &#39;{rlinker._block._fullClassName}&#39;&#34;;
+              assert self._block.signals[self._sname][&#34;type&#34;] == rlinker._block.slots[rlinker._sname][&#34;type&#34;], f&#34;Tipo incompatibles {self._block.signals[self._sname][&#39;type&#39;]} != {rlinker._block.slots[rlinker._sname][&#39;type&#39;]}&#34;;
+              debug.print(f&#34;Suscripción: {self._block}:&#39;{self._sname}&#39; &gt;= {rlinker._block}:&#39;{rlinker._sname}&#39;&#34;);
+              Context.instance.subscribe((self._block,self._sname), (rlinker._block,rlinker._sname), (self._mods,rlinker._mods|{&#34;@sync&#34;:True}));
+              return rlinker._block;
+
+          def __lt__(self, rlinker): # a &lt; b
+              assert self._sname in self._block.slots,         f&#34;Slot &#39;{self._sname}&#39; no existe en &#39;{self._block._fullClassName}&#39;&#34;;
+              assert rlinker._sname in rlinker._block.signals, f&#34;Signal &#39;{rlinker._sname}&#39; no existe en &#39;{rlinker._block._fullClassName}&#39;&#34;;
+              assert self._block.slots[self._sname][&#34;type&#34;] == rlinker._block.signals[rlinker._sname][&#34;type&#34;], f&#34;Tipo incompatibles {self._block.slots[self._sname][&#39;type&#39;]} != {rlinker._block.signals[rlinker._sname][&#39;type&#39;]}&#34;;
+              debug.print(f&#34;Suscripción: {rlinker._block}:&#39;{rlinker._sname}&#39; &lt;= {self._block}:&#39;{self._sname}&#39;&#34;);
+              Context.instance.subscribe((rlinker._block,rlinker._sname), (self._block,self._sname), (rlinker._mods,self._mods|{&#34;@sync&#34;:True}));
+              return self._block;</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="ml4teens.core.context.Context"><code class="flex name class">
+<span>class <span class="ident">Context</span></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Este es un constructor falso, no hace nada.
+<br>
+La inicialización del <strong>único</strong> objeto de esta clase se hace en <em><strong>new</strong></em>.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Context:
+
+    _instance = None;
+    
+    #---------------------------------------------------------------------------
+    @classmethod
+    def __html__(cls):       
+        display( HTML(
+                      &#34;&#34;&#34;
+                      &lt;!-- JQUERY --&gt;
+                      &lt;script src=&#34;https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js&#34;&gt;&lt;/script&gt;
+                      
+                      &lt;!-- JQUERY UI --&gt;
+                      &lt;link rel=&#34;stylesheet&#34; href=&#34;https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.2/themes/smoothness/jquery-ui.css&#34;&gt;
+                      &lt;script src=&#34;https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js&#34;&gt;&lt;/script&gt;
+                      &#34;&#34;&#34;
+               )     );
+        pass;
+
+    #---------------------------------------------------------------------------
+    def __new__(cls, *args, **kwargs):
+        &#34;&#34;&#34;
+        Crea la única instancia de esta clase.        
+        Si ya existe previamente simplemente devuelve la instancia creada con antelación.        
+        Esto permite que sólo exista una instanca de esta clase, aunque se llame en varias ocasiones.
+        &#34;&#34;&#34;
+        if not cls._instance:
+           cls._instance = super(Context, cls).__new__(cls);
+           cls._instance.listeners={};
+           cls._allowGPU = torch.cuda.is_available();
+           #cls.__html__();
+           cls._queue=queue.PriorityQueue();
+           
+           cwd   = os.path.dirname(__file__);
+           mwd   = os.path.join(cwd, &#39;../models&#39;);
+           cache = os.path.join(mwd,&#34;cache&#34;);
+           os.makedirs(cache, exist_ok=True);
+           os.environ[&#39;TRANSFORMERS_CACHE&#39;] = cache;
+        return cls._instance;
+
+    #-----------------------------------------------------------------------------------------
+    def __init__(self):
+        &#34;&#34;&#34;
+        Este es un constructor falso, no hace nada.         
+        La inicialización del **único** objeto de esta clase se hace en *__new__*.
+        &#34;&#34;&#34;
+        pass;
+
+    #-----------------------------------------------------------------------------------------
+    @classmethod
+    @property
+    def instance(cls):
+        return Context() if Context._instance==None else Context._instance;
+        
+    #-----------------------------------------------------------------------------------------
+    @property
+    def allowGPU(self):
+        return self._allowGPU;
+        
+    #-----------------------------------------------------------------------------------------
+    @allowGPU.setter
+    def allowGPU(self, value):
+        self._allowGPU = bool(value);
+        
+    #-----------------------------------------------------------------------------------------
+    @property
+    def gpu(self):
+        return self._allowGPU and torch.cuda.is_available();
+        
+    #-----------------------------------------------------------------------------------------
+    @property
+    def gpus(self):
+        return torch.cuda.device_count() if (self._allowGPU and torch.cuda.is_available()) else 0;
+        
+    #-----------------------------------------------------------------------------------------
+    @property
+    def mwd(self):
+        cwd = os.path.dirname(__file__);
+        return os.path.join(cwd, &#39;../models&#39;);
+        
+    #-----------------------------------------------------------------------------------------
+    @property
+    def fwd(self):
+        cwd = os.path.dirname(__file__);
+        return os.path.join(cwd, &#39;../fonts&#39;);
+        
+    #-----------------------------------------------------------------------------------------
+    def __getitem__(self, key):
+        return os.environ.get(key, None);
+        
+    #-----------------------------------------------------------------------------------------
+    #@classmethod
+    #def notify(cls, message):
+    #    #https://notifyjs.jpillora.com/
+    #    #https://til.simonwillison.net/jupyter/javascript-in-a-jupyter-notebook
+    #    #message=message.replace(&#39;&#34;&#39;,&#34;&#39;&#34;);
+    #    #display( Javascript(data=f&#34;&#34;&#34;$.notify(&#34;{message}&#34;);&#34;&#34;&#34;, lib=[&#34;https://rawgit.com/notifyjs/notifyjs/master/dist/notify.js&#34;]) );
+    #    pass;
+
+    #-----------------------------------------------------------------------------------------
+    def __enter__(self):
+        debug.print(&#34;Entrando en un bloque de contexto&#34;);
+        self.reset(all=True);
+        return self;
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        debug.print(&#34;Saliendo de un bloque de contexto&#34;);
+        self.reset(all=True);
+        
+    #-----------------------------------------------------------------------------------------
+    def blocks(self):
+        blocks=set();
+        for signal in self.listeners:
+            source, _ = signal;
+            blocks.add(source);
+            for slot, _ in self.listeners[signal]:
+                target, _ = slot;
+                blocks.add(target);
+        return list(blocks);
+    
+    #-----------------------------------------------------------------------------------------
+    def reset(self, all=False):
+        self._queue=queue.PriorityQueue();
+        if all:
+           self._instance.listeners={};
+        return self;
+
+    #=========================================================================================
+    def save(self, script_name, slots, signals=None):
+        
+        rt={ &#34;version&#34;:0, &#34;blocks&#34;:[], &#34;links&#34;:{}, &#34;slots&#34;:[], &#34;signals&#34;:[] };
+        
+        refs={};
+        
+        ## blocks
+        for block in self.blocks():
+            b={};
+            b[&#34;__class__&#34; ]=type(block).__name__;
+            b[&#34;__module__&#34;]=block.__class__.__module__;
+            rt[&#34;blocks&#34;].append(b);
+            refs[block]=rt[&#34;blocks&#34;].index(b);
+            
+        ## links
+        items={};
+        for signal in self.listeners:
+            _slots = self.listeners[signal];
+            
+            block, sname = signal;
+            block=refs[block];
+            signal=(block,sname);
+            
+            items[json.dumps(signal)]=[ ((refs[slot[0]],slot[1]),mods) for slot, mods in _slots];
+            
+        rt[&#34;links&#34;]=items;
+        
+        ## slots    
+        if isinstance(slots,(tuple,list)):
+           for slot in slots:
+               s={&#34;block&#34;:refs[slot._block], &#34;slot&#34;:slot._sname, &#34;mods&#34;:slot._mods };
+               rt[&#34;slots&#34;].append(s);
+        else:
+           slot=slots;
+           assert isinstance(slot, Context.Linker), &#34;El parámetro &#39;slots&#39; de &#39;save&#39; debe ser un SLOT o una lista de SLOTs&#34;;
+           s={&#34;block&#34;:refs[slot._block], &#34;slot&#34;:slot._sname, &#34;mods&#34;:slot._mods };
+           rt[&#34;slots&#34;].append(s);
+           
+        ## signals   
+        if isinstance(signals,(tuple,list)):
+           for signal in signals:
+               s={&#34;block&#34;:refs[signal._block], &#34;signal&#34;:signal._sname, &#34;mods&#34;:signal._mods };
+               rt[&#34;signals&#34;].append(s);
+        else:
+           signal=signals;
+           assert isinstance(signal, Context.Linker), &#34;El parámetro &#39;signals&#39; de &#39;save&#39; debe ser un SIGNAL o una lista de SIGNALs&#34;;
+           s={&#34;block&#34;:refs[signal._block], &#34;signal&#34;:signal._sname, &#34;mods&#34;:signal._mods };
+           rt[&#34;signals&#34;].append(s);
+        
+        ## saving ...
+        with open(script_name, &#34;wt&#34;) as fd:
+             json.dump(rt,fd, indent=4);
+
+    #-----------------------------------------------------------------------------------------
+    def subscribe(self, signal, slot, mods=({},{})):
+        &#34;&#34;&#34;
+        Registra la pareja (*signal*, *slot*) en este contexto.
+        
+        Si ya existe esta pareja, la elimina y la vuelve a añadir (quizá con otros *mods*).
+        
+        :param signal:   La señal (*signal*).
+        :type  signal:   tupla (*block*, *signal name*)
+        :param slot:     El *slot*.
+        :type  slot:     Tupla (*block*, *slot name*)
+        :param mods:     Modificadores de *signal*/*slot*.
+        :type  mods:     dict*
+        &#34;&#34;&#34;
+        assert signal is not None and type(signal) is tuple and len(signal)==2;
+        assert slot   is not None and type(slot  ) is tuple and len(slot  )==2;
+        assert type(mods) in (tuple,list) and len(mods)==2 and all([(type(m) is dict) for m in mods]);
+        if not signal in self.listeners: self.listeners[signal]=[];
+        self.listeners[signal]=[(s,m) for s,m in self.listeners[signal] if s!=slot];
+        self.listeners[signal].append((slot,mods));
+
+    #-----------------------------------------------------------------------------------------
+    def unsubscribe(self, signal, slot):
+        &#34;&#34;&#34;
+        Elimina la pareja (*signal*, *slot*) en este contexto.
+        
+        Si no existe esta pareja, no hace nada.
+        
+        :param signal: La señal (*signal*).
+        :type  signal: tupla (*block*, *signal name*)
+        :param slot:   El *slot*.
+        :type  slot:   tupla (*block*, *slot name*)
+        &#34;&#34;&#34;
+        if signal in self.listeners:
+           self.listeners[signal]=[(s,m) for s,m in self.listeners[signal] if s!=slot];
+           
+    #-----------------------------------------------------------------------------------------
+    def checkSubscription(self, signal, slot=None):
+        &#34;&#34;&#34;
+        Comprueba si se ha registrado la pareja (*signal*, *slot*) en este contexto.
+        
+        Si *slot* es None, sólo comprueba si está registrado *signal*.
+        
+        :param signal: La señal (*signal*).
+        :type  signal: tupla (*block*, *signal name*)
+        :param slot:   El *slot*.
+        :type  slot:   tupla (*block*, *slot name*) | None
+        :return:       Si *slot* no es None, devuelve si la pareja (*signal*,*slot*) está registrada. Si *slot* es None, devuelve si *signal* tiene *slot*s escuchando.
+        :rtype:        True/False
+        &#34;&#34;&#34;
+        if slot is not None:
+           if signal in self.listeners:        
+              for s,m in self.listeners[signal]:
+                  if s==slot: return True;
+           return False;
+        else:
+           return signal in self.listeners and self.listeners[signal];
+           
+    #-----------------------------------------------------------------------------------------
+    def emit(self, **kwargs):
+        &#34;&#34;&#34;
+        Emite una señal directamente a los &#39;listeners&#39; de (source,sname) o a un slot (target,sname).
+        
+        &#39;target&#39; y &#39;source&#39; son exclusivos y obligatorios (por separado).
+        
+        :param source: El objeto que envía la señal.
+        :type  source: Block
+        :param target: El objeto al que se le envía la señal.
+        :type  target: Block
+        :param sname:  El nombre de una señal/slot (alias: signal_name o slot_name, según sea source/target).
+        :type  sname:  str
+        :param data:   El dato que acompaña a la señal.
+        :type  data:   Cualquier cosa.
+        :param mods:   Los modificadores, si se trata de el envío de un señal a un slot.
+        :type  mods:   dict | None.
+        &#34;&#34;&#34;
+        
+        #-----------------------------------------------------------------------
+        &#34;&#34;&#34;
+        def updateOnlyThese(mods, onlyThese=set()):
+        
+            if &#34;slot&#34; in mods:
+                if  isinstance(mods[&#34;slot&#34;],str):
+                    onlyThese|=set(mods[&#34;slot&#34;]);
+                else:
+                    raise RuntimeError(&#34;El modificador &#39;slot&#39; tiene que ser de tipo &#39;str&#39;&#34;);    
+                del mods[&#34;slot&#34;];
+
+            if &#34;slots&#34; in mods:
+                if  isinstance(mods[&#34;slots&#34;],(tuple,list)):
+                    onlyThese|=set(mods[&#34;slots&#34;]);
+                else:
+                    raise RuntimeError(&#34;El modificador &#39;slots&#39; tiene que ser de tipo &#39;tuple&#39; o &#39;list&#39;&#34;);    
+                del mods[&#34;slots&#34;];
+                
+            return onlyThese;    
+        &#34;&#34;&#34;    
+        #-----------------------------------------------------------------------
+        
+        assert ((&#34;source&#34; in kwargs) and (&#34;target&#34; not in kwargs)) or ((&#34;source&#34; not in kwargs) and (&#34;target&#34; in kwargs))  or ((&#34;source&#34; in kwargs) and (&#34;target&#34; in kwargs));               
+        assert (&#34;sname&#34; in kwargs) or (&#34;signal_name&#34; in kwargs) or (&#34;slot_name&#34; in kwargs);        
+        assert (&#34;data&#34;  in kwargs);
+        
+        if (&#34;target&#34; in kwargs) and (&#34;source&#34; not in kwargs):
+           # señal enviada desde el espacio del usuario
+           # ha de ejecutarse el slot (sname) correspondiente
+           target=kwargs[&#34;target&#34;];
+           sname=kwargs.get(&#34;sname&#34;) or kwargs.get(&#34;slot_name&#34;) or kwargs.get(&#34;slot&#34;);
+           data =kwargs.get(&#34;data&#34; );
+           mods =kwargs.get(&#34;mods&#34; ) or {}; # signal mods
+           assert type(mods) is dict;
+           debug.print(f&#34;Ha llegado un evento del usuario al slot &#39;{sname}&#39; de {target._fullClassName}::{type(data)}&#34;);
+           if sname in target.slots:
+              slot=target.slots[sname];
+              debug.print(f&#34;Encolando: Una señal a {target._fullClassName} en el slot &#39;{sname}&#39; con data={type(data)}&#34;);
+              self._queue.put( (time.time(), target, sname, data, (mods,{})) );
+           else:
+              raise RuntimeError(f&#34;No existe el slot &#39;{sname}&#39; en {target._fullClassName}&#34;);
+           
+        elif (&#34;source&#34; in kwargs) and (&#34;target&#34; in kwargs):
+           # señal enviada por un bloque (source) a otro concreto (target)
+           # ha de ejecutarse el slot (sname) correspondiente
+           source=kwargs[&#34;source&#34;];
+           target=kwargs[&#34;target&#34;];
+           sname=kwargs.get(&#34;sname&#34;) or kwargs.get(&#34;slot_name&#34;) or kwargs.get(&#34;slot&#34;);
+           data =kwargs.get(&#34;data&#34; );
+           mods =kwargs.get(&#34;mods&#34; ) or ({},{});
+           assert type(mods) in (tuple,list) and len(mods)==2 and all([(type(m) is dict) for m in mods]);
+           debug.print(f&#34;Ha llegado un evento al slot &#39;{sname}&#39; de {target._fullClassName}::{type(data)}&#34;);
+           if sname in target.slots:
+              slot=target.slots[sname];
+              signal_mods, slot_mods = mods;
+              if &#34;@sync&#34; not in slot_mods or bool(slot_mods[&#34;@sync&#34;]) is False:
+                 debug.print(f&#34;Encolando una señal dirigida a {target._fullClassName}::{sname} con type(data)={type(data)}&#34;);
+                 self._queue.put_nowait( (time.time(), target, sname, data, (signal_mods,slot_mods)) );
+              else:
+                 debug.print(f&#34;Ejecutando síncronamente una señal dirigida a {target._fullClassName}::{sname} con type(data)={type(data)}&#34;);
+                 target.run(sname,data,(signal_mods,slot_mods));                 
+           else:
+              raise RuntimeError(f&#34;No existe el slot &#39;{sname}&#39; en {target._fullClassName}&#34;);
+           
+        elif (&#34;source&#34; in kwargs) and (&#34;target&#34; not in kwargs):
+           # señal generada en un bloque (source)
+           # ha de enviarse a todos sus subscriptores
+           source=kwargs[&#34;source&#34;];
+           sname =kwargs.get(&#34;sname&#34;) or kwargs.get(&#34;signal_name&#34;);
+           data  =kwargs.get(&#34;data&#34; );
+           mods  =kwargs.get(&#34;mods&#34; ) or {}; # signal mods
+           assert type(mods) is dict;
+           debug.print(f&#34;{source._fullClassName}:: enviando la señal &#39;{sname}&#39;, con data={type(data)}, a todos sus subscriptores&#34;);
+           
+           &#34;&#34;&#34;
+           onlyThese=set();
+           signal=(source, sname);
+           if signal in self.listeners:
+              for slot, _mods in self.listeners[signal]:
+                  target, slot_name = slot;
+                  signal_mods, _ = _mods;
+                  onlyThese=updateOnlyThese(signal_mods, onlyThese);                  
+                     
+           assert all([(type(m) is str and bool(m)) for m in onlyThese]), f&#34;Referencia al nombre de un slot errónea: {onlyThese}&#34;;
+           &#34;&#34;&#34;
+           
+           signal=(source, sname);
+           if signal in self.listeners:
+              for slot, _mods in self.listeners[signal]:
+                  target, slot_name = slot;
+                  signal_mods, slot_mods = _mods;
+                  debug.print(f&#34;Enviando la señal &#39;{slot_name}&#39;, con data={type(data)}, a {target._fullClassName}&#39;&#34;);                 
+                  #if not onlyThese or slot_name in onlyThese:
+                  if &#34;trace&#34; in mods and mods[&#34;trace&#34;]:
+                     mods[&#34;trace&#34;]={&#34;source&#34;:source, &#34;signal&#34;:sname, &#34;target&#34;:target, &#34;slot&#34;:slot_name};
+                  self.emit(source=source, target=target, sname=slot_name, data=data, mods=(mods|signal_mods,slot_mods));
+           else:
+              raise RuntimeError(f&#34;No existe la señal &#39;{sname}&#39; en {source._fullClassName}&#34;);
+               
+    #-----------------------------------------------------------------------------------------
+    def wait(self, timeout=1):
+        &#34;&#34;&#34;
+        Inicia el loop asíncrono y procesa los mensajes enviados por medio de la cola del contexto uno a uno.
+        Se supone que el usuario ha colocado en la cola, previamente, mensajes para inicial la red.
+        Si no hay mensajes en la cola, finaliza.
+        Puede volver a invocarse, con nuevos mensajes encolados.
+        &#34;&#34;&#34;
+        
+        try:
+          timestamp=time.time();        
+          debug.print(&#34;Entrando en el bucle de eventos.&#34;, flush=True);
+          while True:
+                try:
+                   try:
+                     debug.print(&#34;Esperando por un nuevo evento ...&#34;);
+                     event=self._queue.get(True,1);
+                   
+                   except queue.Empty:
+                     diff=(time.time()-timestamp);
+                     if diff&gt;timeout: break;
+                     else:            continue;
+                     
+                   tm, target, sname, data, mods = event;
+                   target.run(sname, data, mods);
+                                    
+                except KeyboardInterrupt as e:
+                   debug.print(&#34;Interrumpido por el/la usuario/a.&#34;);
+                   
+                except Exception as e:
+                   debug.print(f&#34;Excepción ejecutando un slot: {e}&#34;);
+          
+          return self;
+          
+        finally:
+          while not self._queue.empty(): self._queue.get();
+                        
+    #-----------------------------------------------------------------------------------------
+    #-----------------------------------------------------------------------------------------
+    class Linker:
+
+          def __init__(self, block, sname, mods=None): # TODO indidicar signal o slot
+              from .block import Block;
+              assert isinstance(block, Block);
+              assert sname and type(sname) is str;
+              assert mods is None or isinstance(mods, dict);
+              self._block=block;
+              self._sname=sname;
+              self._mods=mods or {};
+
+          def __rshift__(self, rlinker): # a &gt;&gt; b
+              assert self._sname in self._block.signals,     f&#34;Signal &#39;{self._sname}&#39; no existe en &#39;{self._block._fullClassName}&#39;&#34;;
+              assert rlinker._sname in rlinker._block.slots, f&#34;Slot &#39;{rlinker._sname}&#39; no existe en &#39;{rlinker._block._fullClassName}&#39;&#34;;
+              assert self._block.signals[self._sname][&#34;type&#34;] == rlinker._block.slots[rlinker._sname][&#34;type&#34;], f&#34;Tipo incompatibles {self._block.signals[self._sname][&#39;type&#39;]} != {rlinker._block.slots[rlinker._sname][&#39;type&#39;]}&#34;;
+              debug.print(f&#34;Suscripción: {self._block}:&#39;{self._sname}&#39; &gt;&gt; {rlinker._block}:&#39;{rlinker._sname}&#39;&#34;);
+              Context.instance.subscribe((self._block,self._sname), (rlinker._block,rlinker._sname), (self._mods,rlinker._mods));
+              return rlinker._block;
+
+          def __lshift__(self, rlinker): # a &lt;&lt; b
+              assert self._sname in self._block.slots,         f&#34;Slot &#39;{self._sname}&#39; no existe en &#39;{self._block._fullClassName}&#39;&#34;;
+              assert rlinker._sname in rlinker._block.signals, f&#34;Signal &#39;{rlinker._sname}&#39; no existe en &#39;{rlinker._block._fullClassName}&#39;&#34;;
+              assert self._block.slots[self._sname][&#34;type&#34;] == rlinker._block.signals[rlinker._sname][&#34;type&#34;], f&#34;Tipo incompatibles {self._block.slots[self._sname][&#39;type&#39;]} != {rlinker._block.signals[rlinker._sname][&#39;type&#39;]}&#34;;
+              debug.print(f&#34;Suscripción: {rlinker._block}:&#39;{rlinker._sname}&#39; &lt;&lt; {self._block}:&#39;{self._sname}&#39;&#34;);
+              Context.instance.subscribe((rlinker._block,rlinker._sname), (self._block,self._sname), (rlinker._mods,self._mods));
+              return self._block;
+
+          def __gt__(self, rlinker): # a &gt; b
+              assert self._sname in self._block.signals,     f&#34;Signal &#39;{self._sname}&#39; no existe en &#39;{self._block._fullClassName}&#39;&#34;;
+              assert rlinker._sname in rlinker._block.slots, f&#34;Slot &#39;{rlinker._sname}&#39; no existe en &#39;{rlinker._block._fullClassName}&#39;&#34;;
+              assert self._block.signals[self._sname][&#34;type&#34;] == rlinker._block.slots[rlinker._sname][&#34;type&#34;], f&#34;Tipo incompatibles {self._block.signals[self._sname][&#39;type&#39;]} != {rlinker._block.slots[rlinker._sname][&#39;type&#39;]}&#34;;
+              debug.print(f&#34;Suscripción: {self._block}:&#39;{self._sname}&#39; &gt;= {rlinker._block}:&#39;{rlinker._sname}&#39;&#34;);
+              Context.instance.subscribe((self._block,self._sname), (rlinker._block,rlinker._sname), (self._mods,rlinker._mods|{&#34;@sync&#34;:True}));
+              return rlinker._block;
+
+          def __lt__(self, rlinker): # a &lt; b
+              assert self._sname in self._block.slots,         f&#34;Slot &#39;{self._sname}&#39; no existe en &#39;{self._block._fullClassName}&#39;&#34;;
+              assert rlinker._sname in rlinker._block.signals, f&#34;Signal &#39;{rlinker._sname}&#39; no existe en &#39;{rlinker._block._fullClassName}&#39;&#34;;
+              assert self._block.slots[self._sname][&#34;type&#34;] == rlinker._block.signals[rlinker._sname][&#34;type&#34;], f&#34;Tipo incompatibles {self._block.slots[self._sname][&#39;type&#39;]} != {rlinker._block.signals[rlinker._sname][&#39;type&#39;]}&#34;;
+              debug.print(f&#34;Suscripción: {rlinker._block}:&#39;{rlinker._sname}&#39; &lt;= {self._block}:&#39;{self._sname}&#39;&#34;);
+              Context.instance.subscribe((rlinker._block,rlinker._sname), (self._block,self._sname), (rlinker._mods,self._mods|{&#34;@sync&#34;:True}));
+              return self._block;</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="ml4teens.core.context.Context.Linker"><code class="name">var <span class="ident">Linker</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="ml4teens.core.context.Context.instance"><code class="name">var <span class="ident">instance</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Instance variables</h3>
+<dl>
+<dt id="ml4teens.core.context.Context.allowGPU"><code class="name">var <span class="ident">allowGPU</span></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def allowGPU(self):
+    return self._allowGPU;</code></pre>
+</details>
+</dd>
+<dt id="ml4teens.core.context.Context.fwd"><code class="name">var <span class="ident">fwd</span></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def fwd(self):
+    cwd = os.path.dirname(__file__);
+    return os.path.join(cwd, &#39;../fonts&#39;);</code></pre>
+</details>
+</dd>
+<dt id="ml4teens.core.context.Context.gpu"><code class="name">var <span class="ident">gpu</span></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def gpu(self):
+    return self._allowGPU and torch.cuda.is_available();</code></pre>
+</details>
+</dd>
+<dt id="ml4teens.core.context.Context.gpus"><code class="name">var <span class="ident">gpus</span></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def gpus(self):
+    return torch.cuda.device_count() if (self._allowGPU and torch.cuda.is_available()) else 0;</code></pre>
+</details>
+</dd>
+<dt id="ml4teens.core.context.Context.mwd"><code class="name">var <span class="ident">mwd</span></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def mwd(self):
+    cwd = os.path.dirname(__file__);
+    return os.path.join(cwd, &#39;../models&#39;);</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="ml4teens.core.context.Context.blocks"><code class="name flex">
+<span>def <span class="ident">blocks</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def blocks(self):
+    blocks=set();
+    for signal in self.listeners:
+        source, _ = signal;
+        blocks.add(source);
+        for slot, _ in self.listeners[signal]:
+            target, _ = slot;
+            blocks.add(target);
+    return list(blocks);</code></pre>
+</details>
+</dd>
+<dt id="ml4teens.core.context.Context.checkSubscription"><code class="name flex">
+<span>def <span class="ident">checkSubscription</span></span>(<span>self, signal, slot=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Comprueba si se ha registrado la pareja (<em>signal</em>, <em>slot</em>) en este contexto.</p>
+<p>Si <em>slot</em> es None, sólo comprueba si está registrado <em>signal</em>.</p>
+<p>:param signal: La señal (<em>signal</em>).
+:type
+signal: tupla (<em>block</em>, <em>signal name</em>)
+:param slot:
+El <em>slot</em>.
+:type
+slot:
+tupla (<em>block</em>, <em>slot name</em>) | None
+:return:
+Si <em>slot</em> no es None, devuelve si la pareja (<em>signal</em>,<em>slot</em>) está registrada. Si <em>slot</em> es None, devuelve si <em>signal</em> tiene <em>slot</em>s escuchando.
+:rtype:
+True/False</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def checkSubscription(self, signal, slot=None):
+    &#34;&#34;&#34;
+    Comprueba si se ha registrado la pareja (*signal*, *slot*) en este contexto.
+    
+    Si *slot* es None, sólo comprueba si está registrado *signal*.
+    
+    :param signal: La señal (*signal*).
+    :type  signal: tupla (*block*, *signal name*)
+    :param slot:   El *slot*.
+    :type  slot:   tupla (*block*, *slot name*) | None
+    :return:       Si *slot* no es None, devuelve si la pareja (*signal*,*slot*) está registrada. Si *slot* es None, devuelve si *signal* tiene *slot*s escuchando.
+    :rtype:        True/False
+    &#34;&#34;&#34;
+    if slot is not None:
+       if signal in self.listeners:        
+          for s,m in self.listeners[signal]:
+              if s==slot: return True;
+       return False;
+    else:
+       return signal in self.listeners and self.listeners[signal];</code></pre>
+</details>
+</dd>
+<dt id="ml4teens.core.context.Context.emit"><code class="name flex">
+<span>def <span class="ident">emit</span></span>(<span>self, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Emite una señal directamente a los 'listeners' de (source,sname) o a un slot (target,sname).</p>
+<p>'target' y 'source' son exclusivos y obligatorios (por separado).</p>
+<p>:param source: El objeto que envía la señal.
+:type
+source: Block
+:param target: El objeto al que se le envía la señal.
+:type
+target: Block
+:param sname:
+El nombre de una señal/slot (alias: signal_name o slot_name, según sea source/target).
+:type
+sname:
+str
+:param data:
+El dato que acompaña a la señal.
+:type
+data:
+Cualquier cosa.
+:param mods:
+Los modificadores, si se trata de el envío de un señal a un slot.
+:type
+mods:
+dict | None.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def emit(self, **kwargs):
+    &#34;&#34;&#34;
+    Emite una señal directamente a los &#39;listeners&#39; de (source,sname) o a un slot (target,sname).
+    
+    &#39;target&#39; y &#39;source&#39; son exclusivos y obligatorios (por separado).
+    
+    :param source: El objeto que envía la señal.
+    :type  source: Block
+    :param target: El objeto al que se le envía la señal.
+    :type  target: Block
+    :param sname:  El nombre de una señal/slot (alias: signal_name o slot_name, según sea source/target).
+    :type  sname:  str
+    :param data:   El dato que acompaña a la señal.
+    :type  data:   Cualquier cosa.
+    :param mods:   Los modificadores, si se trata de el envío de un señal a un slot.
+    :type  mods:   dict | None.
+    &#34;&#34;&#34;
+    
+    #-----------------------------------------------------------------------
+    &#34;&#34;&#34;
+    def updateOnlyThese(mods, onlyThese=set()):
+    
+        if &#34;slot&#34; in mods:
+            if  isinstance(mods[&#34;slot&#34;],str):
+                onlyThese|=set(mods[&#34;slot&#34;]);
+            else:
+                raise RuntimeError(&#34;El modificador &#39;slot&#39; tiene que ser de tipo &#39;str&#39;&#34;);    
+            del mods[&#34;slot&#34;];
+
+        if &#34;slots&#34; in mods:
+            if  isinstance(mods[&#34;slots&#34;],(tuple,list)):
+                onlyThese|=set(mods[&#34;slots&#34;]);
+            else:
+                raise RuntimeError(&#34;El modificador &#39;slots&#39; tiene que ser de tipo &#39;tuple&#39; o &#39;list&#39;&#34;);    
+            del mods[&#34;slots&#34;];
+            
+        return onlyThese;    
+    &#34;&#34;&#34;    
+    #-----------------------------------------------------------------------
+    
+    assert ((&#34;source&#34; in kwargs) and (&#34;target&#34; not in kwargs)) or ((&#34;source&#34; not in kwargs) and (&#34;target&#34; in kwargs))  or ((&#34;source&#34; in kwargs) and (&#34;target&#34; in kwargs));               
+    assert (&#34;sname&#34; in kwargs) or (&#34;signal_name&#34; in kwargs) or (&#34;slot_name&#34; in kwargs);        
+    assert (&#34;data&#34;  in kwargs);
+    
+    if (&#34;target&#34; in kwargs) and (&#34;source&#34; not in kwargs):
+       # señal enviada desde el espacio del usuario
+       # ha de ejecutarse el slot (sname) correspondiente
+       target=kwargs[&#34;target&#34;];
+       sname=kwargs.get(&#34;sname&#34;) or kwargs.get(&#34;slot_name&#34;) or kwargs.get(&#34;slot&#34;);
+       data =kwargs.get(&#34;data&#34; );
+       mods =kwargs.get(&#34;mods&#34; ) or {}; # signal mods
+       assert type(mods) is dict;
+       debug.print(f&#34;Ha llegado un evento del usuario al slot &#39;{sname}&#39; de {target._fullClassName}::{type(data)}&#34;);
+       if sname in target.slots:
+          slot=target.slots[sname];
+          debug.print(f&#34;Encolando: Una señal a {target._fullClassName} en el slot &#39;{sname}&#39; con data={type(data)}&#34;);
+          self._queue.put( (time.time(), target, sname, data, (mods,{})) );
+       else:
+          raise RuntimeError(f&#34;No existe el slot &#39;{sname}&#39; en {target._fullClassName}&#34;);
+       
+    elif (&#34;source&#34; in kwargs) and (&#34;target&#34; in kwargs):
+       # señal enviada por un bloque (source) a otro concreto (target)
+       # ha de ejecutarse el slot (sname) correspondiente
+       source=kwargs[&#34;source&#34;];
+       target=kwargs[&#34;target&#34;];
+       sname=kwargs.get(&#34;sname&#34;) or kwargs.get(&#34;slot_name&#34;) or kwargs.get(&#34;slot&#34;);
+       data =kwargs.get(&#34;data&#34; );
+       mods =kwargs.get(&#34;mods&#34; ) or ({},{});
+       assert type(mods) in (tuple,list) and len(mods)==2 and all([(type(m) is dict) for m in mods]);
+       debug.print(f&#34;Ha llegado un evento al slot &#39;{sname}&#39; de {target._fullClassName}::{type(data)}&#34;);
+       if sname in target.slots:
+          slot=target.slots[sname];
+          signal_mods, slot_mods = mods;
+          if &#34;@sync&#34; not in slot_mods or bool(slot_mods[&#34;@sync&#34;]) is False:
+             debug.print(f&#34;Encolando una señal dirigida a {target._fullClassName}::{sname} con type(data)={type(data)}&#34;);
+             self._queue.put_nowait( (time.time(), target, sname, data, (signal_mods,slot_mods)) );
+          else:
+             debug.print(f&#34;Ejecutando síncronamente una señal dirigida a {target._fullClassName}::{sname} con type(data)={type(data)}&#34;);
+             target.run(sname,data,(signal_mods,slot_mods));                 
+       else:
+          raise RuntimeError(f&#34;No existe el slot &#39;{sname}&#39; en {target._fullClassName}&#34;);
+       
+    elif (&#34;source&#34; in kwargs) and (&#34;target&#34; not in kwargs):
+       # señal generada en un bloque (source)
+       # ha de enviarse a todos sus subscriptores
+       source=kwargs[&#34;source&#34;];
+       sname =kwargs.get(&#34;sname&#34;) or kwargs.get(&#34;signal_name&#34;);
+       data  =kwargs.get(&#34;data&#34; );
+       mods  =kwargs.get(&#34;mods&#34; ) or {}; # signal mods
+       assert type(mods) is dict;
+       debug.print(f&#34;{source._fullClassName}:: enviando la señal &#39;{sname}&#39;, con data={type(data)}, a todos sus subscriptores&#34;);
+       
+       &#34;&#34;&#34;
+       onlyThese=set();
+       signal=(source, sname);
+       if signal in self.listeners:
+          for slot, _mods in self.listeners[signal]:
+              target, slot_name = slot;
+              signal_mods, _ = _mods;
+              onlyThese=updateOnlyThese(signal_mods, onlyThese);                  
+                 
+       assert all([(type(m) is str and bool(m)) for m in onlyThese]), f&#34;Referencia al nombre de un slot errónea: {onlyThese}&#34;;
+       &#34;&#34;&#34;
+       
+       signal=(source, sname);
+       if signal in self.listeners:
+          for slot, _mods in self.listeners[signal]:
+              target, slot_name = slot;
+              signal_mods, slot_mods = _mods;
+              debug.print(f&#34;Enviando la señal &#39;{slot_name}&#39;, con data={type(data)}, a {target._fullClassName}&#39;&#34;);                 
+              #if not onlyThese or slot_name in onlyThese:
+              if &#34;trace&#34; in mods and mods[&#34;trace&#34;]:
+                 mods[&#34;trace&#34;]={&#34;source&#34;:source, &#34;signal&#34;:sname, &#34;target&#34;:target, &#34;slot&#34;:slot_name};
+              self.emit(source=source, target=target, sname=slot_name, data=data, mods=(mods|signal_mods,slot_mods));
+       else:
+          raise RuntimeError(f&#34;No existe la señal &#39;{sname}&#39; en {source._fullClassName}&#34;);</code></pre>
+</details>
+</dd>
+<dt id="ml4teens.core.context.Context.reset"><code class="name flex">
+<span>def <span class="ident">reset</span></span>(<span>self, all=False)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def reset(self, all=False):
+    self._queue=queue.PriorityQueue();
+    if all:
+       self._instance.listeners={};
+    return self;</code></pre>
+</details>
+</dd>
+<dt id="ml4teens.core.context.Context.save"><code class="name flex">
+<span>def <span class="ident">save</span></span>(<span>self, script_name, slots, signals=None)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def save(self, script_name, slots, signals=None):
+    
+    rt={ &#34;version&#34;:0, &#34;blocks&#34;:[], &#34;links&#34;:{}, &#34;slots&#34;:[], &#34;signals&#34;:[] };
+    
+    refs={};
+    
+    ## blocks
+    for block in self.blocks():
+        b={};
+        b[&#34;__class__&#34; ]=type(block).__name__;
+        b[&#34;__module__&#34;]=block.__class__.__module__;
+        rt[&#34;blocks&#34;].append(b);
+        refs[block]=rt[&#34;blocks&#34;].index(b);
+        
+    ## links
+    items={};
+    for signal in self.listeners:
+        _slots = self.listeners[signal];
+        
+        block, sname = signal;
+        block=refs[block];
+        signal=(block,sname);
+        
+        items[json.dumps(signal)]=[ ((refs[slot[0]],slot[1]),mods) for slot, mods in _slots];
+        
+    rt[&#34;links&#34;]=items;
+    
+    ## slots    
+    if isinstance(slots,(tuple,list)):
+       for slot in slots:
+           s={&#34;block&#34;:refs[slot._block], &#34;slot&#34;:slot._sname, &#34;mods&#34;:slot._mods };
+           rt[&#34;slots&#34;].append(s);
+    else:
+       slot=slots;
+       assert isinstance(slot, Context.Linker), &#34;El parámetro &#39;slots&#39; de &#39;save&#39; debe ser un SLOT o una lista de SLOTs&#34;;
+       s={&#34;block&#34;:refs[slot._block], &#34;slot&#34;:slot._sname, &#34;mods&#34;:slot._mods };
+       rt[&#34;slots&#34;].append(s);
+       
+    ## signals   
+    if isinstance(signals,(tuple,list)):
+       for signal in signals:
+           s={&#34;block&#34;:refs[signal._block], &#34;signal&#34;:signal._sname, &#34;mods&#34;:signal._mods };
+           rt[&#34;signals&#34;].append(s);
+    else:
+       signal=signals;
+       assert isinstance(signal, Context.Linker), &#34;El parámetro &#39;signals&#39; de &#39;save&#39; debe ser un SIGNAL o una lista de SIGNALs&#34;;
+       s={&#34;block&#34;:refs[signal._block], &#34;signal&#34;:signal._sname, &#34;mods&#34;:signal._mods };
+       rt[&#34;signals&#34;].append(s);
+    
+    ## saving ...
+    with open(script_name, &#34;wt&#34;) as fd:
+         json.dump(rt,fd, indent=4);</code></pre>
+</details>
+</dd>
+<dt id="ml4teens.core.context.Context.subscribe"><code class="name flex">
+<span>def <span class="ident">subscribe</span></span>(<span>self, signal, slot, mods=({}, {}))</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Registra la pareja (<em>signal</em>, <em>slot</em>) en este contexto.</p>
+<p>Si ya existe esta pareja, la elimina y la vuelve a añadir (quizá con otros <em>mods</em>).</p>
+<p>:param signal:
+La señal (<em>signal</em>).
+:type
+signal:
+tupla (<em>block</em>, <em>signal name</em>)
+:param slot:
+El <em>slot</em>.
+:type
+slot:
+Tupla (<em>block</em>, <em>slot name</em>)
+:param mods:
+Modificadores de <em>signal</em>/<em>slot</em>.
+:type
+mods:
+dict*</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def subscribe(self, signal, slot, mods=({},{})):
+    &#34;&#34;&#34;
+    Registra la pareja (*signal*, *slot*) en este contexto.
+    
+    Si ya existe esta pareja, la elimina y la vuelve a añadir (quizá con otros *mods*).
+    
+    :param signal:   La señal (*signal*).
+    :type  signal:   tupla (*block*, *signal name*)
+    :param slot:     El *slot*.
+    :type  slot:     Tupla (*block*, *slot name*)
+    :param mods:     Modificadores de *signal*/*slot*.
+    :type  mods:     dict*
+    &#34;&#34;&#34;
+    assert signal is not None and type(signal) is tuple and len(signal)==2;
+    assert slot   is not None and type(slot  ) is tuple and len(slot  )==2;
+    assert type(mods) in (tuple,list) and len(mods)==2 and all([(type(m) is dict) for m in mods]);
+    if not signal in self.listeners: self.listeners[signal]=[];
+    self.listeners[signal]=[(s,m) for s,m in self.listeners[signal] if s!=slot];
+    self.listeners[signal].append((slot,mods));</code></pre>
+</details>
+</dd>
+<dt id="ml4teens.core.context.Context.unsubscribe"><code class="name flex">
+<span>def <span class="ident">unsubscribe</span></span>(<span>self, signal, slot)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Elimina la pareja (<em>signal</em>, <em>slot</em>) en este contexto.</p>
+<p>Si no existe esta pareja, no hace nada.</p>
+<p>:param signal: La señal (<em>signal</em>).
+:type
+signal: tupla (<em>block</em>, <em>signal name</em>)
+:param slot:
+El <em>slot</em>.
+:type
+slot:
+tupla (<em>block</em>, <em>slot name</em>)</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def unsubscribe(self, signal, slot):
+    &#34;&#34;&#34;
+    Elimina la pareja (*signal*, *slot*) en este contexto.
+    
+    Si no existe esta pareja, no hace nada.
+    
+    :param signal: La señal (*signal*).
+    :type  signal: tupla (*block*, *signal name*)
+    :param slot:   El *slot*.
+    :type  slot:   tupla (*block*, *slot name*)
+    &#34;&#34;&#34;
+    if signal in self.listeners:
+       self.listeners[signal]=[(s,m) for s,m in self.listeners[signal] if s!=slot];</code></pre>
+</details>
+</dd>
+<dt id="ml4teens.core.context.Context.wait"><code class="name flex">
+<span>def <span class="ident">wait</span></span>(<span>self, timeout=1)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Inicia el loop asíncrono y procesa los mensajes enviados por medio de la cola del contexto uno a uno.
+Se supone que el usuario ha colocado en la cola, previamente, mensajes para inicial la red.
+Si no hay mensajes en la cola, finaliza.
+Puede volver a invocarse, con nuevos mensajes encolados.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def wait(self, timeout=1):
+    &#34;&#34;&#34;
+    Inicia el loop asíncrono y procesa los mensajes enviados por medio de la cola del contexto uno a uno.
+    Se supone que el usuario ha colocado en la cola, previamente, mensajes para inicial la red.
+    Si no hay mensajes en la cola, finaliza.
+    Puede volver a invocarse, con nuevos mensajes encolados.
+    &#34;&#34;&#34;
+    
+    try:
+      timestamp=time.time();        
+      debug.print(&#34;Entrando en el bucle de eventos.&#34;, flush=True);
+      while True:
+            try:
+               try:
+                 debug.print(&#34;Esperando por un nuevo evento ...&#34;);
+                 event=self._queue.get(True,1);
+               
+               except queue.Empty:
+                 diff=(time.time()-timestamp);
+                 if diff&gt;timeout: break;
+                 else:            continue;
+                 
+               tm, target, sname, data, mods = event;
+               target.run(sname, data, mods);
+                                
+            except KeyboardInterrupt as e:
+               debug.print(&#34;Interrumpido por el/la usuario/a.&#34;);
+               
+            except Exception as e:
+               debug.print(f&#34;Excepción ejecutando un slot: {e}&#34;);
+      
+      return self;
+      
+    finally:
+      while not self._queue.empty(): self._queue.get();</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="ml4teens.core" href="index.html">ml4teens.core</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="ml4teens.core.context.Context" href="#ml4teens.core.context.Context">Context</a></code></h4>
+<ul class="two-column">
+<li><code><a title="ml4teens.core.context.Context.Linker" href="#ml4teens.core.context.Context.Linker">Linker</a></code></li>
+<li><code><a title="ml4teens.core.context.Context.allowGPU" href="#ml4teens.core.context.Context.allowGPU">allowGPU</a></code></li>
+<li><code><a title="ml4teens.core.context.Context.blocks" href="#ml4teens.core.context.Context.blocks">blocks</a></code></li>
+<li><code><a title="ml4teens.core.context.Context.checkSubscription" href="#ml4teens.core.context.Context.checkSubscription">checkSubscription</a></code></li>
+<li><code><a title="ml4teens.core.context.Context.emit" href="#ml4teens.core.context.Context.emit">emit</a></code></li>
+<li><code><a title="ml4teens.core.context.Context.fwd" href="#ml4teens.core.context.Context.fwd">fwd</a></code></li>
+<li><code><a title="ml4teens.core.context.Context.gpu" href="#ml4teens.core.context.Context.gpu">gpu</a></code></li>
+<li><code><a title="ml4teens.core.context.Context.gpus" href="#ml4teens.core.context.Context.gpus">gpus</a></code></li>
+<li><code><a title="ml4teens.core.context.Context.instance" href="#ml4teens.core.context.Context.instance">instance</a></code></li>
+<li><code><a title="ml4teens.core.context.Context.mwd" href="#ml4teens.core.context.Context.mwd">mwd</a></code></li>
+<li><code><a title="ml4teens.core.context.Context.reset" href="#ml4teens.core.context.Context.reset">reset</a></code></li>
+<li><code><a title="ml4teens.core.context.Context.save" href="#ml4teens.core.context.Context.save">save</a></code></li>
+<li><code><a title="ml4teens.core.context.Context.subscribe" href="#ml4teens.core.context.Context.subscribe">subscribe</a></code></li>
+<li><code><a title="ml4teens.core.context.Context.unsubscribe" href="#ml4teens.core.context.Context.unsubscribe">unsubscribe</a></code></li>
+<li><code><a title="ml4teens.core.context.Context.wait" href="#ml4teens.core.context.Context.wait">wait</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
+</footer>
+</body>
+</html>
