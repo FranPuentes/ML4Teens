@@ -4,6 +4,7 @@ import torch;
 import queue;
 import time;
 import json;
+import torch;
 
 from IPython.display import display;
 from IPython.display import HTML, Javascript;
@@ -57,10 +58,15 @@ class Context:
         if not cls._instance:
            cls._instance = super(Context, cls).__new__(cls);
            cls._instance.listeners={};
-           cls._cpu =True;
-           cls._gpu =False;
+           cls._allowGPU = torch.cuda.is_available();
            #cls.__html__();
            cls._queue=queue.PriorityQueue();
+           
+           cwd   = os.path.dirname(__file__);
+           mwd   = os.path.join(cwd, '../models');
+           cache = os.path.join(mwd,"cache");
+           os.makedirs(cache, exist_ok=True);
+           os.environ['TRANSFORMERS_CACHE'] = cache;
         return cls._instance;
 
     #-----------------------------------------------------------------------------------------
@@ -79,29 +85,35 @@ class Context:
         
     #-----------------------------------------------------------------------------------------
     @property
-    def cpu(self):
-        context = Context._instance;
-        return context._cpu;
+    def allowGPU(self):
+        return self._allowGPU;
         
-    @cpu.setter    
-    def cpu(self, value):
-        context = Context._instance;
-        assert bool(value) or (not bool(value) and torch.cuda.is_available()), "No diponemos de GPUs, así que no podemos activar esta opción";
-        context._cpu=bool(value);
-        context._gpu=not context._cpu;
+    #-----------------------------------------------------------------------------------------
+    @allowGPU.setter
+    def allowGPU(self, value):
+        self._allowGPU = bool(value);
         
     #-----------------------------------------------------------------------------------------
     @property
     def gpu(self):
-        context = Context._instance;
-        return context._gpu;
+        return self._allowGPU and torch.cuda.is_available();
         
-    @gpu.setter    
-    def gpu(self, value):
-        context = Context._instance;
-        assert (not bool(value)) or (bool(value) and torch.cuda.is_available()), "No diponemos de GPUs, así que no podemos activar esta opción";
-        context._gpu=bool(value);
-        context._cpu=not context._gpu;
+    #-----------------------------------------------------------------------------------------
+    @property
+    def gpus(self):
+        return torch.cuda.device_count() if (self._allowGPU and torch.cuda.is_available()) else 0;
+        
+    #-----------------------------------------------------------------------------------------
+    @property
+    def mwd(self):
+        cwd = os.path.dirname(__file__);
+        return os.path.join(cwd, '../models');
+        
+    #-----------------------------------------------------------------------------------------
+    @property
+    def fwd(self):
+        cwd = os.path.dirname(__file__);
+        return os.path.join(cwd, '../fonts');
         
     #-----------------------------------------------------------------------------------------
     def __getitem__(self, key):

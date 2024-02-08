@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='ml4teens',
-    version='0.1.33',
+    version='0.1.34',
     packages=find_packages(),
     install_requires=[ "ipython",
                        "opencv-python>=4.9",
@@ -15,7 +15,7 @@ setup(
                        "ipywidgets",
                        "pandas>=1.3.4",
                        #"transformers>=4.37",
-                       #"torch>=2.1.0",
+                       "torch>=2.2.0",
                        "mediapipe>=0.10.9",
                        "jupyter_ui_poll",
                        "openai",
@@ -24,6 +24,7 @@ setup(
                        "seaborn",
                        "cohere",
                        "tiktoken",
+                       "imgbeddings==0.1.0",
                      ],
     include_package_data=True,
     

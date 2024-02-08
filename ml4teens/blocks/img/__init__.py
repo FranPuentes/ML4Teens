@@ -20,7 +20,7 @@ from .faceLandmarks     import FaceLandmarks
 #from .faceRecognition   import FaceRecognition
 from .handLandmarks     import HandLandmarks
 from .handGestures      import HandGestures
-#from .embedding         import Embedding
+from .embedding         import Embedding
 from .distance          import Distance
 from .similarity        import Similarity
 from .threshold         import Threshold
