@@ -79,7 +79,7 @@ class Embedding(Block):
                    return result.embeddings[0].embedding;
                    """
                    embedding = self._model.to_embeddings(imagen);
-                   return embedding[0];
+                   return  torch.from_numpy(embedding[0]);
 
       #-------------------------------------------------------------------------
       @staticmethod
