@@ -15,7 +15,7 @@ from ...core import Context;
 
 from ...core import Block;
 
-from ...tools import Embeddings;
+from ...tools import ImgEmbeddings;
 
 #===============================================================================
 class Embedding(Block):
@@ -44,7 +44,7 @@ class Embedding(Block):
       #-------------------------------------------------------------------------
       def __init__(self, **kwargs):
           super().__init__(**kwargs);
-          self._embedder=Embeddings();
+          self._embedder=ImgEmbeddings(model_size=self.params.model or "xs", quantize=bool(self.params.quantize) if self.params.quantize is not None else True);
 
       #-------------------------------------------------------------------------
       # SLOTS

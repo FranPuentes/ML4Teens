@@ -1,3 +1,3 @@
 
-#from .embeddings import Embeddings;
-
+from .embeddings import ImgEmbeddings;
+from .embeddings import TxtEmbeddings;
