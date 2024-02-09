@@ -6,6 +6,11 @@ include  ml4teens/models/yolov8n-faces.pt
 include  ml4teens/models/efficientdet_lite0.tflite
 include  ml4teens/models/efficientdet_lite2.tflite
 include  ml4teens/models/ssd_mobilenet_v2.tflite
+include  ml4teens/models/hand_landmark_full.tflite
+include  ml4teens/models/hand_landmark_lite.tflite
+include  ml4teens/models/mobilenet_v3_large.tflite
+include  ml4teens/models/mobilenet_v3_small.tflite
+include  ml4teens/models/universal_sentence_encoder.tflite
 
 include  ml4teens/fonts/README.md
 include  ml4teens/fonts/*.txt
