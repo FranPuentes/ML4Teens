@@ -15,7 +15,7 @@ from ...core import Context;
 
 from ...core import Block;
 
-from ...tools import Embedding;
+from ...tools import Embeddings;
 
 #===============================================================================
 class Embedding(Block):
@@ -44,7 +44,7 @@ class Embedding(Block):
       #-------------------------------------------------------------------------
       def __init__(self, **kwargs):
           super().__init__(**kwargs);
-          self._embedder=Embedding();
+          self._embedder=Embeddings();
 
       #-------------------------------------------------------------------------
       # SLOTS
