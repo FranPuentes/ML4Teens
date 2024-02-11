@@ -24,7 +24,7 @@ def image_from_url(url:str, mode:str=None, width:int=None, height:int=None):
          
          if width is not None or height is not None:
          
-            original_width, original_height = img.size
+            original_width, original_height = img.size;
          
             if width is not None and height is None:
                ratio = width / original_width;
@@ -32,12 +32,12 @@ def image_from_url(url:str, mode:str=None, width:int=None, height:int=None):
                new_dimensions = (width, new_height);
            
             elif height is not None and width is None:
-               ratio = height / original_height
-               new_width = int(original_width * ratio)
-               new_dimensions = (new_width, height)
+               ratio = height / original_height;
+               new_width = int(original_width * ratio);
+               new_dimensions = (new_width, height);
            
             else:
-               new_dimensions = (original_width, original_height)
+               new_dimensions = (width, height);
                
             img = img.resize(new_dimensions, Image.ANTIALIAS);
          
