@@ -10,7 +10,9 @@ def image_from_url(url:str, mode=None, width=None, height=None):
     Si no puede devolver la imagen dispara una excepción.
     """
     try:
-      response = requests.get(url);
+      headers = { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'};
+
+      response = requests.get(url, headers=headers);      
       if response.status_code == 200:
          img = Image.open(BytesIO(response.content));
          print(f"Formato: {img.format}, Tamaño: {img.size}, Modo: {img.mode}");
