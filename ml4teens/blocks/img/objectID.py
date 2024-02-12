@@ -84,9 +84,9 @@ class ObjectID(Block):
           A Boxes dictionary containing the detection bounding boxes, classes and confidences.
           """
           boxes=[{
-                  "class":(int(r),self._model.names[int(r)]),
-                  "conf":float(c),
-                  "xyxy":[float(_) for _ in k] 
+                  "kind"  : (int(r),self._model.names[int(r)]),
+                  "trust" : float(c),
+                  "xyxy"  : [float(_) for _ in k] 
                  }
                  for r,c,k in zip(data.cls,data.conf,data.xyxyn)];
                  
