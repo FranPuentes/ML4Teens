@@ -6,17 +6,6 @@ _enabled=False;
 _startsWith=None;
 
 #===============================================================================
-def _notebook():
-    try:
-        from IPython import get_ipython;
-        ipython = get_ipython();
-        if 'IPKernelApp' not in ipython.config: return False;
-        if 'VSCODE_PID' in os.environ:          return False;
-        return True
-    except (ImportError, AttributeError):
-        return False
-
-#===============================================================================
 def enable(startsWith:str=None):
     global _enabled;
     global _startsWith;

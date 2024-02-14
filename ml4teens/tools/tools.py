@@ -1,3 +1,4 @@
+import sys, io;
 from PIL import Image;
 import requests;
 from io import BytesIO;
@@ -50,4 +51,60 @@ def image_from_url(url:str, mode:str=None, width:int=None, height:int=None):
     except Exception as e:
         raise RuntimeError(f"No he podido cargar la siguiente imagen: {url}");
 
+imageFromUrl = image_from_url;
+
+#===============================================================================
+def runnigInGoogleColab():
+    """
+    Averigua si estamos en un ambiente Google Colab.
+    """
+    if 'google.colab' in sys.modules: return True;
+    else:                             return False;
+
+#-------------------------------------------------------------------------------
+def runnigInJupyterLike():
+    """
+    Averigua si estamos en un ambiente Jupyter Notebook.
+    """
+    try:
+        from IPython import get_ipython;
+        if 'IPKernelApp' in get_ipython().config: return True;
+    except:
+        pass    
+    return False;
     
+#-------------------------------------------------------------------------------
+def runningInNotebook():
+    """
+    Averigua si estamos en un ambiente Notebook genérico.
+    """
+    try:
+        from IPython import get_ipython;
+        if get_ipython() is not None: return True
+    except ImportError:
+        return False    
+    return False
+    
+#===============================================================================
+def uploadFiles():
+    """
+    Invita al usuario a subir ficheros (local -> Colab/Jupyter).
+    
+    Detecta si estamos en un ambiente Colab o Jupyter.
+    
+    Permite subir varios ficheros de cualquier tipo.
+    """
+    _files=[];
+    if runnigInGoogleColab():
+       from google.colab import files;
+       uploaded = files.upload();
+       for filename in uploaded.keys():
+           _files.append(filename);
+    else:
+       import ipywidgets as widgets;
+       uploader = widgets.FileUpload(accept='*/*', multiple=True);
+       display(uploader);
+       for item in uploader.value:
+           _files.append(item["name"]);
+
+    return tuple(_files);
