@@ -1,4 +1,3 @@
-
 from ..core import Block;
 
 class Value(Block):
@@ -9,7 +8,7 @@ class Value(Block):
 
       @Block.slot("data", {object})
       def slot_data(self, slot, data):
-          self._data=data if data is not None else self.params.data;
+          self._data=data if data is not None else self.params.default;
           self.signal_data(self._data);
 
       @Block.signal("data", object)
