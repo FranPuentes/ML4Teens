@@ -4,6 +4,9 @@ import PIL;
 
 from PIL.Image import Image;
 
+import matplotlib.pyplot as plt;
+from io import BytesIO;
+
 from mediapipe import solutions
 from mediapipe.framework.formats import landmark_pb2
 
@@ -25,9 +28,14 @@ class FaceLandmarks(Block):
           cwd = os.path.dirname(__file__);
           mwd = os.path.join(cwd, '../../models');
           fwd = os.path.join(cwd, '../../fonts');
+          
+          num_faces=self.params.faces or 1;
 
           base_options = python.BaseOptions(model_asset_path=os.path.join(mwd,'face_landmarker.task'));
-          options = vision.FaceLandmarkerOptions(base_options=base_options, output_face_blendshapes=True, output_facial_transformation_matrixes=True, num_faces=1);
+          options = vision.FaceLandmarkerOptions(base_options=base_options,
+                                                 output_face_blendshapes=True,
+                                                 output_facial_transformation_matrixes=True,
+                                                 num_faces=num_faces);
           self._model = vision.FaceLandmarker.create_from_options(options);
 
       #-------------------------------------------------------------------------
@@ -89,6 +97,63 @@ class FaceLandmarks(Block):
           if idx==50: return "noseSneerLeft";
           if idx==51: return "noseSneerRight";
           raise KeyError(f"El índice {idx} no se corresponde con ningún face::landmark.");
+          
+      """
+      traducciones = {
+      "_neutral": "neutral",
+      "browDownLeft": "ceño fruncido izquierdo",
+      "browDownRight": "ceño fruncido derecho",
+      "browInnerUp": "ceño elevado interior",
+      "browOuterUpLeft": "ceño elevado exterior izquierdo",
+      "browOuterUpRight": "ceño elevado exterior derecho",
+      "cheekPuff": "inflar mejillas",
+      "cheekSquintLeft": "entrecerrar mejilla izquierda",
+      "cheekSquintRight": "entrecerrar mejilla derecha",
+      "eyeBlinkLeft": "parpadeo izquierdo",
+      "eyeBlinkRight": "parpadeo derecho",
+      "eyeLookDownLeft": "mirada abajo izquierda",
+      "eyeLookDownRight": "mirada abajo derecha",
+      "eyeLookInLeft": "mirada hacia dentro izquierda",
+      "eyeLookInRight": "mirada hacia dentro derecha",
+      "eyeLookOutLeft": "mirada hacia fuera izquierda",
+      "eyeLookOutRight": "mirada hacia fuera derecha",
+      "eyeLookUpLeft": "mirada arriba izquierda",
+      "eyeLookUpRight": "mirada arriba derecha",
+      "eyeSquintLeft": "ojo entrecerrado izquierdo",
+      "eyeSquintRight": "ojo entrecerrado derecho",
+      "eyeWideLeft": "ojo muy abierto izquierdo",
+      "eyeWideRight": "ojo muy abierto derecho",
+      "jawForward": "mandíbula hacia adelante",
+      "jawLeft": "mandíbula izquierda",
+      "jawOpen": "mandíbula abierta",
+      "jawRight": "mandíbula derecha",
+      "mouthClose": "boca cerrada",
+      "mouthDimpleLeft": "hoyuelo izquierdo",
+      "mouthDimpleRight": "hoyuelo derecho",
+      "mouthFrownLeft": "ceño boca izquierda",
+      "mouthFrownRight": "ceño boca derecha",
+      "mouthFunnel": "boca embudo",
+      "mouthLeft": "boca izquierda",
+      "mouthLowerDownLeft": "boca abajo izquierda",
+      "mouthLowerDownRight": "boca abajo derecha",
+      "mouthPressLeft": "presión boca izquierda",
+      "mouthPressRight": "presión boca derecha",
+      "mouthPucker": "boca fruncida",
+      "mouthRight": "boca derecha",
+      "mouthRollLower": "enrollar inferior de boca",
+      "mouthRollUpper": "enrollar superior de boca",
+      "mouthShrugLower": "encoger inferior de boca",
+      "mouthShrugUpper": "encoger superior de boca",
+      "mouthSmileLeft": "sonrisa izquierda",
+      "mouthSmileRight": "sonrisa derecha",
+      "mouthStretchLeft": "estiramiento boca izquierda",
+      "mouthStretchRight": "estiramiento boca derecha",
+      "mouthUpperUpLeft": "parte superior boca arriba izquierda",
+      "mouthUpperUpRight": "parte superior boca arriba derecha",
+      "noseSneerLeft": "arrugar nariz izquierda",
+      "noseSneerRight": "arrugar nariz derecha"
+      }
+      """
       
       #-------------------------------------------------------------------------
       @classmethod
@@ -124,7 +189,38 @@ class FaceLandmarks(Block):
                                                       connection_drawing_spec=mp.solutions.drawing_styles.get_default_face_mesh_iris_connections_style())
         
           return annotated_image    
+          
+      #-------------------------------------------------------------------------
+      @classmethod
+      def plot_features(cls, features):
+        names  = [item["name" ] for item in features];
+        scores = [item["score"] for item in features];
+        
+        ranks = range(len(names));
 
+        with BytesIO() as buff:
+             fig, ax = plt.subplots(figsize=(10, 10));
+             bar = ax.barh(ranks, scores, label=[str(x) for x in ranks]);
+             ax.set_yticks(ranks, names);
+             ax.invert_yaxis();
+
+             for score, patch in zip(scores, bar.patches):
+                 plt.text(patch.get_x() + patch.get_width(), patch.get_y(), f"{score:.2f}", va="top");
+
+             ax.set_xlabel('Score');
+             ax.set_title("Features");
+             plt.tight_layout();
+
+             plt.savefig(buff, format='png');
+             buff.seek(0);
+             image = PIL.Image.open(buff)
+             image.load();
+
+             buff.close();
+             plt.close();
+
+        return image;
+          
       #-------------------------------------------------------------------------
       # SLOTS
       #-------------------------------------------------------------------------
@@ -134,7 +230,7 @@ class FaceLandmarks(Block):
           if data:
              image = data.convert('RGB');  
              image = mp.Image(image_format=mp.ImageFormat.SRGB, data=np.asarray(image));
-             results = self._model.detect(image)
+             results = self._model.detect(image);
 
              if self.signal_image():
                 image = image.numpy_view();
@@ -157,25 +253,29 @@ class FaceLandmarks(Block):
                 for idx in range(len(results.face_landmarks)):
                     landmarks   = results.face_landmarks[idx];
                     blendshapes = results.face_blendshapes[idx];
-                    face={"kind":f"face::{0}", "trust":0.0, "xy":[], "z":[], "blendshapes":[] };
-                    for l, lm in enumerate(landmarks):
-                        face["xy"        ].append((lm.x, lm.y));
-                        face["z"         ].append(lm.z);
-                    for b, bs in enumerate(blendshapes):
-                        face["blendshapes"].append( {"index":bs.index, "score":bs.score, "name":bs.category_name} );
+                    matrix      = results.facial_transformation_matrixes[idx];
+                    face={"kind":f"face::{0}", "trust":0.0, "matrix":matrix, "xyz":[]};
+                    for lm in landmarks:
+                        face["xyz"].append((lm.x, lm.y, lm.z));
                     rt.append(face);
                     
                 self.signal_landmarks(rt);
 
-             if self.signal_normalized():
+             if self.signal_features():
                 rt=[];
                 for idx in range(len(results.face_landmarks)):
-                    landmarks   = results.face_landmarks[idx];
                     blendshapes = results.face_blendshapes[idx];
-                    face=[(lm.x,lm.y,lm.z) for lm in landmarks];
+                    face = [ {"index":bs.index, "score":bs.score, "name":bs.category_name} for bs in blendshapes ];
                     rt.append(face);
                     
-                self.signal_normalized(rt);
+                self.signal_features(rt);
+                
+             if self.signal_plot():
+                for idx in range(len(results.face_landmarks)):
+                    blendshapes = results.face_blendshapes[idx];
+                    face = [ {"index":bs.index, "score":bs.score, "name":bs.category_name} for bs in blendshapes ];
+                    image = FaceLandmarks.plot_features(face);
+                    self.signal_plot(image);
                 
      #-------------------------------------------------------------------------
       # SIGNALS
@@ -184,12 +284,16 @@ class FaceLandmarks(Block):
       def signal_image(self, data):
           return data;
 
+      @Block.signal("plot", Image)
+      def signal_plot(self, data):
+          return data;
+
       #-------------------------------------------------------------------------
       @Block.signal("landmarks", list)
       def signal_landmarks(self, data):
           return data;
 
       #-------------------------------------------------------------------------
-      @Block.signal("normalized", list)
-      def signal_normalized(self, data):
+      @Block.signal("features", list)
+      def signal_features(self, data):
           return data;

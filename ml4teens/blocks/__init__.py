@@ -6,6 +6,7 @@ from .timer    import Timer;
 from .ifElse   import IfElse;
 from .forEach  import ForEach;
 from .value    import Value;
+from .values   import Values;
 
 from .         import img;
 from .         import txt;
