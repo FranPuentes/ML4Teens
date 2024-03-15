@@ -150,19 +150,17 @@ class VideoSource(Block):
              self._fd = cv.VideoCapture(self._device);
              
              if self.params.closeButton:
+                text="Cerrar Webcam";
+                if self.params.closeButton is str and len(self.params.closeButton)>0:
+                   text=self.params.closeButton;
                 import ipywidgets as widgets;
                 from IPython.display import display;
-                button = widgets.Button(description="Cerrar Webcam");
-                
-                # Cambiar el estilo del botón
-                button.style.button_color = 'lightgreen'  # Cambiar el color de fondo del botón
-                button.style.font_weight = 'bold'  # Cambiar el peso de la fuente a negrita
-
-                # Cambiar el layout del botón
-                button.layout.width = '200px'  # Cambiar el ancho del botón
-                button.layout.height = '40px'  # Cambiar la altura del botón
-                button.layout.border = '2px solid black'  # Agregar un borde al botón
-
+                button = widgets.Button(description=text);
+                button.style.button_color = 'lightgreen';  # Cambiar el color de fondo del botón
+                button.style.font_weight = 'bold';         # Cambiar el peso de la fuente a negrita
+                button.layout.width = '200px';             # Cambiar el ancho del botón
+                button.layout.height = '40px';             # Cambiar la altura del botón
+                button.layout.border = '2px solid black';  # Agregar un borde al botón
                 button.on_click(lambda _: self.close());
                 display(button);
           

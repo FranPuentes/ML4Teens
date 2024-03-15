@@ -194,13 +194,12 @@ class Block(ABC):
                     if self.params.done is not None:
                        if callable(self.params.done):
                           done=self.params.done(data);
-                          self.signal_done(done);
                        else:
                           done=self.params.done;
-                          self.signal_done(done);
+                       self.signal_done(done);
                     else:
-                       if bool(done) is True: # SUGGEST: enviar el valor de 'done' si no es None.
-                          self.signal_done(f"{self._fullClassName}::{_slot}");
+                       if done is not None:
+                          self.signal_done(done);
                        
                   except Exception as e:
                     debug.print(f"{cls}:: Excepción: '{e}'", exception=e);
