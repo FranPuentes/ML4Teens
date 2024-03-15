@@ -17,9 +17,9 @@ class VideoSource(Block):
       # speed:float [0,10]
       def __init__(self, **kwargs):
           super().__init__(**kwargs);
-          self.sync=True;
           
           self._source=None;
+          self._device=None;
           self._fuente=None;
           self._istemp=None;
           self._fd    =None;
@@ -27,9 +27,9 @@ class VideoSource(Block):
           self._delay =None;
           
       #-------------------------------------------------------------------------
-      def __del__(self):
+      def close(self):
           self.reset();
-
+          
       #-------------------------------------------------------------------------
       def reset(self):
       
@@ -41,6 +41,7 @@ class VideoSource(Block):
              
           self._fd    =None;
           self._source=None;
+          self._device=None;
           self._fuente=None;
           self._istemp=None;
           self._tm    =None;
@@ -80,17 +81,10 @@ class VideoSource(Block):
           return imagen.resize((width, height));
           
       #-------------------------------------------------------------------------
-      @Block.signal("source", str)
-      def signal_source(self, data):
-          return data;
+      #@Block.signal("source", str)
+      #def signal_source(self, data):
+      #    return data;
 
-      #-------------------------------------------------------------------------
-      """
-      @Block.signal("device", int)
-      def signal_frame(self, frame):
-          return frame;
-      """
-      
       #-------------------------------------------------------------------------
       @Block.signal("frame", Image)
       def signal_frame(self, frame):
@@ -127,71 +121,105 @@ class VideoSource(Block):
 
           self.reset();
           
-          self._source=source;
+          if type(source) is str:
           
-          if self._source.startswith("http"):
-             with requests.get(self._source, stream=True) as r:
-                  r.raise_for_status();
-                  with NamedTemporaryFile(delete=False, suffix='.mp4') as f:
-                       for chunk in r.iter_content(chunk_size=65536//8):
-                           f.write(chunk);
-                       self._fuente = f.name;
-                       self._istemp = True;
-          else:
-             self._fuente = self._source;
-             self._istemp = False;
+             self._source=source;
+             self._device=None;
+             
+             if self._source.startswith("http"):
+                with requests.get(self._source, stream=True) as r:
+                     r.raise_for_status();
+                     with NamedTemporaryFile(delete=False, suffix='.mp4') as f:
+                          for chunk in r.iter_content(chunk_size=65536//8):
+                              f.write(chunk);
+                          self._fuente = f.name;
+                          self._istemp = True;
+             else:
+                self._fuente = self._source;
+                self._istemp = False;
 
-          if not os.path.exists(self._fuente): raise RuntimeError(f"El fichero '{self._fuente}', no existe.");
+             if not os.path.exists(self._fuente): raise RuntimeError(f"El fichero '{self._fuente}', no existe.");
 
-          self._fd = cv.VideoCapture(self._fuente);
+             self._fd = cv.VideoCapture(self._fuente);
+             
+          elif type(source) is int:
+             
+             self._source=None;
+             self._device=source;
+             
+             self._fd = cv.VideoCapture(self._device);
+             
+             if self.params.closeButton:
+                import ipywidgets as widgets;
+                from IPython.display import display;
+                button = widgets.Button(description="Cerrar Webcam");
+                
+                # Cambiar el estilo del botón
+                button.style.button_color = 'lightgreen'  # Cambiar el color de fondo del botón
+                button.style.font_weight = 'bold'  # Cambiar el peso de la fuente a negrita
+
+                # Cambiar el layout del botón
+                button.layout.width = '200px'  # Cambiar el ancho del botón
+                button.layout.height = '40px'  # Cambiar la altura del botón
+                button.layout.border = '2px solid black'  # Agregar un borde al botón
+
+                button.on_click(lambda _: self.close());
+                display(button);
+          
           try:
-            if not self._fd.isOpened():
-               raise RuntimeError(f"Error al abrir el vídeo '{self._fuente}'");
+            if self._fd is None or not self._fd.isOpened():
+               raise RuntimeError(f"Error al abrir el vídeo '{source}'");
                
             else:
-                ancho       = self._fd.get(cv.CAP_PROP_FRAME_WIDTH);
-                alto        = self._fd.get(cv.CAP_PROP_FRAME_HEIGHT);
-                fps         = self._fd.get(cv.CAP_PROP_FPS);
-                frames      = self._fd.get(cv.CAP_PROP_FRAME_COUNT);
-                codificador = int(self._fd.get(cv.CAP_PROP_FOURCC));
+               ancho       = self._fd.get(cv.CAP_PROP_FRAME_WIDTH);
+               alto        = self._fd.get(cv.CAP_PROP_FRAME_HEIGHT);
+               fps         = self._fd.get(cv.CAP_PROP_FPS);
+               frames      = self._fd.get(cv.CAP_PROP_FRAME_COUNT);
+               codificador = int(self._fd.get(cv.CAP_PROP_FOURCC));
                 
-                self._delay = 1/fps;
+               self._delay = 1/fps;
                 
-                speed=self.params.speed or 1;
-                self._delay=self._delay*speed;
+               speed=self.params.speed or 1;
+               self._delay=self._delay*speed;
 
-                self.signal_info({"source":self._source, "width":ancho, "height":alto, "fps":fps, "frames":frames, "encoder":codificador, "delay":int(self._delay*1000) });
+               self.signal_info({"source":self._source or self._device, 
+                                 "width":ancho, 
+                                 "height":alto, 
+                                 "fps":fps, 
+                                 "frames":frames, 
+                                 "encoder":codificador, 
+                                 "delay":int(self._delay*1000) });
 
-                ok, frame = self._fd.read();
+               ok, frame = self._fd.read();
                 
-                if not ok:
-                   self.signal_end(True);
-                   self.reset();
+               if not ok:
+                  self.signal_end(True);
+                  self.reset();
                 
-                else:
-                   assert len(frame.shape)==2 or (len(frame.shape)==3 and frame.shape[2] in [3, 4]), "Formato de vídeo no soportado";
+               else:
+                  assert len(frame.shape)==2 or (len(frame.shape)==3 and frame.shape[2] in [3, 4]), "Formato de vídeo no soportado";
 
-                   self.signal_begin(frames);
+                  self.signal_begin(frames);
                 
-                   if len(frame.shape)==3: shape=(alto,ancho,frame.shape[2]);
-                   else:                   shape=(alto,ancho,1);
-                   self.signal_dims(shape);
+                  if len(frame.shape)==3: shape=(alto,ancho,frame.shape[2]);
+                  else:                   shape=(alto,ancho,1);
+                  self.signal_dims(shape);
                    
-                   self._tm = time.time();
+                  self._tm = time.time();
 
-                   # TODO, quedarnos sólo con unos pocos modos: L, RGB, RGBA, ...
+                  # TODO, quedarnos sólo con unos pocos modos: L, RGB, RGBA, ...
                    
-                   if len(frame.shape)==2:
-                      frame=frame;
-                   else:
-                      if frame.shape[2]==3:
-                         frame=cv.cvtColor(frame, cv.COLOR_BGR2RGB);
-                      else:
-                         frame=cv.cvtColor(frame, cv.COLOR_BGRA2RGBA);
+                  if len(frame.shape)==2:
+                     frame=frame;
+                  else:
+                     if frame.shape[2]==3:
+                        frame=cv.cvtColor(frame, cv.COLOR_BGR2RGB);
+                     else:
+                        frame=cv.cvtColor(frame, cv.COLOR_BGRA2RGBA);
                              
-                   frame = PIL.Image.fromarray(frame);
-                   frame = self._resize(frame, self.params.width, self.params.height);
-                   self.signal_frame(frame);
+                  frame = PIL.Image.fromarray(frame);
+                  frame = self._resize(frame, self.params.width, self.params.height);
+                  self.signal_frame(frame);
                    
           except Exception as e:
             self.signal_end(False);
@@ -204,8 +232,7 @@ class VideoSource(Block):
 
           if self._fd is None or not self._fd.isOpened():
              self.reset();
-             return
-             #raise RuntimeError(f"Se ha invocado al slot 'next' de '{self._fullClassName}' sin tener una fuente abierta.");
+             return;
              
           try:
             ok, frame = self._fd.read();

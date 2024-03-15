@@ -17,11 +17,6 @@ class Display(Block):
           self._handle=None;
           
       #-------------------------------------------------------------------------
-      @Block.signal("image", Image)
-      def signal_image(self, data):
-          return data;
-
-      #-------------------------------------------------------------------------
       def _redim(self, imagen, width=None, height=None):
 
           if width is None and height is None: return imagen;
@@ -38,6 +33,15 @@ class Display(Block):
           imagen = imagen.resize(dimensiones);
                 
           return imagen;
+          
+      #-------------------------------------------------------------------------
+      def _rotate(self, imagen, n):
+      
+          if n is None or type(n) not in (int, float):
+             return imagen;
+             
+          else:
+             return imagen.rotate(n);
 
       #-------------------------------------------------------------------------
       @Block.slot("image", {Image})
@@ -46,6 +50,7 @@ class Display(Block):
              width =self.params.width;
              height=self.params.height;
              imagen=self._redim(data,width,height);
+             imagen=self._rotate(imagen, self.params.rotate);
              #TODO motrar 'title', si hay ...
              if not self.params.feed:
                 if self._handle is None:
@@ -55,4 +60,9 @@ class Display(Block):
              else:                    
                 display(imagen);
           self.signal_image(data);
+
+      #-------------------------------------------------------------------------
+      @Block.signal("image", Image)
+      def signal_image(self, data):
+          return data;
 
