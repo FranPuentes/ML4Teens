@@ -114,11 +114,6 @@ class VideoSource(Block):
       @Block.slot("source", {str,int})
       def slot_source(self, slot, source):
 
-          # TODO 'fuente' puede ser un número de dispositivo! Y lo será.
-          
-          # TODO mandar la señal 'source'
-          # TODO mandar la señal 'device'
-
           self.reset();
           
           if type(source) is str:
@@ -266,3 +261,8 @@ class VideoSource(Block):
             self.signal_end(False);
             self.reset();
             raise e;
+
+      #-------------------------------------------------------------------------
+      @Block.slot("close", {object})
+      def slot_close(self, slot, _):
+          self.reset();

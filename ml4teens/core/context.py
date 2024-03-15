@@ -8,6 +8,7 @@ import torch;
 
 from IPython.display import display;
 from IPython.display import HTML, Javascript;
+from jupyter_ui_poll import ui_events;
 
 from .signalType import SignalType;
 from .signals    import Signals;
@@ -131,12 +132,12 @@ class Context:
     #-----------------------------------------------------------------------------------------
     def __enter__(self):
         debug.print("Entrando en un bloque de contexto");
-        self.reset(all=True);
+        self.reset(all=True, close_signal=False);
         return self;
 
     def __exit__(self, exc_type, exc_value, traceback):
         debug.print("Saliendo de un bloque de contexto");
-        self.reset(all=True);
+        self.reset(all=True, close_signal=True);
         
     #-----------------------------------------------------------------------------------------
     def blocks(self):
@@ -150,7 +151,13 @@ class Context:
         return list(blocks);
     
     #-----------------------------------------------------------------------------------------
-    def reset(self, all=False):
+    def reset(self, all=False, close_signal=False):
+    
+        if close_signal:
+           for block in self.blocks():
+               if "close" in block.slots:
+                  block.run("close",True,[{},{}]); 
+
         self._queue=queue.PriorityQueue();
         if all:
            self._instance.listeners={};
@@ -400,11 +407,16 @@ class Context:
           debug.print("Entrando en el bucle de eventos.", flush=True);
           while True:
                 try:
+                
+                   with ui_events() as poll:
+                        poll(10);
+                
                    try:
                      debug.print("Esperando por un nuevo evento ...");
-                     event=self._queue.get(True,1);
+                     event=self._queue.get(True,0.5);
                    
                    except queue.Empty:
+                   
                      diff=(time.time()-timestamp);
                      if diff>timeout: break;
                      else:            continue;
