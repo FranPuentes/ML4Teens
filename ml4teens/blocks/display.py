@@ -60,7 +60,9 @@ class Display(Block):
              else:                    
                 display(imagen);
           self.signal_image(data);
-
+          
+          return True;
+          
       #-------------------------------------------------------------------------
       @Block.signal("image", Image)
       def signal_image(self, data):
