@@ -32,7 +32,10 @@ class FaceLandmarks(Block):
 
       #-------------------------------------------------------------------------
       @classmethod
-      def names(cls, idx):
+      def names(cls, idx=None):
+          
+          if idx is None: return 52;
+          
           if idx== 0: return "_neutral";
           if idx== 1: return "browDownLeft";
           if idx== 2: return "browDownRight";
@@ -149,20 +152,31 @@ class FaceLandmarks(Block):
                 salida = FaceLandmarks.draw_landmarks_on_image(image, results, self.params);
                 self.signal_image(PIL.Image.fromarray(salida));
 
-             rt=[];
-             for idx in range(len(results.face_landmarks)):
-                 landmarks   = results.face_landmarks[idx];
-                 blendshapes = results.face_blendshapes[idx];
-                 face={"kind":f"face::{0}", "trust":0.0, "xy":[], "z":[], "blendshapes":[] };
-                 for l, lm in enumerate(landmarks):
-                     face["xy"        ].append((lm.x, lm.y));
-                     face["z"         ].append(lm.z);
-                 for b, bs in enumerate(blendshapes):
-                     face["blendshapes"].append( {"index":bs.index, "score":bs.score, "name":bs.category_name} );
-                 rt.append(face);
+             if self.signal_landmarks():
+                rt=[];
+                for idx in range(len(results.face_landmarks)):
+                    landmarks   = results.face_landmarks[idx];
+                    blendshapes = results.face_blendshapes[idx];
+                    face={"kind":f"face::{0}", "trust":0.0, "xy":[], "z":[], "blendshapes":[] };
+                    for l, lm in enumerate(landmarks):
+                        face["xy"        ].append((lm.x, lm.y));
+                        face["z"         ].append(lm.z);
+                    for b, bs in enumerate(blendshapes):
+                        face["blendshapes"].append( {"index":bs.index, "score":bs.score, "name":bs.category_name} );
+                    rt.append(face);
+                    
+                self.signal_landmarks(rt);
 
-             self.signal_landmarks(rt);
-
+             if self.signal_normalized():
+                rt=[];
+                for idx in range(len(results.face_landmarks)):
+                    landmarks   = results.face_landmarks[idx];
+                    blendshapes = results.face_blendshapes[idx];
+                    face=[(lm.x,lm.y,lm.z) for lm in landmarks];
+                    rt.append(face);
+                    
+                self.signal_normalized(rt);
+                
      #-------------------------------------------------------------------------
       # SIGNALS
       #-------------------------------------------------------------------------
@@ -173,4 +187,9 @@ class FaceLandmarks(Block):
       #-------------------------------------------------------------------------
       @Block.signal("landmarks", list)
       def signal_landmarks(self, data):
+          return data;
+
+      #-------------------------------------------------------------------------
+      @Block.signal("normalized", list)
+      def signal_normalized(self, data):
           return data;
