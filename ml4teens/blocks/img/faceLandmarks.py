@@ -271,11 +271,17 @@ class FaceLandmarks(Block):
                 self.signal_features(rt);
                 
              if self.signal_plot():
-                for idx in range(len(results.face_landmarks)):
-                    blendshapes = results.face_blendshapes[idx];
-                    face = [ {"index":bs.index, "score":bs.score, "name":bs.category_name} for bs in blendshapes ];
-                    image = FaceLandmarks.plot_features(face);
-                    self.signal_plot(image);
+                if len(results.face_landmarks) > 0:
+                   for idx in range(len(results.face_landmarks)):
+                       blendshapes = results.face_blendshapes[idx];
+                       face = [ {"index":bs.index, "score":bs.score, "name":bs.category_name} for bs in blendshapes ];
+                       image = FaceLandmarks.plot_features(face);
+                       self.signal_plot(image);
+                else:
+                   if self.params.emptyPlot:
+                      face=[{"index":n, "score":0.0, "name":FaceLandmarks.names(n)} for n in range(52)];
+                      image = FaceLandmarks.plot_features(face);
+                      self.signal_plot(image);
                 
      #-------------------------------------------------------------------------
       # SIGNALS
