@@ -4,7 +4,7 @@ import re;
 #=============================================================================================
 class Type:
 
-      accepted_names=["Tensor"];
+      accepted_names=["Tensor","DataFrame"];
       
       @staticmethod
       def accepted_type(tp, kind):

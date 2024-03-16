@@ -451,7 +451,7 @@ class Context:
           def __rshift__(self, rlinker): # a >> b
               assert self._sname in self._block.signals,     f"Signal '{self._sname}' no existe en '{self._block._fullClassName}'";
               assert rlinker._sname in rlinker._block.slots, f"Slot '{rlinker._sname}' no existe en '{rlinker._block._fullClassName}'";
-              assert self._block.signals[self._sname]["type"] == rlinker._block.slots[rlinker._sname]["type"], f"Tipo incompatibles {self._block.signals[self._sname]['type']} != {rlinker._block.slots[rlinker._sname]['type']}";
+              assert isinstance(self._block.signals[self._sname]["type"],object) or (self._block.signals[self._sname]["type"] == rlinker._block.slots[rlinker._sname]["type"]), f"Tipo incompatibles {self._block.signals[self._sname]['type']} != {rlinker._block.slots[rlinker._sname]['type']}";
               debug.print(f"Suscripción: {self._block}:'{self._sname}' >> {rlinker._block}:'{rlinker._sname}'");
               Context.instance.subscribe((self._block,self._sname), (rlinker._block,rlinker._sname), (self._mods,rlinker._mods));
               return rlinker._block;
@@ -459,7 +459,7 @@ class Context:
           def __lshift__(self, rlinker): # a << b
               assert self._sname in self._block.slots,         f"Slot '{self._sname}' no existe en '{self._block._fullClassName}'";
               assert rlinker._sname in rlinker._block.signals, f"Signal '{rlinker._sname}' no existe en '{rlinker._block._fullClassName}'";
-              assert self._block.slots[self._sname]["type"] == rlinker._block.signals[rlinker._sname]["type"], f"Tipo incompatibles {self._block.slots[self._sname]['type']} != {rlinker._block.signals[rlinker._sname]['type']}";
+              assert isinstance(rlinker._block.signals[rlinker._sname]["type"],object) or (self._block.slots[self._sname]["type"] == rlinker._block.signals[rlinker._sname]["type"]), f"Tipo incompatibles {self._block.slots[self._sname]['type']} != {rlinker._block.signals[rlinker._sname]['type']}";
               debug.print(f"Suscripción: {rlinker._block}:'{rlinker._sname}' << {self._block}:'{self._sname}'");
               Context.instance.subscribe((rlinker._block,rlinker._sname), (self._block,self._sname), (rlinker._mods,self._mods));
               return self._block;
@@ -467,7 +467,7 @@ class Context:
           def __gt__(self, rlinker): # a > b
               assert self._sname in self._block.signals,     f"Signal '{self._sname}' no existe en '{self._block._fullClassName}'";
               assert rlinker._sname in rlinker._block.slots, f"Slot '{rlinker._sname}' no existe en '{rlinker._block._fullClassName}'";
-              assert self._block.signals[self._sname]["type"] == rlinker._block.slots[rlinker._sname]["type"], f"Tipo incompatibles {self._block.signals[self._sname]['type']} != {rlinker._block.slots[rlinker._sname]['type']}";
+              assert (isinstance(self._block.signals[self._sname]["type"],object)) or (self._block.signals[self._sname]["type"] == rlinker._block.slots[rlinker._sname]["type"]), f"Tipo incompatibles {self._block.signals[self._sname]['type']} != {rlinker._block.slots[rlinker._sname]['type']}";
               debug.print(f"Suscripción: {self._block}:'{self._sname}' >= {rlinker._block}:'{rlinker._sname}'");
               Context.instance.subscribe((self._block,self._sname), (rlinker._block,rlinker._sname), (self._mods,rlinker._mods|{"@sync":True}));
               return rlinker._block;
@@ -475,7 +475,7 @@ class Context:
           def __lt__(self, rlinker): # a < b
               assert self._sname in self._block.slots,         f"Slot '{self._sname}' no existe en '{self._block._fullClassName}'";
               assert rlinker._sname in rlinker._block.signals, f"Signal '{rlinker._sname}' no existe en '{rlinker._block._fullClassName}'";
-              assert self._block.slots[self._sname]["type"] == rlinker._block.signals[rlinker._sname]["type"], f"Tipo incompatibles {self._block.slots[self._sname]['type']} != {rlinker._block.signals[rlinker._sname]['type']}";
+              assert isinstance(rlinker._block.signals[rlinker._sname]["type"],object) or (self._block.slots[self._sname]["type"] == rlinker._block.signals[rlinker._sname]["type"]), f"Tipo incompatibles {self._block.slots[self._sname]['type']} != {rlinker._block.signals[rlinker._sname]['type']}";
               debug.print(f"Suscripción: {rlinker._block}:'{rlinker._sname}' <= {self._block}:'{self._sname}'");
               Context.instance.subscribe((rlinker._block,rlinker._sname), (self._block,self._sname), (rlinker._mods,self._mods|{"@sync":True}));
               return self._block;

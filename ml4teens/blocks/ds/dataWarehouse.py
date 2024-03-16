@@ -30,7 +30,7 @@ class DataWarehouse(Block):
       def __init__(self, **kwargs):
           super().__init__(**kwargs);
           
-          self._df=pd.DataFrame();
+          self._df   =None;
           self._label=None;
           
       #-------------------------------------------------------------------------
@@ -47,6 +47,30 @@ class DataWarehouse(Block):
           self._df.to_csv(filename if bool(filename) else self.params.filename, index=False);
       
       #-------------------------------------------------------------------------
+      def append(self, data):
+      
+          if isinstance(data,list) and all(isinstance(d,list) for d in data):
+             # lista de listas.
+             for item in data: self.append(item);
+             return;    
+             
+          if isinstance(data,list) and all(isinstance(d,dict) and all(key in d for key in ["name","score"]) for d in data):
+             # lista de diccionarios con claves 'name' y 'score'.
+             inst={};
+             for item in data:
+                 inst[item["name"]]=item["score"];
+             self.append(inst);    
+             return;    
+             
+          if isinstance(data,dict):
+             # diccionario, las claves son las columnas.
+             inst=copy.copy(data);
+             if self.params.labelName:
+                inst[self.params.labelName]=self._label if self._label is not None else self.params.label;
+             if self._df is None: self._df = pd.DataFrame([inst]);
+             else:                self._df = pd.concat( [ self._df, pd.DataFrame([inst]) ], ignore_index=True);
+      
+      #-------------------------------------------------------------------------
       @Block.slot("label", {int, float, str})
       def slot_label(self, slot, data):
 
@@ -56,28 +80,14 @@ class DataWarehouse(Block):
              self.params.labelName="__TARGET__";             
           
       #-------------------------------------------------------------------------
-      @Block.slot("instance", {list})
+      @Block.slot("instance", {list,dict})
       def slot_features(self, slot, data):
-      
-          if isinstance(data,list) and all(isinstance(d,dict) and all(key in d for key in ["name","score"]) for d in data):
-             # lista de diccionarios con claves 'name' y 'score'.
-             inst={};
-             for item in data:
-                 inst[data["name"]]=data["score"];
-             if self.params.labelName:
-                inst[self.params.labelName]=self._label if self._label is not None else self.params.label;
-             self._df = pd.concat( [ self._df, pd.DataFrame([inst]) ], ignore_index=True);
-             
-          if isinstance(data,dict):
-             # diccionario, las claves son las columnas.
-             inst=copy.copy(data);
-             if self.params.labelName:
-                inst[self.params.labelName]=self._label if self._label is not None else self.params.label;
-             self._df = pd.concat( [ self._df, pd.DataFrame([inst]) ], ignore_index=True);
-             
+          if data is not None:
+             if self.params.fit is not None: data=self.params.fit(data);
+             if data is not None: self.append(data);
           self.signal_dataframe(self._df);
 
       #-------------------------------------------------------------------------
-      @Block.signal("dataframe", {pd.DataFrame})
+      @Block.signal("dataframe", pd.DataFrame)
       def signal_dataframe(self, data):
           return data;

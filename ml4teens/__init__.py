@@ -1,8 +1,10 @@
 #!/bin/env python3
 
 import torch;
-
 Tensor=torch.Tensor;
+
+import pandas;
+DataFrame=pandas.DataFrame;
 
 from . import core;
 from . import blocks;
