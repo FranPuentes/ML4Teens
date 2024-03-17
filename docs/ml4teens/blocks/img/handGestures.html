@@ -470,7 +470,7 @@ def names(cls, idx):
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.handGestures.HandGestures.signal_end"><code class="name flex">
-<span>def <span class="ident">signal_end</span></span>(<span>self, data='a990ff1f68150bb999b7ea0d7947cef5c1cbd2f74386410fe3f06678e551f0ad')</span>
+<span>def <span class="ident">signal_end</span></span>(<span>self, data='39666f3f0d4e26ab64b1f817ef83657e76e5a9cdf4f31188953d4d1f8516e1fa')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -489,7 +489,7 @@ def names(cls, idx):
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.handGestures.HandGestures.signal_gesture"><code class="name flex">
-<span>def <span class="ident">signal_gesture</span></span>(<span>self, data='72b4f01a0ea49ea2a769a9862c466c517032bad2bbc315e333b2bcda733a82c2')</span>
+<span>def <span class="ident">signal_gesture</span></span>(<span>self, data='c7127e2513741b31da1730d762bf7ceaf6c9887d2659e4168064d8b52f6b7d2d')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -508,7 +508,7 @@ def names(cls, idx):
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.handGestures.HandGestures.signal_image"><code class="name flex">
-<span>def <span class="ident">signal_image</span></span>(<span>self, data='ea8181e6e54011484f8feb47bc77ed9c0d74b16cb482f2d994c7d58b2ca35968')</span>
+<span>def <span class="ident">signal_image</span></span>(<span>self, data='5b79940c69efcf37091612c4d124b75d721a6e4ff7be8f26b50a0485c4968d23')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -527,7 +527,7 @@ def names(cls, idx):
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.handGestures.HandGestures.signal_landmark"><code class="name flex">
-<span>def <span class="ident">signal_landmark</span></span>(<span>self, data='636adbf3418f5e856621a4372a3fdf4e97c3b6fa6188a40aa9930b986a78ddc0')</span>
+<span>def <span class="ident">signal_landmark</span></span>(<span>self, data='e929880dcf79d0bf0a1c043c4f1858cb7a067e90468c4cc733ff23fc3c6aa3b2')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -546,7 +546,7 @@ def names(cls, idx):
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.handGestures.HandGestures.signal_landmarks"><code class="name flex">
-<span>def <span class="ident">signal_landmarks</span></span>(<span>self, data='4cd1ddea9cc4a64941456c574c239c27d483d25747f4a42f05d4841a6438bba8')</span>
+<span>def <span class="ident">signal_landmarks</span></span>(<span>self, data='dfbc2dde7202a1cc6ef53b12310ecc63136c509889eeec639a056a40ad507c6c')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -585,13 +585,12 @@ def names(cls, idx):
       if self.params.done is not None:
          if callable(self.params.done):
             done=self.params.done(data);
-            self.signal_done(done);
          else:
             done=self.params.done;
-            self.signal_done(done);
+         self.signal_done(done);
       else:
-         if bool(done) is True: # SUGGEST: enviar el valor de &#39;done&#39; si no es None.
-            self.signal_done(f&#34;{self._fullClassName}::{_slot}&#34;);
+         if done is not None:
+            self.signal_done(done);
          
     except Exception as e:
       debug.print(f&#34;{cls}:: Excepción: &#39;{e}&#39;&#34;, exception=e);
@@ -621,13 +620,12 @@ def names(cls, idx):
       if self.params.done is not None:
          if callable(self.params.done):
             done=self.params.done(data);
-            self.signal_done(done);
          else:
             done=self.params.done;
-            self.signal_done(done);
+         self.signal_done(done);
       else:
-         if bool(done) is True: # SUGGEST: enviar el valor de &#39;done&#39; si no es None.
-            self.signal_done(f&#34;{self._fullClassName}::{_slot}&#34;);
+         if done is not None:
+            self.signal_done(done);
          
     except Exception as e:
       debug.print(f&#34;{cls}:: Excepción: &#39;{e}&#39;&#34;, exception=e);

@@ -186,7 +186,7 @@ class PoseEstimation(Block):
 <h3>Methods</h3>
 <dl>
 <dt id="ml4teens.blocks.img.poseEstimation.PoseEstimation.signal_boxes"><code class="name flex">
-<span>def <span class="ident">signal_boxes</span></span>(<span>self, data='36e76d4a4279acf07ab377f82a26e96b48dedaed6994fb1a8630f7540df71c13')</span>
+<span>def <span class="ident">signal_boxes</span></span>(<span>self, data='188ca69b51a361d64d6ebbffd9d446b494a13e51247d5876eadd1df3e7821fd1')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -205,7 +205,7 @@ class PoseEstimation(Block):
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.poseEstimation.PoseEstimation.signal_image"><code class="name flex">
-<span>def <span class="ident">signal_image</span></span>(<span>self, data='2559658cb4bf1c9c07a2cc1435723e23c946a2670f1303a640b7bd902df43c1a')</span>
+<span>def <span class="ident">signal_image</span></span>(<span>self, data='b2400ab2a05e7d5484e9f70bfd6e4b7b9fea442e48730d468343a11608fb6f8a')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -244,13 +244,12 @@ class PoseEstimation(Block):
       if self.params.done is not None:
          if callable(self.params.done):
             done=self.params.done(data);
-            self.signal_done(done);
          else:
             done=self.params.done;
-            self.signal_done(done);
+         self.signal_done(done);
       else:
-         if bool(done) is True: # SUGGEST: enviar el valor de &#39;done&#39; si no es None.
-            self.signal_done(f&#34;{self._fullClassName}::{_slot}&#34;);
+         if done is not None:
+            self.signal_done(done);
          
     except Exception as e:
       debug.print(f&#34;{cls}:: Excepción: &#39;{e}&#39;&#34;, exception=e);

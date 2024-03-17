@@ -185,7 +185,7 @@ class Video2File(Block):
 <h3>Methods</h3>
 <dl>
 <dt id="ml4teens.blocks.img.video2file.Video2File.signal_filename"><code class="name flex">
-<span>def <span class="ident">signal_filename</span></span>(<span>self, data='c6f53e3c153b4f98ab2c507983ea33f0fffa10a292e09cee1778e2699cce6443')</span>
+<span>def <span class="ident">signal_filename</span></span>(<span>self, data='712f7b80c7380bea699686871d32073e6efe6d952b51a4ad6dc417f0642ba1f0')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -224,13 +224,12 @@ class Video2File(Block):
       if self.params.done is not None:
          if callable(self.params.done):
             done=self.params.done(data);
-            self.signal_done(done);
          else:
             done=self.params.done;
-            self.signal_done(done);
+         self.signal_done(done);
       else:
-         if bool(done) is True: # SUGGEST: enviar el valor de &#39;done&#39; si no es None.
-            self.signal_done(f&#34;{self._fullClassName}::{_slot}&#34;);
+         if done is not None:
+            self.signal_done(done);
          
     except Exception as e:
       debug.print(f&#34;{cls}:: Excepción: &#39;{e}&#39;&#34;, exception=e);
@@ -260,13 +259,12 @@ class Video2File(Block):
       if self.params.done is not None:
          if callable(self.params.done):
             done=self.params.done(data);
-            self.signal_done(done);
          else:
             done=self.params.done;
-            self.signal_done(done);
+         self.signal_done(done);
       else:
-         if bool(done) is True: # SUGGEST: enviar el valor de &#39;done&#39; si no es None.
-            self.signal_done(f&#34;{self._fullClassName}::{_slot}&#34;);
+         if done is not None:
+            self.signal_done(done);
          
     except Exception as e:
       debug.print(f&#34;{cls}:: Excepción: &#39;{e}&#39;&#34;, exception=e);
@@ -296,13 +294,12 @@ class Video2File(Block):
       if self.params.done is not None:
          if callable(self.params.done):
             done=self.params.done(data);
-            self.signal_done(done);
          else:
             done=self.params.done;
-            self.signal_done(done);
+         self.signal_done(done);
       else:
-         if bool(done) is True: # SUGGEST: enviar el valor de &#39;done&#39; si no es None.
-            self.signal_done(f&#34;{self._fullClassName}::{_slot}&#34;);
+         if done is not None:
+            self.signal_done(done);
          
     except Exception as e:
       debug.print(f&#34;{cls}:: Excepción: &#39;{e}&#39;&#34;, exception=e);
@@ -332,13 +329,12 @@ class Video2File(Block):
       if self.params.done is not None:
          if callable(self.params.done):
             done=self.params.done(data);
-            self.signal_done(done);
          else:
             done=self.params.done;
-            self.signal_done(done);
+         self.signal_done(done);
       else:
-         if bool(done) is True: # SUGGEST: enviar el valor de &#39;done&#39; si no es None.
-            self.signal_done(f&#34;{self._fullClassName}::{_slot}&#34;);
+         if done is not None:
+            self.signal_done(done);
          
     except Exception as e:
       debug.print(f&#34;{cls}:: Excepción: &#39;{e}&#39;&#34;, exception=e);
@@ -368,13 +364,12 @@ class Video2File(Block):
       if self.params.done is not None:
          if callable(self.params.done):
             done=self.params.done(data);
-            self.signal_done(done);
          else:
             done=self.params.done;
-            self.signal_done(done);
+         self.signal_done(done);
       else:
-         if bool(done) is True: # SUGGEST: enviar el valor de &#39;done&#39; si no es None.
-            self.signal_done(f&#34;{self._fullClassName}::{_slot}&#34;);
+         if done is not None:
+            self.signal_done(done);
          
     except Exception as e:
       debug.print(f&#34;{cls}:: Excepción: &#39;{e}&#39;&#34;, exception=e);

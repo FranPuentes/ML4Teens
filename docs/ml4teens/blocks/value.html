@@ -36,7 +36,7 @@ class Value(Block):
 
       @Block.slot(&#34;data&#34;, {object})
       def slot_data(self, slot, data):
-          self._data=data if data is not None else self.params.data;
+          self._data=data if data is not None else self.params.default;
           self.signal_data(self._data);
 
       @Block.signal(&#34;data&#34;, object)
@@ -75,7 +75,7 @@ class Value(Block):
 
       @Block.slot(&#34;data&#34;, {object})
       def slot_data(self, slot, data):
-          self._data=data if data is not None else self.params.data;
+          self._data=data if data is not None else self.params.default;
           self.signal_data(self._data);
 
       @Block.signal(&#34;data&#34;, object)
@@ -109,7 +109,7 @@ def data(self):
 <h3>Methods</h3>
 <dl>
 <dt id="ml4teens.blocks.value.Value.signal_data"><code class="name flex">
-<span>def <span class="ident">signal_data</span></span>(<span>self, data='366b3c6525b1a98305e7917d920836e6e8eeb509d25fdce27187a0f3a59ee7f0')</span>
+<span>def <span class="ident">signal_data</span></span>(<span>self, data='f14e27cc0002db3d9d55de5f86d26b72cea1abb38f67c787d13f6f03313aa843')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -148,13 +148,12 @@ def data(self):
       if self.params.done is not None:
          if callable(self.params.done):
             done=self.params.done(data);
-            self.signal_done(done);
          else:
             done=self.params.done;
-            self.signal_done(done);
+         self.signal_done(done);
       else:
-         if bool(done) is True: # SUGGEST: enviar el valor de &#39;done&#39; si no es None.
-            self.signal_done(f&#34;{self._fullClassName}::{_slot}&#34;);
+         if done is not None:
+            self.signal_done(done);
          
     except Exception as e:
       debug.print(f&#34;{cls}:: Excepción: &#39;{e}&#39;&#34;, exception=e);

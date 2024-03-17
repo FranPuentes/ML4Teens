@@ -45,11 +45,6 @@ class Display(Block):
           self._handle=None;
           
       #-------------------------------------------------------------------------
-      @Block.signal(&#34;image&#34;, Image)
-      def signal_image(self, data):
-          return data;
-
-      #-------------------------------------------------------------------------
       def _redim(self, imagen, width=None, height=None):
 
           if width is None and height is None: return imagen;
@@ -66,6 +61,15 @@ class Display(Block):
           imagen = imagen.resize(dimensiones);
                 
           return imagen;
+          
+      #-------------------------------------------------------------------------
+      def _rotate(self, imagen, n):
+      
+          if n is None or type(n) not in (int, float):
+             return imagen;
+             
+          else:
+             return imagen.rotate(n);
 
       #-------------------------------------------------------------------------
       @Block.slot(&#34;image&#34;, {Image})
@@ -74,6 +78,7 @@ class Display(Block):
              width =self.params.width;
              height=self.params.height;
              imagen=self._redim(data,width,height);
+             imagen=self._rotate(imagen, self.params.rotate);
              #TODO motrar &#39;title&#39;, si hay ...
              if not self.params.feed:
                 if self._handle is None:
@@ -82,7 +87,14 @@ class Display(Block):
                    self._handle.update(imagen);
              else:                    
                 display(imagen);
-          self.signal_image(data);</code></pre>
+          self.signal_image(data);
+          
+          return True;
+          
+      #-------------------------------------------------------------------------
+      @Block.signal(&#34;image&#34;, Image)
+      def signal_image(self, data):
+          return data;</code></pre>
 </details>
 </section>
 <section>
@@ -115,11 +127,6 @@ class Display(Block):
           self._handle=None;
           
       #-------------------------------------------------------------------------
-      @Block.signal(&#34;image&#34;, Image)
-      def signal_image(self, data):
-          return data;
-
-      #-------------------------------------------------------------------------
       def _redim(self, imagen, width=None, height=None):
 
           if width is None and height is None: return imagen;
@@ -136,6 +143,15 @@ class Display(Block):
           imagen = imagen.resize(dimensiones);
                 
           return imagen;
+          
+      #-------------------------------------------------------------------------
+      def _rotate(self, imagen, n):
+      
+          if n is None or type(n) not in (int, float):
+             return imagen;
+             
+          else:
+             return imagen.rotate(n);
 
       #-------------------------------------------------------------------------
       @Block.slot(&#34;image&#34;, {Image})
@@ -144,6 +160,7 @@ class Display(Block):
              width =self.params.width;
              height=self.params.height;
              imagen=self._redim(data,width,height);
+             imagen=self._rotate(imagen, self.params.rotate);
              #TODO motrar &#39;title&#39;, si hay ...
              if not self.params.feed:
                 if self._handle is None:
@@ -152,7 +169,14 @@ class Display(Block):
                    self._handle.update(imagen);
              else:                    
                 display(imagen);
-          self.signal_image(data);</code></pre>
+          self.signal_image(data);
+          
+          return True;
+          
+      #-------------------------------------------------------------------------
+      @Block.signal(&#34;image&#34;, Image)
+      def signal_image(self, data):
+          return data;</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -162,7 +186,7 @@ class Display(Block):
 <h3>Methods</h3>
 <dl>
 <dt id="ml4teens.blocks.display.Display.signal_image"><code class="name flex">
-<span>def <span class="ident">signal_image</span></span>(<span>self, data='aa76b9321dbe863d7e6b7e6b61dc1dea4a3d3f9ca7634c53ec94853ef86561fa')</span>
+<span>def <span class="ident">signal_image</span></span>(<span>self, data='00cda7182afdfa4a7212af9538ec5b80a8e1a0721015ced56768d9f29b93bb6d')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -201,13 +225,12 @@ class Display(Block):
       if self.params.done is not None:
          if callable(self.params.done):
             done=self.params.done(data);
-            self.signal_done(done);
          else:
             done=self.params.done;
-            self.signal_done(done);
+         self.signal_done(done);
       else:
-         if bool(done) is True: # SUGGEST: enviar el valor de &#39;done&#39; si no es None.
-            self.signal_done(f&#34;{self._fullClassName}::{_slot}&#34;);
+         if done is not None:
+            self.signal_done(done);
          
     except Exception as e:
       debug.print(f&#34;{cls}:: Excepción: &#39;{e}&#39;&#34;, exception=e);

@@ -36,6 +36,7 @@ import torch;
 
 from IPython.display import display;
 from IPython.display import HTML, Javascript;
+from jupyter_ui_poll import ui_events;
 
 from .signalType import SignalType;
 from .signals    import Signals;
@@ -159,12 +160,12 @@ class Context:
     #-----------------------------------------------------------------------------------------
     def __enter__(self):
         debug.print(&#34;Entrando en un bloque de contexto&#34;);
-        self.reset(all=True);
+        self.reset(all=True, close_signal=False);
         return self;
 
     def __exit__(self, exc_type, exc_value, traceback):
         debug.print(&#34;Saliendo de un bloque de contexto&#34;);
-        self.reset(all=True);
+        self.reset(all=True, close_signal=True);
         
     #-----------------------------------------------------------------------------------------
     def blocks(self):
@@ -178,7 +179,13 @@ class Context:
         return list(blocks);
     
     #-----------------------------------------------------------------------------------------
-    def reset(self, all=False):
+    def reset(self, all=False, close_signal=False):
+    
+        if close_signal:
+           for block in self.blocks():
+               if &#34;close&#34; in block.slots:
+                  block.run(&#34;close&#34;,True,[{},{}]); 
+
         self._queue=queue.PriorityQueue();
         if all:
            self._instance.listeners={};
@@ -428,11 +435,16 @@ class Context:
           debug.print(&#34;Entrando en el bucle de eventos.&#34;, flush=True);
           while True:
                 try:
+                
+                   with ui_events() as poll:
+                        poll(10);
+                
                    try:
                      debug.print(&#34;Esperando por un nuevo evento ...&#34;);
-                     event=self._queue.get(True,1);
+                     event=self._queue.get(True,0.5);
                    
                    except queue.Empty:
+                   
                      diff=(time.time()-timestamp);
                      if diff&gt;timeout: break;
                      else:            continue;
@@ -467,7 +479,7 @@ class Context:
           def __rshift__(self, rlinker): # a &gt;&gt; b
               assert self._sname in self._block.signals,     f&#34;Signal &#39;{self._sname}&#39; no existe en &#39;{self._block._fullClassName}&#39;&#34;;
               assert rlinker._sname in rlinker._block.slots, f&#34;Slot &#39;{rlinker._sname}&#39; no existe en &#39;{rlinker._block._fullClassName}&#39;&#34;;
-              assert self._block.signals[self._sname][&#34;type&#34;] == rlinker._block.slots[rlinker._sname][&#34;type&#34;], f&#34;Tipo incompatibles {self._block.signals[self._sname][&#39;type&#39;]} != {rlinker._block.slots[rlinker._sname][&#39;type&#39;]}&#34;;
+              assert isinstance(self._block.signals[self._sname][&#34;type&#34;],object) or (self._block.signals[self._sname][&#34;type&#34;] == rlinker._block.slots[rlinker._sname][&#34;type&#34;]), f&#34;Tipo incompatibles {self._block.signals[self._sname][&#39;type&#39;]} != {rlinker._block.slots[rlinker._sname][&#39;type&#39;]}&#34;;
               debug.print(f&#34;Suscripción: {self._block}:&#39;{self._sname}&#39; &gt;&gt; {rlinker._block}:&#39;{rlinker._sname}&#39;&#34;);
               Context.instance.subscribe((self._block,self._sname), (rlinker._block,rlinker._sname), (self._mods,rlinker._mods));
               return rlinker._block;
@@ -475,7 +487,7 @@ class Context:
           def __lshift__(self, rlinker): # a &lt;&lt; b
               assert self._sname in self._block.slots,         f&#34;Slot &#39;{self._sname}&#39; no existe en &#39;{self._block._fullClassName}&#39;&#34;;
               assert rlinker._sname in rlinker._block.signals, f&#34;Signal &#39;{rlinker._sname}&#39; no existe en &#39;{rlinker._block._fullClassName}&#39;&#34;;
-              assert self._block.slots[self._sname][&#34;type&#34;] == rlinker._block.signals[rlinker._sname][&#34;type&#34;], f&#34;Tipo incompatibles {self._block.slots[self._sname][&#39;type&#39;]} != {rlinker._block.signals[rlinker._sname][&#39;type&#39;]}&#34;;
+              assert isinstance(rlinker._block.signals[rlinker._sname][&#34;type&#34;],object) or (self._block.slots[self._sname][&#34;type&#34;] == rlinker._block.signals[rlinker._sname][&#34;type&#34;]), f&#34;Tipo incompatibles {self._block.slots[self._sname][&#39;type&#39;]} != {rlinker._block.signals[rlinker._sname][&#39;type&#39;]}&#34;;
               debug.print(f&#34;Suscripción: {rlinker._block}:&#39;{rlinker._sname}&#39; &lt;&lt; {self._block}:&#39;{self._sname}&#39;&#34;);
               Context.instance.subscribe((rlinker._block,rlinker._sname), (self._block,self._sname), (rlinker._mods,self._mods));
               return self._block;
@@ -483,7 +495,7 @@ class Context:
           def __gt__(self, rlinker): # a &gt; b
               assert self._sname in self._block.signals,     f&#34;Signal &#39;{self._sname}&#39; no existe en &#39;{self._block._fullClassName}&#39;&#34;;
               assert rlinker._sname in rlinker._block.slots, f&#34;Slot &#39;{rlinker._sname}&#39; no existe en &#39;{rlinker._block._fullClassName}&#39;&#34;;
-              assert self._block.signals[self._sname][&#34;type&#34;] == rlinker._block.slots[rlinker._sname][&#34;type&#34;], f&#34;Tipo incompatibles {self._block.signals[self._sname][&#39;type&#39;]} != {rlinker._block.slots[rlinker._sname][&#39;type&#39;]}&#34;;
+              assert (isinstance(self._block.signals[self._sname][&#34;type&#34;],object)) or (self._block.signals[self._sname][&#34;type&#34;] == rlinker._block.slots[rlinker._sname][&#34;type&#34;]), f&#34;Tipo incompatibles {self._block.signals[self._sname][&#39;type&#39;]} != {rlinker._block.slots[rlinker._sname][&#39;type&#39;]}&#34;;
               debug.print(f&#34;Suscripción: {self._block}:&#39;{self._sname}&#39; &gt;= {rlinker._block}:&#39;{rlinker._sname}&#39;&#34;);
               Context.instance.subscribe((self._block,self._sname), (rlinker._block,rlinker._sname), (self._mods,rlinker._mods|{&#34;@sync&#34;:True}));
               return rlinker._block;
@@ -491,7 +503,7 @@ class Context:
           def __lt__(self, rlinker): # a &lt; b
               assert self._sname in self._block.slots,         f&#34;Slot &#39;{self._sname}&#39; no existe en &#39;{self._block._fullClassName}&#39;&#34;;
               assert rlinker._sname in rlinker._block.signals, f&#34;Signal &#39;{rlinker._sname}&#39; no existe en &#39;{rlinker._block._fullClassName}&#39;&#34;;
-              assert self._block.slots[self._sname][&#34;type&#34;] == rlinker._block.signals[rlinker._sname][&#34;type&#34;], f&#34;Tipo incompatibles {self._block.slots[self._sname][&#39;type&#39;]} != {rlinker._block.signals[rlinker._sname][&#39;type&#39;]}&#34;;
+              assert isinstance(rlinker._block.signals[rlinker._sname][&#34;type&#34;],object) or (self._block.slots[self._sname][&#34;type&#34;] == rlinker._block.signals[rlinker._sname][&#34;type&#34;]), f&#34;Tipo incompatibles {self._block.slots[self._sname][&#39;type&#39;]} != {rlinker._block.signals[rlinker._sname][&#39;type&#39;]}&#34;;
               debug.print(f&#34;Suscripción: {rlinker._block}:&#39;{rlinker._sname}&#39; &lt;= {self._block}:&#39;{self._sname}&#39;&#34;);
               Context.instance.subscribe((rlinker._block,rlinker._sname), (self._block,self._sname), (rlinker._mods,self._mods|{&#34;@sync&#34;:True}));
               return self._block;</code></pre>
@@ -619,12 +631,12 @@ La inicialización del <strong>único</strong> objeto de esta clase se hace en <
     #-----------------------------------------------------------------------------------------
     def __enter__(self):
         debug.print(&#34;Entrando en un bloque de contexto&#34;);
-        self.reset(all=True);
+        self.reset(all=True, close_signal=False);
         return self;
 
     def __exit__(self, exc_type, exc_value, traceback):
         debug.print(&#34;Saliendo de un bloque de contexto&#34;);
-        self.reset(all=True);
+        self.reset(all=True, close_signal=True);
         
     #-----------------------------------------------------------------------------------------
     def blocks(self):
@@ -638,7 +650,13 @@ La inicialización del <strong>único</strong> objeto de esta clase se hace en <
         return list(blocks);
     
     #-----------------------------------------------------------------------------------------
-    def reset(self, all=False):
+    def reset(self, all=False, close_signal=False):
+    
+        if close_signal:
+           for block in self.blocks():
+               if &#34;close&#34; in block.slots:
+                  block.run(&#34;close&#34;,True,[{},{}]); 
+
         self._queue=queue.PriorityQueue();
         if all:
            self._instance.listeners={};
@@ -888,11 +906,16 @@ La inicialización del <strong>único</strong> objeto de esta clase se hace en <
           debug.print(&#34;Entrando en el bucle de eventos.&#34;, flush=True);
           while True:
                 try:
+                
+                   with ui_events() as poll:
+                        poll(10);
+                
                    try:
                      debug.print(&#34;Esperando por un nuevo evento ...&#34;);
-                     event=self._queue.get(True,1);
+                     event=self._queue.get(True,0.5);
                    
                    except queue.Empty:
+                   
                      diff=(time.time()-timestamp);
                      if diff&gt;timeout: break;
                      else:            continue;
@@ -927,7 +950,7 @@ La inicialización del <strong>único</strong> objeto de esta clase se hace en <
           def __rshift__(self, rlinker): # a &gt;&gt; b
               assert self._sname in self._block.signals,     f&#34;Signal &#39;{self._sname}&#39; no existe en &#39;{self._block._fullClassName}&#39;&#34;;
               assert rlinker._sname in rlinker._block.slots, f&#34;Slot &#39;{rlinker._sname}&#39; no existe en &#39;{rlinker._block._fullClassName}&#39;&#34;;
-              assert self._block.signals[self._sname][&#34;type&#34;] == rlinker._block.slots[rlinker._sname][&#34;type&#34;], f&#34;Tipo incompatibles {self._block.signals[self._sname][&#39;type&#39;]} != {rlinker._block.slots[rlinker._sname][&#39;type&#39;]}&#34;;
+              assert isinstance(self._block.signals[self._sname][&#34;type&#34;],object) or (self._block.signals[self._sname][&#34;type&#34;] == rlinker._block.slots[rlinker._sname][&#34;type&#34;]), f&#34;Tipo incompatibles {self._block.signals[self._sname][&#39;type&#39;]} != {rlinker._block.slots[rlinker._sname][&#39;type&#39;]}&#34;;
               debug.print(f&#34;Suscripción: {self._block}:&#39;{self._sname}&#39; &gt;&gt; {rlinker._block}:&#39;{rlinker._sname}&#39;&#34;);
               Context.instance.subscribe((self._block,self._sname), (rlinker._block,rlinker._sname), (self._mods,rlinker._mods));
               return rlinker._block;
@@ -935,7 +958,7 @@ La inicialización del <strong>único</strong> objeto de esta clase se hace en <
           def __lshift__(self, rlinker): # a &lt;&lt; b
               assert self._sname in self._block.slots,         f&#34;Slot &#39;{self._sname}&#39; no existe en &#39;{self._block._fullClassName}&#39;&#34;;
               assert rlinker._sname in rlinker._block.signals, f&#34;Signal &#39;{rlinker._sname}&#39; no existe en &#39;{rlinker._block._fullClassName}&#39;&#34;;
-              assert self._block.slots[self._sname][&#34;type&#34;] == rlinker._block.signals[rlinker._sname][&#34;type&#34;], f&#34;Tipo incompatibles {self._block.slots[self._sname][&#39;type&#39;]} != {rlinker._block.signals[rlinker._sname][&#39;type&#39;]}&#34;;
+              assert isinstance(rlinker._block.signals[rlinker._sname][&#34;type&#34;],object) or (self._block.slots[self._sname][&#34;type&#34;] == rlinker._block.signals[rlinker._sname][&#34;type&#34;]), f&#34;Tipo incompatibles {self._block.slots[self._sname][&#39;type&#39;]} != {rlinker._block.signals[rlinker._sname][&#39;type&#39;]}&#34;;
               debug.print(f&#34;Suscripción: {rlinker._block}:&#39;{rlinker._sname}&#39; &lt;&lt; {self._block}:&#39;{self._sname}&#39;&#34;);
               Context.instance.subscribe((rlinker._block,rlinker._sname), (self._block,self._sname), (rlinker._mods,self._mods));
               return self._block;
@@ -943,7 +966,7 @@ La inicialización del <strong>único</strong> objeto de esta clase se hace en <
           def __gt__(self, rlinker): # a &gt; b
               assert self._sname in self._block.signals,     f&#34;Signal &#39;{self._sname}&#39; no existe en &#39;{self._block._fullClassName}&#39;&#34;;
               assert rlinker._sname in rlinker._block.slots, f&#34;Slot &#39;{rlinker._sname}&#39; no existe en &#39;{rlinker._block._fullClassName}&#39;&#34;;
-              assert self._block.signals[self._sname][&#34;type&#34;] == rlinker._block.slots[rlinker._sname][&#34;type&#34;], f&#34;Tipo incompatibles {self._block.signals[self._sname][&#39;type&#39;]} != {rlinker._block.slots[rlinker._sname][&#39;type&#39;]}&#34;;
+              assert (isinstance(self._block.signals[self._sname][&#34;type&#34;],object)) or (self._block.signals[self._sname][&#34;type&#34;] == rlinker._block.slots[rlinker._sname][&#34;type&#34;]), f&#34;Tipo incompatibles {self._block.signals[self._sname][&#39;type&#39;]} != {rlinker._block.slots[rlinker._sname][&#39;type&#39;]}&#34;;
               debug.print(f&#34;Suscripción: {self._block}:&#39;{self._sname}&#39; &gt;= {rlinker._block}:&#39;{rlinker._sname}&#39;&#34;);
               Context.instance.subscribe((self._block,self._sname), (rlinker._block,rlinker._sname), (self._mods,rlinker._mods|{&#34;@sync&#34;:True}));
               return rlinker._block;
@@ -951,7 +974,7 @@ La inicialización del <strong>único</strong> objeto de esta clase se hace en <
           def __lt__(self, rlinker): # a &lt; b
               assert self._sname in self._block.slots,         f&#34;Slot &#39;{self._sname}&#39; no existe en &#39;{self._block._fullClassName}&#39;&#34;;
               assert rlinker._sname in rlinker._block.signals, f&#34;Signal &#39;{rlinker._sname}&#39; no existe en &#39;{rlinker._block._fullClassName}&#39;&#34;;
-              assert self._block.slots[self._sname][&#34;type&#34;] == rlinker._block.signals[rlinker._sname][&#34;type&#34;], f&#34;Tipo incompatibles {self._block.slots[self._sname][&#39;type&#39;]} != {rlinker._block.signals[rlinker._sname][&#39;type&#39;]}&#34;;
+              assert isinstance(rlinker._block.signals[rlinker._sname][&#34;type&#34;],object) or (self._block.slots[self._sname][&#34;type&#34;] == rlinker._block.signals[rlinker._sname][&#34;type&#34;]), f&#34;Tipo incompatibles {self._block.slots[self._sname][&#39;type&#39;]} != {rlinker._block.signals[rlinker._sname][&#39;type&#39;]}&#34;;
               debug.print(f&#34;Suscripción: {rlinker._block}:&#39;{rlinker._sname}&#39; &lt;= {self._block}:&#39;{self._sname}&#39;&#34;);
               Context.instance.subscribe((rlinker._block,rlinker._sname), (self._block,self._sname), (rlinker._mods,self._mods|{&#34;@sync&#34;:True}));
               return self._block;</code></pre>
@@ -1248,7 +1271,7 @@ dict | None.</p></div>
 </details>
 </dd>
 <dt id="ml4teens.core.context.Context.reset"><code class="name flex">
-<span>def <span class="ident">reset</span></span>(<span>self, all=False)</span>
+<span>def <span class="ident">reset</span></span>(<span>self, all=False, close_signal=False)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -1256,7 +1279,13 @@ dict | None.</p></div>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def reset(self, all=False):
+<pre><code class="python">def reset(self, all=False, close_signal=False):
+
+    if close_signal:
+       for block in self.blocks():
+           if &#34;close&#34; in block.slots:
+              block.run(&#34;close&#34;,True,[{},{}]); 
+
     self._queue=queue.PriorityQueue();
     if all:
        self._instance.listeners={};
@@ -1430,11 +1459,16 @@ Puede volver a invocarse, con nuevos mensajes encolados.</p></div>
       debug.print(&#34;Entrando en el bucle de eventos.&#34;, flush=True);
       while True:
             try:
+            
+               with ui_events() as poll:
+                    poll(10);
+            
                try:
                  debug.print(&#34;Esperando por un nuevo evento ...&#34;);
-                 event=self._queue.get(True,1);
+                 event=self._queue.get(True,0.5);
                
                except queue.Empty:
+               
                  diff=(time.time()-timestamp);
                  if diff&gt;timeout: break;
                  else:            continue;

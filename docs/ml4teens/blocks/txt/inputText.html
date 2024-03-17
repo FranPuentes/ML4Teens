@@ -147,7 +147,7 @@ Espera a que pulse el botón de enviar.</p></div>
 <h3>Methods</h3>
 <dl>
 <dt id="ml4teens.blocks.txt.inputText.InputText.signal_stdout"><code class="name flex">
-<span>def <span class="ident">signal_stdout</span></span>(<span>self, data='91126e2544c6a36614c473d34b9516bcd8b97f098b538106ec44c20c548be30e')</span>
+<span>def <span class="ident">signal_stdout</span></span>(<span>self, data='99d8ee9bb69d17c650b0cdac4e11db746569e3b81503610283fe6c1d3b12c9f0')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -186,13 +186,12 @@ Espera a que pulse el botón de enviar.</p></div>
       if self.params.done is not None:
          if callable(self.params.done):
             done=self.params.done(data);
-            self.signal_done(done);
          else:
             done=self.params.done;
-            self.signal_done(done);
+         self.signal_done(done);
       else:
-         if bool(done) is True: # SUGGEST: enviar el valor de &#39;done&#39; si no es None.
-            self.signal_done(f&#34;{self._fullClassName}::{_slot}&#34;);
+         if done is not None:
+            self.signal_done(done);
          
     except Exception as e:
       debug.print(f&#34;{cls}:: Excepción: &#39;{e}&#39;&#34;, exception=e);

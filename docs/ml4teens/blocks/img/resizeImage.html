@@ -190,7 +190,7 @@ class ResizeImage(Block):
 <h3>Methods</h3>
 <dl>
 <dt id="ml4teens.blocks.img.resizeImage.ResizeImage.signal_image"><code class="name flex">
-<span>def <span class="ident">signal_image</span></span>(<span>self, data='f26c3f29d135dc10d8ff9877886e3f024821272d76b11b269550c6cc8b41af11')</span>
+<span>def <span class="ident">signal_image</span></span>(<span>self, data='10a7eba150dc8df1d009287f0162e414d8a663aa1e3bc38ad2142f8c34c460d6')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -209,7 +209,7 @@ class ResizeImage(Block):
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.resizeImage.ResizeImage.signal_shape"><code class="name flex">
-<span>def <span class="ident">signal_shape</span></span>(<span>self, data='2a652d699d926ec54274f76a55b4eb98752367b64ef7c426815ea26e777cecb1')</span>
+<span>def <span class="ident">signal_shape</span></span>(<span>self, data='f0a6539a99d6b536bbdd5a412cca05bf9a17bf41207fd0502e909795cb6d7165')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -248,13 +248,12 @@ class ResizeImage(Block):
       if self.params.done is not None:
          if callable(self.params.done):
             done=self.params.done(data);
-            self.signal_done(done);
          else:
             done=self.params.done;
-            self.signal_done(done);
+         self.signal_done(done);
       else:
-         if bool(done) is True: # SUGGEST: enviar el valor de &#39;done&#39; si no es None.
-            self.signal_done(f&#34;{self._fullClassName}::{_slot}&#34;);
+         if done is not None:
+            self.signal_done(done);
          
     except Exception as e:
       debug.print(f&#34;{cls}:: Excepción: &#39;{e}&#39;&#34;, exception=e);
@@ -284,13 +283,12 @@ class ResizeImage(Block):
       if self.params.done is not None:
          if callable(self.params.done):
             done=self.params.done(data);
-            self.signal_done(done);
          else:
             done=self.params.done;
-            self.signal_done(done);
+         self.signal_done(done);
       else:
-         if bool(done) is True: # SUGGEST: enviar el valor de &#39;done&#39; si no es None.
-            self.signal_done(f&#34;{self._fullClassName}::{_slot}&#34;);
+         if done is not None:
+            self.signal_done(done);
          
     except Exception as e:
       debug.print(f&#34;{cls}:: Excepción: &#39;{e}&#39;&#34;, exception=e);

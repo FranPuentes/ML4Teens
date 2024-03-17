@@ -303,7 +303,7 @@ class FaceBoxing(Block):
 <h3>Methods</h3>
 <dl>
 <dt id="ml4teens.blocks.img.faceBoxing.FaceBoxing.signal_box"><code class="name flex">
-<span>def <span class="ident">signal_box</span></span>(<span>self, data='a99ae8235da2944896a4958a72c7c01f557e6e58df9cae7ac38307835bbd6807')</span>
+<span>def <span class="ident">signal_box</span></span>(<span>self, data='55e1bd8dd5df7788ec129804a96de2ecc0f260503f85bed0f3d1c9acc884c1b7')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -322,7 +322,7 @@ class FaceBoxing(Block):
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.faceBoxing.FaceBoxing.signal_boxes"><code class="name flex">
-<span>def <span class="ident">signal_boxes</span></span>(<span>self, data='23f774002c9dcd8e7b689ea3389899427038a7be16e11579e4b549a61caea7a4')</span>
+<span>def <span class="ident">signal_boxes</span></span>(<span>self, data='a015b2c4b383d0fe3fc84a593f304d408905d5ef95d9aedbd8d29586db00455e')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -341,7 +341,7 @@ class FaceBoxing(Block):
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.faceBoxing.FaceBoxing.signal_end"><code class="name flex">
-<span>def <span class="ident">signal_end</span></span>(<span>self, data='c7c7938acd54525faeeb7edb1b7b86e9f38717d17a361197600a28f8130b0198')</span>
+<span>def <span class="ident">signal_end</span></span>(<span>self, data='243d15c0932d0f7f60c5b1e1ea0954f297664ce04f99814070a60487c03c4cd8')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -360,7 +360,7 @@ class FaceBoxing(Block):
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.faceBoxing.FaceBoxing.signal_image"><code class="name flex">
-<span>def <span class="ident">signal_image</span></span>(<span>self, data='d61016fb7aa33a7f43426dca46a6bab2675846087438db5ef62dc3bd0f8d64a5')</span>
+<span>def <span class="ident">signal_image</span></span>(<span>self, data='af4985625c455261ff83d97b98948f269af0ec7edac027febfd648366206d772')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -399,13 +399,12 @@ class FaceBoxing(Block):
       if self.params.done is not None:
          if callable(self.params.done):
             done=self.params.done(data);
-            self.signal_done(done);
          else:
             done=self.params.done;
-            self.signal_done(done);
+         self.signal_done(done);
       else:
-         if bool(done) is True: # SUGGEST: enviar el valor de &#39;done&#39; si no es None.
-            self.signal_done(f&#34;{self._fullClassName}::{_slot}&#34;);
+         if done is not None:
+            self.signal_done(done);
          
     except Exception as e:
       debug.print(f&#34;{cls}:: Excepción: &#39;{e}&#39;&#34;, exception=e);
@@ -435,13 +434,12 @@ class FaceBoxing(Block):
       if self.params.done is not None:
          if callable(self.params.done):
             done=self.params.done(data);
-            self.signal_done(done);
          else:
             done=self.params.done;
-            self.signal_done(done);
+         self.signal_done(done);
       else:
-         if bool(done) is True: # SUGGEST: enviar el valor de &#39;done&#39; si no es None.
-            self.signal_done(f&#34;{self._fullClassName}::{_slot}&#34;);
+         if done is not None:
+            self.signal_done(done);
          
     except Exception as e:
       debug.print(f&#34;{cls}:: Excepción: &#39;{e}&#39;&#34;, exception=e);

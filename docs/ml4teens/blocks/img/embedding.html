@@ -43,72 +43,14 @@ from ...core import Context;
 
 from ...core import Block;
 
+from ...tools import ImgEmbeddings;
+
 #===============================================================================
 class Embedding(Block):
       &#34;&#34;&#34;
       Dada una imagen calcula su embedding.
       &#34;&#34;&#34;
       
-      #-------------------------------------------------------------------------
-      class Embedder():
-      
-            #-------------------------------------------------------------------
-            def __init__(self):
-            
-                if Context().gpu:
-                   from transformers import AutoImageProcessor, ViTModel;
-                   
-                   self._processor = AutoImageProcessor.from_pretrained(&#34;google/vit-base-patch16-224-in21k&#34;);
-                   self._model     = ViTModel.from_pretrained(&#34;google/vit-base-patch16-224-in21k&#34;);
-                
-                else:
-                   &#34;&#34;&#34;
-                   import mediapipe as mp;
-                   from mediapipe.tasks import python;
-                   from mediapipe.tasks.python import vision;
-                   
-                   BaseOptions = mp.tasks.BaseOptions;
-                   ImageEmbedder = mp.tasks.vision.ImageEmbedder;
-                   ImageEmbedderOptions = mp.tasks.vision.ImageEmbedderOptions;
-                   VisionRunningMode = mp.tasks.vision.RunningMode;
-
-                   model_name=&#34;mobilenet_v3_small.tflite&#34;;
-                   if &#34;model&#34; in self.params:
-                       if self.params[&#34;model&#34;].lower() in [&#34;nano&#34;,  &#34;xs&#34;]: model_name=&#34;mobilenet_v3_small.tflite&#34;;
-                       if self.params[&#34;model&#34;].lower() in [&#34;small&#34;, &#34;s&#34; ]: model_name=&#34;mobilenet_v3_small.tflite&#34;;
-                       if self.params[&#34;model&#34;].lower() in [&#34;medium&#34;,&#34;m&#34; ]: model_name=&#34;mobilenet_v3_small.tflite&#34;;
-                       if self.params[&#34;model&#34;].lower() in [&#34;large&#34;, &#34;l&#34; ]: model_name=&#34;mobilenet_v3_large.tflite&#34;;
-                       if self.params[&#34;model&#34;].lower() in [&#34;xlarge&#34;,&#34;xl&#34;]: model_name=&#34;mobilenet_v3_large.tflite&#34;;
-
-                   options = ImageEmbedderOptions(base_options=BaseOptions(model_asset_path=os.path.join(Context().mwd, model_name)),
-                                                  quantize=self.params.quantize or True,
-                                                  running_mode=VisionRunningMode.IMAGE);
-
-                   self._processor = None;
-                   self._model = ImageEmbedder.create_from_options(options);
-                   &#34;&#34;&#34;
-                   from imgbeddings import imgbeddings;
-                   
-                   self._processor = None;
-                   self._model = imgbeddings();
-                
-            #-------------------------------------------------------------------
-            def embedding(self, imagen):
-                
-                if Context().gpu:
-                   inputs = self._processor(imagen, return_tensors=&#34;pt&#34;);
-                   with torch.no_grad():
-                        outputs = self._model(**inputs);
-                        return outputs.last_hidden_state[0];
-                
-                else:
-                   &#34;&#34;&#34;
-                   result = self._model.embed(imagen);
-                   return result.embeddings[0].embedding;
-                   &#34;&#34;&#34;
-                   embedding = self._model.to_embeddings(imagen);
-                   return  torch.from_numpy(embedding[0]);
-
       #-------------------------------------------------------------------------
       @staticmethod
       def download(source:str):
@@ -130,7 +72,7 @@ class Embedding(Block):
       #-------------------------------------------------------------------------
       def __init__(self, **kwargs):
           super().__init__(**kwargs);
-          self._embedder=Embedding.Embedder();
+          self._embedder=ImgEmbeddings(model_size=self.params.model or &#34;xs&#34;, quantize=bool(self.params.quantize) if self.params.quantize is not None else True);
 
       #-------------------------------------------------------------------------
       # SLOTS
@@ -187,66 +129,6 @@ class Embedding(Block):
       &#34;&#34;&#34;
       
       #-------------------------------------------------------------------------
-      class Embedder():
-      
-            #-------------------------------------------------------------------
-            def __init__(self):
-            
-                if Context().gpu:
-                   from transformers import AutoImageProcessor, ViTModel;
-                   
-                   self._processor = AutoImageProcessor.from_pretrained(&#34;google/vit-base-patch16-224-in21k&#34;);
-                   self._model     = ViTModel.from_pretrained(&#34;google/vit-base-patch16-224-in21k&#34;);
-                
-                else:
-                   &#34;&#34;&#34;
-                   import mediapipe as mp;
-                   from mediapipe.tasks import python;
-                   from mediapipe.tasks.python import vision;
-                   
-                   BaseOptions = mp.tasks.BaseOptions;
-                   ImageEmbedder = mp.tasks.vision.ImageEmbedder;
-                   ImageEmbedderOptions = mp.tasks.vision.ImageEmbedderOptions;
-                   VisionRunningMode = mp.tasks.vision.RunningMode;
-
-                   model_name=&#34;mobilenet_v3_small.tflite&#34;;
-                   if &#34;model&#34; in self.params:
-                       if self.params[&#34;model&#34;].lower() in [&#34;nano&#34;,  &#34;xs&#34;]: model_name=&#34;mobilenet_v3_small.tflite&#34;;
-                       if self.params[&#34;model&#34;].lower() in [&#34;small&#34;, &#34;s&#34; ]: model_name=&#34;mobilenet_v3_small.tflite&#34;;
-                       if self.params[&#34;model&#34;].lower() in [&#34;medium&#34;,&#34;m&#34; ]: model_name=&#34;mobilenet_v3_small.tflite&#34;;
-                       if self.params[&#34;model&#34;].lower() in [&#34;large&#34;, &#34;l&#34; ]: model_name=&#34;mobilenet_v3_large.tflite&#34;;
-                       if self.params[&#34;model&#34;].lower() in [&#34;xlarge&#34;,&#34;xl&#34;]: model_name=&#34;mobilenet_v3_large.tflite&#34;;
-
-                   options = ImageEmbedderOptions(base_options=BaseOptions(model_asset_path=os.path.join(Context().mwd, model_name)),
-                                                  quantize=self.params.quantize or True,
-                                                  running_mode=VisionRunningMode.IMAGE);
-
-                   self._processor = None;
-                   self._model = ImageEmbedder.create_from_options(options);
-                   &#34;&#34;&#34;
-                   from imgbeddings import imgbeddings;
-                   
-                   self._processor = None;
-                   self._model = imgbeddings();
-                
-            #-------------------------------------------------------------------
-            def embedding(self, imagen):
-                
-                if Context().gpu:
-                   inputs = self._processor(imagen, return_tensors=&#34;pt&#34;);
-                   with torch.no_grad():
-                        outputs = self._model(**inputs);
-                        return outputs.last_hidden_state[0];
-                
-                else:
-                   &#34;&#34;&#34;
-                   result = self._model.embed(imagen);
-                   return result.embeddings[0].embedding;
-                   &#34;&#34;&#34;
-                   embedding = self._model.to_embeddings(imagen);
-                   return  torch.from_numpy(embedding[0]);
-
-      #-------------------------------------------------------------------------
       @staticmethod
       def download(source:str):
           if source.startswith(&#34;http&#34;):
@@ -267,7 +149,7 @@ class Embedding(Block):
       #-------------------------------------------------------------------------
       def __init__(self, **kwargs):
           super().__init__(**kwargs);
-          self._embedder=Embedding.Embedder();
+          self._embedder=ImgEmbeddings(model_size=self.params.model or &#34;xs&#34;, quantize=bool(self.params.quantize) if self.params.quantize is not None else True);
 
       #-------------------------------------------------------------------------
       # SLOTS
@@ -302,13 +184,6 @@ class Embedding(Block):
 <li><a title="ml4teens.core.block.Block" href="../../core/block.html#ml4teens.core.block.Block">Block</a></li>
 <li>abc.ABC</li>
 </ul>
-<h3>Class variables</h3>
-<dl>
-<dt id="ml4teens.blocks.img.embedding.Embedding.Embedder"><code class="name">var <span class="ident">Embedder</span></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-</dl>
 <h3>Static methods</h3>
 <dl>
 <dt id="ml4teens.blocks.img.embedding.Embedding.download"><code class="name flex">
@@ -340,7 +215,7 @@ def download(source:str):
 <h3>Methods</h3>
 <dl>
 <dt id="ml4teens.blocks.img.embedding.Embedding.signal_embedding"><code class="name flex">
-<span>def <span class="ident">signal_embedding</span></span>(<span>self, data='0458d256522dd3975dcc10448c3fa0c6af8e8f16042f64b9c4e4cd4b63550061')</span>
+<span>def <span class="ident">signal_embedding</span></span>(<span>self, data='a29fc6cc0740786cd8177a540eade23d4f39e2a9b436fe227cc4a143060ac48b')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -379,13 +254,12 @@ def download(source:str):
       if self.params.done is not None:
          if callable(self.params.done):
             done=self.params.done(data);
-            self.signal_done(done);
          else:
             done=self.params.done;
-            self.signal_done(done);
+         self.signal_done(done);
       else:
-         if bool(done) is True: # SUGGEST: enviar el valor de &#39;done&#39; si no es None.
-            self.signal_done(f&#34;{self._fullClassName}::{_slot}&#34;);
+         if done is not None:
+            self.signal_done(done);
          
     except Exception as e:
       debug.print(f&#34;{cls}:: Excepción: &#39;{e}&#39;&#34;, exception=e);
@@ -423,7 +297,6 @@ def download(source:str):
 <li>
 <h4><code><a title="ml4teens.blocks.img.embedding.Embedding" href="#ml4teens.blocks.img.embedding.Embedding">Embedding</a></code></h4>
 <ul class="">
-<li><code><a title="ml4teens.blocks.img.embedding.Embedding.Embedder" href="#ml4teens.blocks.img.embedding.Embedding.Embedder">Embedder</a></code></li>
 <li><code><a title="ml4teens.blocks.img.embedding.Embedding.download" href="#ml4teens.blocks.img.embedding.Embedding.download">download</a></code></li>
 <li><code><a title="ml4teens.blocks.img.embedding.Embedding.signal_embedding" href="#ml4teens.blocks.img.embedding.Embedding.signal_embedding">signal_embedding</a></code></li>
 <li><code><a title="ml4teens.blocks.img.embedding.Embedding.slot_image" href="#ml4teens.blocks.img.embedding.Embedding.slot_image">slot_image</a></code></li>

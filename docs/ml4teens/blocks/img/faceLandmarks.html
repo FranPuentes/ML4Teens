@@ -32,6 +32,9 @@ import PIL;
 
 from PIL.Image import Image;
 
+import matplotlib.pyplot as plt;
+from io import BytesIO;
+
 from mediapipe import solutions
 from mediapipe.framework.formats import landmark_pb2
 
@@ -53,14 +56,22 @@ class FaceLandmarks(Block):
           cwd = os.path.dirname(__file__);
           mwd = os.path.join(cwd, &#39;../../models&#39;);
           fwd = os.path.join(cwd, &#39;../../fonts&#39;);
+          
+          num_faces=self.params.faces or 1;
 
           base_options = python.BaseOptions(model_asset_path=os.path.join(mwd,&#39;face_landmarker.task&#39;));
-          options = vision.FaceLandmarkerOptions(base_options=base_options, output_face_blendshapes=True, output_facial_transformation_matrixes=True, num_faces=1);
+          options = vision.FaceLandmarkerOptions(base_options=base_options,
+                                                 output_face_blendshapes=True,
+                                                 output_facial_transformation_matrixes=True,
+                                                 num_faces=num_faces);
           self._model = vision.FaceLandmarker.create_from_options(options);
 
       #-------------------------------------------------------------------------
       @classmethod
-      def names(cls, idx):
+      def names(cls, idx=None):
+          
+          if idx is None: return 52;
+          
           if idx== 0: return &#34;_neutral&#34;;
           if idx== 1: return &#34;browDownLeft&#34;;
           if idx== 2: return &#34;browDownRight&#34;;
@@ -114,6 +125,63 @@ class FaceLandmarks(Block):
           if idx==50: return &#34;noseSneerLeft&#34;;
           if idx==51: return &#34;noseSneerRight&#34;;
           raise KeyError(f&#34;El índice {idx} no se corresponde con ningún face::landmark.&#34;);
+          
+      &#34;&#34;&#34;
+      traducciones = {
+      &#34;_neutral&#34;: &#34;neutral&#34;,
+      &#34;browDownLeft&#34;: &#34;ceño fruncido izquierdo&#34;,
+      &#34;browDownRight&#34;: &#34;ceño fruncido derecho&#34;,
+      &#34;browInnerUp&#34;: &#34;ceño elevado interior&#34;,
+      &#34;browOuterUpLeft&#34;: &#34;ceño elevado exterior izquierdo&#34;,
+      &#34;browOuterUpRight&#34;: &#34;ceño elevado exterior derecho&#34;,
+      &#34;cheekPuff&#34;: &#34;inflar mejillas&#34;,
+      &#34;cheekSquintLeft&#34;: &#34;entrecerrar mejilla izquierda&#34;,
+      &#34;cheekSquintRight&#34;: &#34;entrecerrar mejilla derecha&#34;,
+      &#34;eyeBlinkLeft&#34;: &#34;parpadeo izquierdo&#34;,
+      &#34;eyeBlinkRight&#34;: &#34;parpadeo derecho&#34;,
+      &#34;eyeLookDownLeft&#34;: &#34;mirada abajo izquierda&#34;,
+      &#34;eyeLookDownRight&#34;: &#34;mirada abajo derecha&#34;,
+      &#34;eyeLookInLeft&#34;: &#34;mirada hacia dentro izquierda&#34;,
+      &#34;eyeLookInRight&#34;: &#34;mirada hacia dentro derecha&#34;,
+      &#34;eyeLookOutLeft&#34;: &#34;mirada hacia fuera izquierda&#34;,
+      &#34;eyeLookOutRight&#34;: &#34;mirada hacia fuera derecha&#34;,
+      &#34;eyeLookUpLeft&#34;: &#34;mirada arriba izquierda&#34;,
+      &#34;eyeLookUpRight&#34;: &#34;mirada arriba derecha&#34;,
+      &#34;eyeSquintLeft&#34;: &#34;ojo entrecerrado izquierdo&#34;,
+      &#34;eyeSquintRight&#34;: &#34;ojo entrecerrado derecho&#34;,
+      &#34;eyeWideLeft&#34;: &#34;ojo muy abierto izquierdo&#34;,
+      &#34;eyeWideRight&#34;: &#34;ojo muy abierto derecho&#34;,
+      &#34;jawForward&#34;: &#34;mandíbula hacia adelante&#34;,
+      &#34;jawLeft&#34;: &#34;mandíbula izquierda&#34;,
+      &#34;jawOpen&#34;: &#34;mandíbula abierta&#34;,
+      &#34;jawRight&#34;: &#34;mandíbula derecha&#34;,
+      &#34;mouthClose&#34;: &#34;boca cerrada&#34;,
+      &#34;mouthDimpleLeft&#34;: &#34;hoyuelo izquierdo&#34;,
+      &#34;mouthDimpleRight&#34;: &#34;hoyuelo derecho&#34;,
+      &#34;mouthFrownLeft&#34;: &#34;ceño boca izquierda&#34;,
+      &#34;mouthFrownRight&#34;: &#34;ceño boca derecha&#34;,
+      &#34;mouthFunnel&#34;: &#34;boca embudo&#34;,
+      &#34;mouthLeft&#34;: &#34;boca izquierda&#34;,
+      &#34;mouthLowerDownLeft&#34;: &#34;boca abajo izquierda&#34;,
+      &#34;mouthLowerDownRight&#34;: &#34;boca abajo derecha&#34;,
+      &#34;mouthPressLeft&#34;: &#34;presión boca izquierda&#34;,
+      &#34;mouthPressRight&#34;: &#34;presión boca derecha&#34;,
+      &#34;mouthPucker&#34;: &#34;boca fruncida&#34;,
+      &#34;mouthRight&#34;: &#34;boca derecha&#34;,
+      &#34;mouthRollLower&#34;: &#34;enrollar inferior de boca&#34;,
+      &#34;mouthRollUpper&#34;: &#34;enrollar superior de boca&#34;,
+      &#34;mouthShrugLower&#34;: &#34;encoger inferior de boca&#34;,
+      &#34;mouthShrugUpper&#34;: &#34;encoger superior de boca&#34;,
+      &#34;mouthSmileLeft&#34;: &#34;sonrisa izquierda&#34;,
+      &#34;mouthSmileRight&#34;: &#34;sonrisa derecha&#34;,
+      &#34;mouthStretchLeft&#34;: &#34;estiramiento boca izquierda&#34;,
+      &#34;mouthStretchRight&#34;: &#34;estiramiento boca derecha&#34;,
+      &#34;mouthUpperUpLeft&#34;: &#34;parte superior boca arriba izquierda&#34;,
+      &#34;mouthUpperUpRight&#34;: &#34;parte superior boca arriba derecha&#34;,
+      &#34;noseSneerLeft&#34;: &#34;arrugar nariz izquierda&#34;,
+      &#34;noseSneerRight&#34;: &#34;arrugar nariz derecha&#34;
+      }
+      &#34;&#34;&#34;
       
       #-------------------------------------------------------------------------
       @classmethod
@@ -149,7 +217,38 @@ class FaceLandmarks(Block):
                                                       connection_drawing_spec=mp.solutions.drawing_styles.get_default_face_mesh_iris_connections_style())
         
           return annotated_image    
+          
+      #-------------------------------------------------------------------------
+      @classmethod
+      def plot_features(cls, features):
+        names  = [item[&#34;name&#34; ] for item in features];
+        scores = [item[&#34;score&#34;] for item in features];
+        
+        ranks = range(len(names));
 
+        with BytesIO() as buff:
+             fig, ax = plt.subplots(figsize=(10, 10));
+             bar = ax.barh(ranks, scores, label=[str(x) for x in ranks]);
+             ax.set_yticks(ranks, names);
+             ax.invert_yaxis();
+
+             for score, patch in zip(scores, bar.patches):
+                 plt.text(patch.get_x() + patch.get_width(), patch.get_y(), f&#34;{score:.2f}&#34;, va=&#34;top&#34;);
+
+             ax.set_xlabel(&#39;Score&#39;);
+             ax.set_title(&#34;Features&#34;);
+             plt.tight_layout();
+
+             plt.savefig(buff, format=&#39;png&#39;);
+             buff.seek(0);
+             image = PIL.Image.open(buff)
+             image.load();
+
+             buff.close();
+             plt.close();
+
+        return image;
+          
       #-------------------------------------------------------------------------
       # SLOTS
       #-------------------------------------------------------------------------
@@ -159,7 +258,7 @@ class FaceLandmarks(Block):
           if data:
              image = data.convert(&#39;RGB&#39;);  
              image = mp.Image(image_format=mp.ImageFormat.SRGB, data=np.asarray(image));
-             results = self._model.detect(image)
+             results = self._model.detect(image);
 
              if self.signal_image():
                 image = image.numpy_view();
@@ -177,20 +276,41 @@ class FaceLandmarks(Block):
                 salida = FaceLandmarks.draw_landmarks_on_image(image, results, self.params);
                 self.signal_image(PIL.Image.fromarray(salida));
 
-             rt=[];
-             for idx in range(len(results.face_landmarks)):
-                 landmarks   = results.face_landmarks[idx];
-                 blendshapes = results.face_blendshapes[idx];
-                 face={&#34;kind&#34;:f&#34;face::{0}&#34;, &#34;trust&#34;:0.0, &#34;xy&#34;:[], &#34;z&#34;:[], &#34;blendshapes&#34;:[] };
-                 for l, lm in enumerate(landmarks):
-                     face[&#34;xy&#34;        ].append((lm.x, lm.y));
-                     face[&#34;z&#34;         ].append(lm.z);
-                 for b, bs in enumerate(blendshapes):
-                     face[&#34;blendshapes&#34;].append( {&#34;index&#34;:bs.index, &#34;score&#34;:bs.score, &#34;name&#34;:bs.category_name} );
-                 rt.append(face);
+             if self.signal_landmarks():
+                rt=[];
+                for idx in range(len(results.face_landmarks)):
+                    landmarks   = results.face_landmarks[idx];
+                    blendshapes = results.face_blendshapes[idx];
+                    matrix      = results.facial_transformation_matrixes[idx];
+                    face={&#34;kind&#34;:f&#34;face::{0}&#34;, &#34;trust&#34;:0.0, &#34;matrix&#34;:matrix, &#34;xyz&#34;:[]};
+                    for lm in landmarks:
+                        face[&#34;xyz&#34;].append((lm.x, lm.y, lm.z));
+                    rt.append(face);
+                    
+                self.signal_landmarks(rt);
 
-             self.signal_landmarks(rt);
-
+             if self.signal_features():
+                rt=[];
+                for idx in range(len(results.face_landmarks)):
+                    blendshapes = results.face_blendshapes[idx];
+                    face = [ {&#34;index&#34;:bs.index, &#34;score&#34;:bs.score, &#34;name&#34;:bs.category_name} for bs in blendshapes ];
+                    rt.append(face);
+                    
+                self.signal_features(rt);
+                
+             if self.signal_plot():
+                if len(results.face_landmarks) &gt; 0:
+                   for idx in range(len(results.face_landmarks)):
+                       blendshapes = results.face_blendshapes[idx];
+                       face = [ {&#34;index&#34;:bs.index, &#34;score&#34;:bs.score, &#34;name&#34;:bs.category_name} for bs in blendshapes ];
+                       image = FaceLandmarks.plot_features(face);
+                       self.signal_plot(image);
+                else:
+                   if self.params.emptyPlot:
+                      face=[{&#34;index&#34;:n, &#34;score&#34;:0.0, &#34;name&#34;:FaceLandmarks.names(n)} for n in range(52)];
+                      image = FaceLandmarks.plot_features(face);
+                      self.signal_plot(image);
+                
      #-------------------------------------------------------------------------
       # SIGNALS
       #-------------------------------------------------------------------------
@@ -198,9 +318,18 @@ class FaceLandmarks(Block):
       def signal_image(self, data):
           return data;
 
+      @Block.signal(&#34;plot&#34;, Image)
+      def signal_plot(self, data):
+          return data;
+
       #-------------------------------------------------------------------------
       @Block.signal(&#34;landmarks&#34;, list)
       def signal_landmarks(self, data):
+          return data;
+
+      #-------------------------------------------------------------------------
+      @Block.signal(&#34;features&#34;, list)
+      def signal_features(self, data):
           return data;</code></pre>
 </details>
 </section>
@@ -234,14 +363,22 @@ class FaceLandmarks(Block):
           cwd = os.path.dirname(__file__);
           mwd = os.path.join(cwd, &#39;../../models&#39;);
           fwd = os.path.join(cwd, &#39;../../fonts&#39;);
+          
+          num_faces=self.params.faces or 1;
 
           base_options = python.BaseOptions(model_asset_path=os.path.join(mwd,&#39;face_landmarker.task&#39;));
-          options = vision.FaceLandmarkerOptions(base_options=base_options, output_face_blendshapes=True, output_facial_transformation_matrixes=True, num_faces=1);
+          options = vision.FaceLandmarkerOptions(base_options=base_options,
+                                                 output_face_blendshapes=True,
+                                                 output_facial_transformation_matrixes=True,
+                                                 num_faces=num_faces);
           self._model = vision.FaceLandmarker.create_from_options(options);
 
       #-------------------------------------------------------------------------
       @classmethod
-      def names(cls, idx):
+      def names(cls, idx=None):
+          
+          if idx is None: return 52;
+          
           if idx== 0: return &#34;_neutral&#34;;
           if idx== 1: return &#34;browDownLeft&#34;;
           if idx== 2: return &#34;browDownRight&#34;;
@@ -295,6 +432,63 @@ class FaceLandmarks(Block):
           if idx==50: return &#34;noseSneerLeft&#34;;
           if idx==51: return &#34;noseSneerRight&#34;;
           raise KeyError(f&#34;El índice {idx} no se corresponde con ningún face::landmark.&#34;);
+          
+      &#34;&#34;&#34;
+      traducciones = {
+      &#34;_neutral&#34;: &#34;neutral&#34;,
+      &#34;browDownLeft&#34;: &#34;ceño fruncido izquierdo&#34;,
+      &#34;browDownRight&#34;: &#34;ceño fruncido derecho&#34;,
+      &#34;browInnerUp&#34;: &#34;ceño elevado interior&#34;,
+      &#34;browOuterUpLeft&#34;: &#34;ceño elevado exterior izquierdo&#34;,
+      &#34;browOuterUpRight&#34;: &#34;ceño elevado exterior derecho&#34;,
+      &#34;cheekPuff&#34;: &#34;inflar mejillas&#34;,
+      &#34;cheekSquintLeft&#34;: &#34;entrecerrar mejilla izquierda&#34;,
+      &#34;cheekSquintRight&#34;: &#34;entrecerrar mejilla derecha&#34;,
+      &#34;eyeBlinkLeft&#34;: &#34;parpadeo izquierdo&#34;,
+      &#34;eyeBlinkRight&#34;: &#34;parpadeo derecho&#34;,
+      &#34;eyeLookDownLeft&#34;: &#34;mirada abajo izquierda&#34;,
+      &#34;eyeLookDownRight&#34;: &#34;mirada abajo derecha&#34;,
+      &#34;eyeLookInLeft&#34;: &#34;mirada hacia dentro izquierda&#34;,
+      &#34;eyeLookInRight&#34;: &#34;mirada hacia dentro derecha&#34;,
+      &#34;eyeLookOutLeft&#34;: &#34;mirada hacia fuera izquierda&#34;,
+      &#34;eyeLookOutRight&#34;: &#34;mirada hacia fuera derecha&#34;,
+      &#34;eyeLookUpLeft&#34;: &#34;mirada arriba izquierda&#34;,
+      &#34;eyeLookUpRight&#34;: &#34;mirada arriba derecha&#34;,
+      &#34;eyeSquintLeft&#34;: &#34;ojo entrecerrado izquierdo&#34;,
+      &#34;eyeSquintRight&#34;: &#34;ojo entrecerrado derecho&#34;,
+      &#34;eyeWideLeft&#34;: &#34;ojo muy abierto izquierdo&#34;,
+      &#34;eyeWideRight&#34;: &#34;ojo muy abierto derecho&#34;,
+      &#34;jawForward&#34;: &#34;mandíbula hacia adelante&#34;,
+      &#34;jawLeft&#34;: &#34;mandíbula izquierda&#34;,
+      &#34;jawOpen&#34;: &#34;mandíbula abierta&#34;,
+      &#34;jawRight&#34;: &#34;mandíbula derecha&#34;,
+      &#34;mouthClose&#34;: &#34;boca cerrada&#34;,
+      &#34;mouthDimpleLeft&#34;: &#34;hoyuelo izquierdo&#34;,
+      &#34;mouthDimpleRight&#34;: &#34;hoyuelo derecho&#34;,
+      &#34;mouthFrownLeft&#34;: &#34;ceño boca izquierda&#34;,
+      &#34;mouthFrownRight&#34;: &#34;ceño boca derecha&#34;,
+      &#34;mouthFunnel&#34;: &#34;boca embudo&#34;,
+      &#34;mouthLeft&#34;: &#34;boca izquierda&#34;,
+      &#34;mouthLowerDownLeft&#34;: &#34;boca abajo izquierda&#34;,
+      &#34;mouthLowerDownRight&#34;: &#34;boca abajo derecha&#34;,
+      &#34;mouthPressLeft&#34;: &#34;presión boca izquierda&#34;,
+      &#34;mouthPressRight&#34;: &#34;presión boca derecha&#34;,
+      &#34;mouthPucker&#34;: &#34;boca fruncida&#34;,
+      &#34;mouthRight&#34;: &#34;boca derecha&#34;,
+      &#34;mouthRollLower&#34;: &#34;enrollar inferior de boca&#34;,
+      &#34;mouthRollUpper&#34;: &#34;enrollar superior de boca&#34;,
+      &#34;mouthShrugLower&#34;: &#34;encoger inferior de boca&#34;,
+      &#34;mouthShrugUpper&#34;: &#34;encoger superior de boca&#34;,
+      &#34;mouthSmileLeft&#34;: &#34;sonrisa izquierda&#34;,
+      &#34;mouthSmileRight&#34;: &#34;sonrisa derecha&#34;,
+      &#34;mouthStretchLeft&#34;: &#34;estiramiento boca izquierda&#34;,
+      &#34;mouthStretchRight&#34;: &#34;estiramiento boca derecha&#34;,
+      &#34;mouthUpperUpLeft&#34;: &#34;parte superior boca arriba izquierda&#34;,
+      &#34;mouthUpperUpRight&#34;: &#34;parte superior boca arriba derecha&#34;,
+      &#34;noseSneerLeft&#34;: &#34;arrugar nariz izquierda&#34;,
+      &#34;noseSneerRight&#34;: &#34;arrugar nariz derecha&#34;
+      }
+      &#34;&#34;&#34;
       
       #-------------------------------------------------------------------------
       @classmethod
@@ -330,7 +524,38 @@ class FaceLandmarks(Block):
                                                       connection_drawing_spec=mp.solutions.drawing_styles.get_default_face_mesh_iris_connections_style())
         
           return annotated_image    
+          
+      #-------------------------------------------------------------------------
+      @classmethod
+      def plot_features(cls, features):
+        names  = [item[&#34;name&#34; ] for item in features];
+        scores = [item[&#34;score&#34;] for item in features];
+        
+        ranks = range(len(names));
 
+        with BytesIO() as buff:
+             fig, ax = plt.subplots(figsize=(10, 10));
+             bar = ax.barh(ranks, scores, label=[str(x) for x in ranks]);
+             ax.set_yticks(ranks, names);
+             ax.invert_yaxis();
+
+             for score, patch in zip(scores, bar.patches):
+                 plt.text(patch.get_x() + patch.get_width(), patch.get_y(), f&#34;{score:.2f}&#34;, va=&#34;top&#34;);
+
+             ax.set_xlabel(&#39;Score&#39;);
+             ax.set_title(&#34;Features&#34;);
+             plt.tight_layout();
+
+             plt.savefig(buff, format=&#39;png&#39;);
+             buff.seek(0);
+             image = PIL.Image.open(buff)
+             image.load();
+
+             buff.close();
+             plt.close();
+
+        return image;
+          
       #-------------------------------------------------------------------------
       # SLOTS
       #-------------------------------------------------------------------------
@@ -340,7 +565,7 @@ class FaceLandmarks(Block):
           if data:
              image = data.convert(&#39;RGB&#39;);  
              image = mp.Image(image_format=mp.ImageFormat.SRGB, data=np.asarray(image));
-             results = self._model.detect(image)
+             results = self._model.detect(image);
 
              if self.signal_image():
                 image = image.numpy_view();
@@ -358,20 +583,41 @@ class FaceLandmarks(Block):
                 salida = FaceLandmarks.draw_landmarks_on_image(image, results, self.params);
                 self.signal_image(PIL.Image.fromarray(salida));
 
-             rt=[];
-             for idx in range(len(results.face_landmarks)):
-                 landmarks   = results.face_landmarks[idx];
-                 blendshapes = results.face_blendshapes[idx];
-                 face={&#34;kind&#34;:f&#34;face::{0}&#34;, &#34;trust&#34;:0.0, &#34;xy&#34;:[], &#34;z&#34;:[], &#34;blendshapes&#34;:[] };
-                 for l, lm in enumerate(landmarks):
-                     face[&#34;xy&#34;        ].append((lm.x, lm.y));
-                     face[&#34;z&#34;         ].append(lm.z);
-                 for b, bs in enumerate(blendshapes):
-                     face[&#34;blendshapes&#34;].append( {&#34;index&#34;:bs.index, &#34;score&#34;:bs.score, &#34;name&#34;:bs.category_name} );
-                 rt.append(face);
+             if self.signal_landmarks():
+                rt=[];
+                for idx in range(len(results.face_landmarks)):
+                    landmarks   = results.face_landmarks[idx];
+                    blendshapes = results.face_blendshapes[idx];
+                    matrix      = results.facial_transformation_matrixes[idx];
+                    face={&#34;kind&#34;:f&#34;face::{0}&#34;, &#34;trust&#34;:0.0, &#34;matrix&#34;:matrix, &#34;xyz&#34;:[]};
+                    for lm in landmarks:
+                        face[&#34;xyz&#34;].append((lm.x, lm.y, lm.z));
+                    rt.append(face);
+                    
+                self.signal_landmarks(rt);
 
-             self.signal_landmarks(rt);
-
+             if self.signal_features():
+                rt=[];
+                for idx in range(len(results.face_landmarks)):
+                    blendshapes = results.face_blendshapes[idx];
+                    face = [ {&#34;index&#34;:bs.index, &#34;score&#34;:bs.score, &#34;name&#34;:bs.category_name} for bs in blendshapes ];
+                    rt.append(face);
+                    
+                self.signal_features(rt);
+                
+             if self.signal_plot():
+                if len(results.face_landmarks) &gt; 0:
+                   for idx in range(len(results.face_landmarks)):
+                       blendshapes = results.face_blendshapes[idx];
+                       face = [ {&#34;index&#34;:bs.index, &#34;score&#34;:bs.score, &#34;name&#34;:bs.category_name} for bs in blendshapes ];
+                       image = FaceLandmarks.plot_features(face);
+                       self.signal_plot(image);
+                else:
+                   if self.params.emptyPlot:
+                      face=[{&#34;index&#34;:n, &#34;score&#34;:0.0, &#34;name&#34;:FaceLandmarks.names(n)} for n in range(52)];
+                      image = FaceLandmarks.plot_features(face);
+                      self.signal_plot(image);
+                
      #-------------------------------------------------------------------------
       # SIGNALS
       #-------------------------------------------------------------------------
@@ -379,9 +625,18 @@ class FaceLandmarks(Block):
       def signal_image(self, data):
           return data;
 
+      @Block.signal(&#34;plot&#34;, Image)
+      def signal_plot(self, data):
+          return data;
+
       #-------------------------------------------------------------------------
       @Block.signal(&#34;landmarks&#34;, list)
       def signal_landmarks(self, data):
+          return data;
+
+      #-------------------------------------------------------------------------
+      @Block.signal(&#34;features&#34;, list)
+      def signal_features(self, data):
           return data;</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -436,7 +691,7 @@ def draw_landmarks_on_image(cls, rgb_image, detection_result, params):
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.faceLandmarks.FaceLandmarks.names"><code class="name flex">
-<span>def <span class="ident">names</span></span>(<span>idx)</span>
+<span>def <span class="ident">names</span></span>(<span>idx=None)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -445,7 +700,10 @@ def draw_landmarks_on_image(cls, rgb_image, detection_result, params):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">@classmethod
-def names(cls, idx):
+def names(cls, idx=None):
+    
+    if idx is None: return 52;
+    
     if idx== 0: return &#34;_neutral&#34;;
     if idx== 1: return &#34;browDownLeft&#34;;
     if idx== 2: return &#34;browDownRight&#34;;
@@ -501,11 +759,70 @@ def names(cls, idx):
     raise KeyError(f&#34;El índice {idx} no se corresponde con ningún face::landmark.&#34;);</code></pre>
 </details>
 </dd>
+<dt id="ml4teens.blocks.img.faceLandmarks.FaceLandmarks.plot_features"><code class="name flex">
+<span>def <span class="ident">plot_features</span></span>(<span>features)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@classmethod
+def plot_features(cls, features):
+  names  = [item[&#34;name&#34; ] for item in features];
+  scores = [item[&#34;score&#34;] for item in features];
+  
+  ranks = range(len(names));
+
+  with BytesIO() as buff:
+       fig, ax = plt.subplots(figsize=(10, 10));
+       bar = ax.barh(ranks, scores, label=[str(x) for x in ranks]);
+       ax.set_yticks(ranks, names);
+       ax.invert_yaxis();
+
+       for score, patch in zip(scores, bar.patches):
+           plt.text(patch.get_x() + patch.get_width(), patch.get_y(), f&#34;{score:.2f}&#34;, va=&#34;top&#34;);
+
+       ax.set_xlabel(&#39;Score&#39;);
+       ax.set_title(&#34;Features&#34;);
+       plt.tight_layout();
+
+       plt.savefig(buff, format=&#39;png&#39;);
+       buff.seek(0);
+       image = PIL.Image.open(buff)
+       image.load();
+
+       buff.close();
+       plt.close();
+
+  return image;</code></pre>
+</details>
+</dd>
 </dl>
 <h3>Methods</h3>
 <dl>
+<dt id="ml4teens.blocks.img.faceLandmarks.FaceLandmarks.signal_features"><code class="name flex">
+<span>def <span class="ident">signal_features</span></span>(<span>self, data='8c54ec108f155e238f0c011156c428a3196ef23c7de9d2ce2853668c877c2de2')</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def wrapper(self, data=_unique_):
+    using=self.checkSignalUsage(name);
+    if data is _unique_:
+       return using;
+    else:
+       if using:
+          data=func(self,data);
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+</details>
+</dd>
 <dt id="ml4teens.blocks.img.faceLandmarks.FaceLandmarks.signal_image"><code class="name flex">
-<span>def <span class="ident">signal_image</span></span>(<span>self, data='70c2c6141a129added27127932442a25a3f106f2569e184ba1683561097ca48a')</span>
+<span>def <span class="ident">signal_image</span></span>(<span>self, data='1b87e7797ab9cd12f289f4676476f5d1de44c95fee1a1ef9413dc2cef88426c1')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -524,7 +841,26 @@ def names(cls, idx):
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.faceLandmarks.FaceLandmarks.signal_landmarks"><code class="name flex">
-<span>def <span class="ident">signal_landmarks</span></span>(<span>self, data='53c8867e53ceebf594c732b2162ee4c10e02539c6f4f6b2353b8fbbdf30f513d')</span>
+<span>def <span class="ident">signal_landmarks</span></span>(<span>self, data='54523734b8f34dbc12954cbf71e347201ab5a1fa4d8170720f9c43ac00f5b526')</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def wrapper(self, data=_unique_):
+    using=self.checkSignalUsage(name);
+    if data is _unique_:
+       return using;
+    else:
+       if using:
+          data=func(self,data);
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+</details>
+</dd>
+<dt id="ml4teens.blocks.img.faceLandmarks.FaceLandmarks.signal_plot"><code class="name flex">
+<span>def <span class="ident">signal_plot</span></span>(<span>self, data='72a89e519feafc61cbd48364e25cf62f83fa13372052200392d12ec555e72cc6')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -563,13 +899,12 @@ def names(cls, idx):
       if self.params.done is not None:
          if callable(self.params.done):
             done=self.params.done(data);
-            self.signal_done(done);
          else:
             done=self.params.done;
-            self.signal_done(done);
+         self.signal_done(done);
       else:
-         if bool(done) is True: # SUGGEST: enviar el valor de &#39;done&#39; si no es None.
-            self.signal_done(f&#34;{self._fullClassName}::{_slot}&#34;);
+         if done is not None:
+            self.signal_done(done);
          
     except Exception as e:
       debug.print(f&#34;{cls}:: Excepción: &#39;{e}&#39;&#34;, exception=e);
@@ -609,8 +944,11 @@ def names(cls, idx):
 <ul class="">
 <li><code><a title="ml4teens.blocks.img.faceLandmarks.FaceLandmarks.draw_landmarks_on_image" href="#ml4teens.blocks.img.faceLandmarks.FaceLandmarks.draw_landmarks_on_image">draw_landmarks_on_image</a></code></li>
 <li><code><a title="ml4teens.blocks.img.faceLandmarks.FaceLandmarks.names" href="#ml4teens.blocks.img.faceLandmarks.FaceLandmarks.names">names</a></code></li>
+<li><code><a title="ml4teens.blocks.img.faceLandmarks.FaceLandmarks.plot_features" href="#ml4teens.blocks.img.faceLandmarks.FaceLandmarks.plot_features">plot_features</a></code></li>
+<li><code><a title="ml4teens.blocks.img.faceLandmarks.FaceLandmarks.signal_features" href="#ml4teens.blocks.img.faceLandmarks.FaceLandmarks.signal_features">signal_features</a></code></li>
 <li><code><a title="ml4teens.blocks.img.faceLandmarks.FaceLandmarks.signal_image" href="#ml4teens.blocks.img.faceLandmarks.FaceLandmarks.signal_image">signal_image</a></code></li>
 <li><code><a title="ml4teens.blocks.img.faceLandmarks.FaceLandmarks.signal_landmarks" href="#ml4teens.blocks.img.faceLandmarks.FaceLandmarks.signal_landmarks">signal_landmarks</a></code></li>
+<li><code><a title="ml4teens.blocks.img.faceLandmarks.FaceLandmarks.signal_plot" href="#ml4teens.blocks.img.faceLandmarks.FaceLandmarks.signal_plot">signal_plot</a></code></li>
 <li><code><a title="ml4teens.blocks.img.faceLandmarks.FaceLandmarks.slot_image" href="#ml4teens.blocks.img.faceLandmarks.FaceLandmarks.slot_image">slot_image</a></code></li>
 </ul>
 </li>

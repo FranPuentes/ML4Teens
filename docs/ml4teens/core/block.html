@@ -222,13 +222,12 @@ class Block(ABC):
                     if self.params.done is not None:
                        if callable(self.params.done):
                           done=self.params.done(data);
-                          self.signal_done(done);
                        else:
                           done=self.params.done;
-                          self.signal_done(done);
+                       self.signal_done(done);
                     else:
-                       if bool(done) is True: # SUGGEST: enviar el valor de &#39;done&#39; si no es None.
-                          self.signal_done(f&#34;{self._fullClassName}::{_slot}&#34;);
+                       if done is not None:
+                          self.signal_done(done);
                        
                   except Exception as e:
                     debug.print(f&#34;{cls}:: Excepción: &#39;{e}&#39;&#34;, exception=e);
@@ -499,13 +498,12 @@ class Block(ABC):
                     if self.params.done is not None:
                        if callable(self.params.done):
                           done=self.params.done(data);
-                          self.signal_done(done);
                        else:
                           done=self.params.done;
-                          self.signal_done(done);
+                       self.signal_done(done);
                     else:
-                       if bool(done) is True: # SUGGEST: enviar el valor de &#39;done&#39; si no es None.
-                          self.signal_done(f&#34;{self._fullClassName}::{_slot}&#34;);
+                       if done is not None:
+                          self.signal_done(done);
                        
                   except Exception as e:
                     debug.print(f&#34;{cls}:: Excepción: &#39;{e}&#39;&#34;, exception=e);
@@ -683,6 +681,8 @@ class Block(ABC):
 <ul class="hlist">
 <li><a title="ml4teens.blocks.display.Display" href="../blocks/display.html#ml4teens.blocks.display.Display">Display</a></li>
 <li><a title="ml4teens.blocks.drain.Drain" href="../blocks/drain.html#ml4teens.blocks.drain.Drain">Drain</a></li>
+<li><a title="ml4teens.blocks.ds.dataLabelizer.DataLabelizer" href="../blocks/ds/dataLabelizer.html#ml4teens.blocks.ds.dataLabelizer.DataLabelizer">DataLabelizer</a></li>
+<li><a title="ml4teens.blocks.ds.dataWarehouse.DataWarehouse" href="../blocks/ds/dataWarehouse.html#ml4teens.blocks.ds.dataWarehouse.DataWarehouse">DataWarehouse</a></li>
 <li><a title="ml4teens.blocks.forEach.ForEach" href="../blocks/forEach.html#ml4teens.blocks.forEach.ForEach">ForEach</a></li>
 <li><a title="ml4teens.blocks.ifElse.IfElse" href="../blocks/ifElse.html#ml4teens.blocks.ifElse.IfElse">IfElse</a></li>
 <li><a title="ml4teens.blocks.img.convertImage.ConvertImage" href="../blocks/img/convertImage.html#ml4teens.blocks.img.convertImage.ConvertImage">ConvertImage</a></li>
@@ -717,6 +717,7 @@ class Block(ABC):
 <li><a title="ml4teens.blocks.txt.inputText.InputText" href="../blocks/txt/inputText.html#ml4teens.blocks.txt.inputText.InputText">InputText</a></li>
 <li><a title="ml4teens.blocks.txt.oaiChat.OAIChat" href="../blocks/txt/oaiChat.html#ml4teens.blocks.txt.oaiChat.OAIChat">OAIChat</a></li>
 <li><a title="ml4teens.blocks.value.Value" href="../blocks/value.html#ml4teens.blocks.value.Value">Value</a></li>
+<li><a title="ml4teens.blocks.values.Values" href="../blocks/values.html#ml4teens.blocks.values.Values">Values</a></li>
 </ul>
 <h3>Static methods</h3>
 <dl>
@@ -779,13 +780,12 @@ def slot(name, typedecl, default=None):
               if self.params.done is not None:
                  if callable(self.params.done):
                     done=self.params.done(data);
-                    self.signal_done(done);
                  else:
                     done=self.params.done;
-                    self.signal_done(done);
+                 self.signal_done(done);
               else:
-                 if bool(done) is True: # SUGGEST: enviar el valor de &#39;done&#39; si no es None.
-                    self.signal_done(f&#34;{self._fullClassName}::{_slot}&#34;);
+                 if done is not None:
+                    self.signal_done(done);
                  
             except Exception as e:
               debug.print(f&#34;{cls}:: Excepción: &#39;{e}&#39;&#34;, exception=e);

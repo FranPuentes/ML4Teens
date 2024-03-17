@@ -290,7 +290,7 @@ class TrimImage(Block):
 <h3>Methods</h3>
 <dl>
 <dt id="ml4teens.blocks.img.trimImage.TrimImage.signal_image"><code class="name flex">
-<span>def <span class="ident">signal_image</span></span>(<span>self, data='5bf62992eb8eac81350f1a1f10c14cfe2c7c671e79d6a11d4c2e0e7e8a94b190')</span>
+<span>def <span class="ident">signal_image</span></span>(<span>self, data='71f167da322bdd725b21f92f04b1649cd78f67e28647aa89caee9d8a9374fcdd')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -329,13 +329,12 @@ class TrimImage(Block):
       if self.params.done is not None:
          if callable(self.params.done):
             done=self.params.done(data);
-            self.signal_done(done);
          else:
             done=self.params.done;
-            self.signal_done(done);
+         self.signal_done(done);
       else:
-         if bool(done) is True: # SUGGEST: enviar el valor de &#39;done&#39; si no es None.
-            self.signal_done(f&#34;{self._fullClassName}::{_slot}&#34;);
+         if done is not None:
+            self.signal_done(done);
          
     except Exception as e:
       debug.print(f&#34;{cls}:: Excepción: &#39;{e}&#39;&#34;, exception=e);
@@ -365,13 +364,12 @@ class TrimImage(Block):
       if self.params.done is not None:
          if callable(self.params.done):
             done=self.params.done(data);
-            self.signal_done(done);
          else:
             done=self.params.done;
-            self.signal_done(done);
+         self.signal_done(done);
       else:
-         if bool(done) is True: # SUGGEST: enviar el valor de &#39;done&#39; si no es None.
-            self.signal_done(f&#34;{self._fullClassName}::{_slot}&#34;);
+         if done is not None:
+            self.signal_done(done);
          
     except Exception as e:
       debug.print(f&#34;{cls}:: Excepción: &#39;{e}&#39;&#34;, exception=e);

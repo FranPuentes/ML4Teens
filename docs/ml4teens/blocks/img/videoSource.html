@@ -45,9 +45,9 @@ class VideoSource(Block):
       # speed:float [0,10]
       def __init__(self, **kwargs):
           super().__init__(**kwargs);
-          self.sync=True;
           
           self._source=None;
+          self._device=None;
           self._fuente=None;
           self._istemp=None;
           self._fd    =None;
@@ -55,9 +55,9 @@ class VideoSource(Block):
           self._delay =None;
           
       #-------------------------------------------------------------------------
-      def __del__(self):
+      def close(self):
           self.reset();
-
+          
       #-------------------------------------------------------------------------
       def reset(self):
       
@@ -69,6 +69,7 @@ class VideoSource(Block):
              
           self._fd    =None;
           self._source=None;
+          self._device=None;
           self._fuente=None;
           self._istemp=None;
           self._tm    =None;
@@ -108,17 +109,10 @@ class VideoSource(Block):
           return imagen.resize((width, height));
           
       #-------------------------------------------------------------------------
-      @Block.signal(&#34;source&#34;, str)
-      def signal_source(self, data):
-          return data;
+      #@Block.signal(&#34;source&#34;, str)
+      #def signal_source(self, data):
+      #    return data;
 
-      #-------------------------------------------------------------------------
-      &#34;&#34;&#34;
-      @Block.signal(&#34;device&#34;, int)
-      def signal_frame(self, frame):
-          return frame;
-      &#34;&#34;&#34;
-      
       #-------------------------------------------------------------------------
       @Block.signal(&#34;frame&#34;, Image)
       def signal_frame(self, frame):
@@ -148,78 +142,105 @@ class VideoSource(Block):
       @Block.slot(&#34;source&#34;, {str,int})
       def slot_source(self, slot, source):
 
-          # TODO &#39;fuente&#39; puede ser un número de dispositivo! Y lo será.
-          
-          # TODO mandar la señal &#39;source&#39;
-          # TODO mandar la señal &#39;device&#39;
-
           self.reset();
           
-          self._source=source;
+          if type(source) is str:
           
-          if self._source.startswith(&#34;http&#34;):
-             with requests.get(self._source, stream=True) as r:
-                  r.raise_for_status();
-                  with NamedTemporaryFile(delete=False, suffix=&#39;.mp4&#39;) as f:
-                       for chunk in r.iter_content(chunk_size=65536//8):
-                           f.write(chunk);
-                       self._fuente = f.name;
-                       self._istemp = True;
-          else:
-             self._fuente = self._source;
-             self._istemp = False;
+             self._source=source;
+             self._device=None;
+             
+             if self._source.startswith(&#34;http&#34;):
+                with requests.get(self._source, stream=True) as r:
+                     r.raise_for_status();
+                     with NamedTemporaryFile(delete=False, suffix=&#39;.mp4&#39;) as f:
+                          for chunk in r.iter_content(chunk_size=65536//8):
+                              f.write(chunk);
+                          self._fuente = f.name;
+                          self._istemp = True;
+             else:
+                self._fuente = self._source;
+                self._istemp = False;
 
-          if not os.path.exists(self._fuente): raise RuntimeError(f&#34;El fichero &#39;{self._fuente}&#39;, no existe.&#34;);
+             if not os.path.exists(self._fuente): raise RuntimeError(f&#34;El fichero &#39;{self._fuente}&#39;, no existe.&#34;);
 
-          self._fd = cv.VideoCapture(self._fuente);
+             self._fd = cv.VideoCapture(self._fuente);
+             
+          elif type(source) is int:
+             
+             self._source=None;
+             self._device=source;
+             
+             self._fd = cv.VideoCapture(self._device);
+             
+             if self.params.closeButton:
+                text=&#34;Cerrar Webcam&#34;;
+                if self.params.closeButton is str and len(self.params.closeButton)&gt;0:
+                   text=self.params.closeButton;
+                import ipywidgets as widgets;
+                from IPython.display import display;
+                button = widgets.Button(description=text);
+                button.style.button_color = &#39;lightgreen&#39;;  # Cambiar el color de fondo del botón
+                button.style.font_weight = &#39;bold&#39;;         # Cambiar el peso de la fuente a negrita
+                button.layout.width = &#39;200px&#39;;             # Cambiar el ancho del botón
+                button.layout.height = &#39;40px&#39;;             # Cambiar la altura del botón
+                button.layout.border = &#39;2px solid black&#39;;  # Agregar un borde al botón
+                button.on_click(lambda _: self.close());
+                display(button);
+          
           try:
-            if not self._fd.isOpened():
-               raise RuntimeError(f&#34;Error al abrir el vídeo &#39;{self._fuente}&#39;&#34;);
+            if self._fd is None or not self._fd.isOpened():
+               raise RuntimeError(f&#34;Error al abrir el vídeo &#39;{source}&#39;&#34;);
                
             else:
-                ancho       = self._fd.get(cv.CAP_PROP_FRAME_WIDTH);
-                alto        = self._fd.get(cv.CAP_PROP_FRAME_HEIGHT);
-                fps         = self._fd.get(cv.CAP_PROP_FPS);
-                frames      = self._fd.get(cv.CAP_PROP_FRAME_COUNT);
-                codificador = int(self._fd.get(cv.CAP_PROP_FOURCC));
+               ancho       = self._fd.get(cv.CAP_PROP_FRAME_WIDTH);
+               alto        = self._fd.get(cv.CAP_PROP_FRAME_HEIGHT);
+               fps         = self._fd.get(cv.CAP_PROP_FPS);
+               frames      = self._fd.get(cv.CAP_PROP_FRAME_COUNT);
+               codificador = int(self._fd.get(cv.CAP_PROP_FOURCC));
                 
-                self._delay = 1/fps;
+               self._delay = 1/fps;
                 
-                speed=self.params.speed or 1;
-                self._delay=self._delay*speed;
+               speed=self.params.speed or 1;
+               self._delay=self._delay*speed;
 
-                self.signal_info({&#34;source&#34;:self._source, &#34;width&#34;:ancho, &#34;height&#34;:alto, &#34;fps&#34;:fps, &#34;frames&#34;:frames, &#34;encoder&#34;:codificador, &#34;delay&#34;:int(self._delay*1000) });
+               self.signal_info({&#34;source&#34;:self._source or self._device, 
+                                 &#34;width&#34;:ancho, 
+                                 &#34;height&#34;:alto, 
+                                 &#34;fps&#34;:fps, 
+                                 &#34;frames&#34;:frames, 
+                                 &#34;encoder&#34;:codificador, 
+                                 &#34;delay&#34;:int(self._delay*1000) });
 
-                ok, frame = self._fd.read();
+               ok, frame = self._fd.read();
                 
-                if not ok:
-                   self.signal_end(True);
-                   self.reset();
+               if not ok:
+                  self.signal_end(True);
+                  self.reset();
                 
-                else:
-                   assert len(frame.shape)==2 or (len(frame.shape)==3 and frame.shape[2] in [3, 4]), &#34;Formato de vídeo no soportado&#34;;
+               else:
+                  assert len(frame.shape)==2 or (len(frame.shape)==3 and frame.shape[2] in [3, 4]), &#34;Formato de vídeo no soportado&#34;;
 
-                   self.signal_begin(frames);
+                  self.signal_begin(frames);
                 
-                   if len(frame.shape)==3: shape=(alto,ancho,frame.shape[2]);
-                   else:                   shape=(alto,ancho,1);
-                   self.signal_dims(shape);
+                  if len(frame.shape)==3: shape=(alto,ancho,frame.shape[2]);
+                  else:                   shape=(alto,ancho,1);
+                  self.signal_dims(shape);
                    
-                   self._tm = time.time();
+                  self._tm = time.time();
 
-                   # TODO, quedarnos sólo con unos pocos modos: L, RGB, RGBA, ...
+                  # TODO, quedarnos sólo con unos pocos modos: L, RGB, RGBA, ...
                    
-                   if len(frame.shape)==2:
-                      frame=frame;
-                   else:
-                      if frame.shape[2]==3:
-                         frame=cv.cvtColor(frame, cv.COLOR_BGR2RGB);
-                      else:
-                         frame=cv.cvtColor(frame, cv.COLOR_BGRA2RGBA);
+                  if len(frame.shape)==2:
+                     frame=frame;
+                  else:
+                     if frame.shape[2]==3:
+                        frame=cv.cvtColor(frame, cv.COLOR_BGR2RGB);
+                     else:
+                        frame=cv.cvtColor(frame, cv.COLOR_BGRA2RGBA);
                              
-                   frame = PIL.Image.fromarray(frame);
-                   frame = self._resize(frame, self.params.width, self.params.height);
-                   self.signal_frame(frame);
+                  frame = PIL.Image.fromarray(frame);
+                  frame = self._resize(frame, self.params.width, self.params.height);
+                  self.signal_frame(frame);
                    
           except Exception as e:
             self.signal_end(False);
@@ -232,8 +253,7 @@ class VideoSource(Block):
 
           if self._fd is None or not self._fd.isOpened():
              self.reset();
-             return
-             #raise RuntimeError(f&#34;Se ha invocado al slot &#39;next&#39; de &#39;{self._fullClassName}&#39; sin tener una fuente abierta.&#34;);
+             return;
              
           try:
             ok, frame = self._fd.read();
@@ -268,7 +288,12 @@ class VideoSource(Block):
           except Exception as e:
             self.signal_end(False);
             self.reset();
-            raise e;</code></pre>
+            raise e;
+
+      #-------------------------------------------------------------------------
+      @Block.slot(&#34;close&#34;, {object})
+      def slot_close(self, slot, _):
+          self.reset();</code></pre>
 </details>
 </section>
 <section>
@@ -296,9 +321,9 @@ class VideoSource(Block):
       # speed:float [0,10]
       def __init__(self, **kwargs):
           super().__init__(**kwargs);
-          self.sync=True;
           
           self._source=None;
+          self._device=None;
           self._fuente=None;
           self._istemp=None;
           self._fd    =None;
@@ -306,9 +331,9 @@ class VideoSource(Block):
           self._delay =None;
           
       #-------------------------------------------------------------------------
-      def __del__(self):
+      def close(self):
           self.reset();
-
+          
       #-------------------------------------------------------------------------
       def reset(self):
       
@@ -320,6 +345,7 @@ class VideoSource(Block):
              
           self._fd    =None;
           self._source=None;
+          self._device=None;
           self._fuente=None;
           self._istemp=None;
           self._tm    =None;
@@ -359,17 +385,10 @@ class VideoSource(Block):
           return imagen.resize((width, height));
           
       #-------------------------------------------------------------------------
-      @Block.signal(&#34;source&#34;, str)
-      def signal_source(self, data):
-          return data;
+      #@Block.signal(&#34;source&#34;, str)
+      #def signal_source(self, data):
+      #    return data;
 
-      #-------------------------------------------------------------------------
-      &#34;&#34;&#34;
-      @Block.signal(&#34;device&#34;, int)
-      def signal_frame(self, frame):
-          return frame;
-      &#34;&#34;&#34;
-      
       #-------------------------------------------------------------------------
       @Block.signal(&#34;frame&#34;, Image)
       def signal_frame(self, frame):
@@ -399,78 +418,105 @@ class VideoSource(Block):
       @Block.slot(&#34;source&#34;, {str,int})
       def slot_source(self, slot, source):
 
-          # TODO &#39;fuente&#39; puede ser un número de dispositivo! Y lo será.
-          
-          # TODO mandar la señal &#39;source&#39;
-          # TODO mandar la señal &#39;device&#39;
-
           self.reset();
           
-          self._source=source;
+          if type(source) is str:
           
-          if self._source.startswith(&#34;http&#34;):
-             with requests.get(self._source, stream=True) as r:
-                  r.raise_for_status();
-                  with NamedTemporaryFile(delete=False, suffix=&#39;.mp4&#39;) as f:
-                       for chunk in r.iter_content(chunk_size=65536//8):
-                           f.write(chunk);
-                       self._fuente = f.name;
-                       self._istemp = True;
-          else:
-             self._fuente = self._source;
-             self._istemp = False;
+             self._source=source;
+             self._device=None;
+             
+             if self._source.startswith(&#34;http&#34;):
+                with requests.get(self._source, stream=True) as r:
+                     r.raise_for_status();
+                     with NamedTemporaryFile(delete=False, suffix=&#39;.mp4&#39;) as f:
+                          for chunk in r.iter_content(chunk_size=65536//8):
+                              f.write(chunk);
+                          self._fuente = f.name;
+                          self._istemp = True;
+             else:
+                self._fuente = self._source;
+                self._istemp = False;
 
-          if not os.path.exists(self._fuente): raise RuntimeError(f&#34;El fichero &#39;{self._fuente}&#39;, no existe.&#34;);
+             if not os.path.exists(self._fuente): raise RuntimeError(f&#34;El fichero &#39;{self._fuente}&#39;, no existe.&#34;);
 
-          self._fd = cv.VideoCapture(self._fuente);
+             self._fd = cv.VideoCapture(self._fuente);
+             
+          elif type(source) is int:
+             
+             self._source=None;
+             self._device=source;
+             
+             self._fd = cv.VideoCapture(self._device);
+             
+             if self.params.closeButton:
+                text=&#34;Cerrar Webcam&#34;;
+                if self.params.closeButton is str and len(self.params.closeButton)&gt;0:
+                   text=self.params.closeButton;
+                import ipywidgets as widgets;
+                from IPython.display import display;
+                button = widgets.Button(description=text);
+                button.style.button_color = &#39;lightgreen&#39;;  # Cambiar el color de fondo del botón
+                button.style.font_weight = &#39;bold&#39;;         # Cambiar el peso de la fuente a negrita
+                button.layout.width = &#39;200px&#39;;             # Cambiar el ancho del botón
+                button.layout.height = &#39;40px&#39;;             # Cambiar la altura del botón
+                button.layout.border = &#39;2px solid black&#39;;  # Agregar un borde al botón
+                button.on_click(lambda _: self.close());
+                display(button);
+          
           try:
-            if not self._fd.isOpened():
-               raise RuntimeError(f&#34;Error al abrir el vídeo &#39;{self._fuente}&#39;&#34;);
+            if self._fd is None or not self._fd.isOpened():
+               raise RuntimeError(f&#34;Error al abrir el vídeo &#39;{source}&#39;&#34;);
                
             else:
-                ancho       = self._fd.get(cv.CAP_PROP_FRAME_WIDTH);
-                alto        = self._fd.get(cv.CAP_PROP_FRAME_HEIGHT);
-                fps         = self._fd.get(cv.CAP_PROP_FPS);
-                frames      = self._fd.get(cv.CAP_PROP_FRAME_COUNT);
-                codificador = int(self._fd.get(cv.CAP_PROP_FOURCC));
+               ancho       = self._fd.get(cv.CAP_PROP_FRAME_WIDTH);
+               alto        = self._fd.get(cv.CAP_PROP_FRAME_HEIGHT);
+               fps         = self._fd.get(cv.CAP_PROP_FPS);
+               frames      = self._fd.get(cv.CAP_PROP_FRAME_COUNT);
+               codificador = int(self._fd.get(cv.CAP_PROP_FOURCC));
                 
-                self._delay = 1/fps;
+               self._delay = 1/fps;
                 
-                speed=self.params.speed or 1;
-                self._delay=self._delay*speed;
+               speed=self.params.speed or 1;
+               self._delay=self._delay*speed;
 
-                self.signal_info({&#34;source&#34;:self._source, &#34;width&#34;:ancho, &#34;height&#34;:alto, &#34;fps&#34;:fps, &#34;frames&#34;:frames, &#34;encoder&#34;:codificador, &#34;delay&#34;:int(self._delay*1000) });
+               self.signal_info({&#34;source&#34;:self._source or self._device, 
+                                 &#34;width&#34;:ancho, 
+                                 &#34;height&#34;:alto, 
+                                 &#34;fps&#34;:fps, 
+                                 &#34;frames&#34;:frames, 
+                                 &#34;encoder&#34;:codificador, 
+                                 &#34;delay&#34;:int(self._delay*1000) });
 
-                ok, frame = self._fd.read();
+               ok, frame = self._fd.read();
                 
-                if not ok:
-                   self.signal_end(True);
-                   self.reset();
+               if not ok:
+                  self.signal_end(True);
+                  self.reset();
                 
-                else:
-                   assert len(frame.shape)==2 or (len(frame.shape)==3 and frame.shape[2] in [3, 4]), &#34;Formato de vídeo no soportado&#34;;
+               else:
+                  assert len(frame.shape)==2 or (len(frame.shape)==3 and frame.shape[2] in [3, 4]), &#34;Formato de vídeo no soportado&#34;;
 
-                   self.signal_begin(frames);
+                  self.signal_begin(frames);
                 
-                   if len(frame.shape)==3: shape=(alto,ancho,frame.shape[2]);
-                   else:                   shape=(alto,ancho,1);
-                   self.signal_dims(shape);
+                  if len(frame.shape)==3: shape=(alto,ancho,frame.shape[2]);
+                  else:                   shape=(alto,ancho,1);
+                  self.signal_dims(shape);
                    
-                   self._tm = time.time();
+                  self._tm = time.time();
 
-                   # TODO, quedarnos sólo con unos pocos modos: L, RGB, RGBA, ...
+                  # TODO, quedarnos sólo con unos pocos modos: L, RGB, RGBA, ...
                    
-                   if len(frame.shape)==2:
-                      frame=frame;
-                   else:
-                      if frame.shape[2]==3:
-                         frame=cv.cvtColor(frame, cv.COLOR_BGR2RGB);
-                      else:
-                         frame=cv.cvtColor(frame, cv.COLOR_BGRA2RGBA);
+                  if len(frame.shape)==2:
+                     frame=frame;
+                  else:
+                     if frame.shape[2]==3:
+                        frame=cv.cvtColor(frame, cv.COLOR_BGR2RGB);
+                     else:
+                        frame=cv.cvtColor(frame, cv.COLOR_BGRA2RGBA);
                              
-                   frame = PIL.Image.fromarray(frame);
-                   frame = self._resize(frame, self.params.width, self.params.height);
-                   self.signal_frame(frame);
+                  frame = PIL.Image.fromarray(frame);
+                  frame = self._resize(frame, self.params.width, self.params.height);
+                  self.signal_frame(frame);
                    
           except Exception as e:
             self.signal_end(False);
@@ -483,8 +529,7 @@ class VideoSource(Block):
 
           if self._fd is None or not self._fd.isOpened():
              self.reset();
-             return
-             #raise RuntimeError(f&#34;Se ha invocado al slot &#39;next&#39; de &#39;{self._fullClassName}&#39; sin tener una fuente abierta.&#34;);
+             return;
              
           try:
             ok, frame = self._fd.read();
@@ -519,7 +564,12 @@ class VideoSource(Block):
           except Exception as e:
             self.signal_end(False);
             self.reset();
-            raise e;</code></pre>
+            raise e;
+
+      #-------------------------------------------------------------------------
+      @Block.slot(&#34;close&#34;, {object})
+      def slot_close(self, slot, _):
+          self.reset();</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -528,6 +578,19 @@ class VideoSource(Block):
 </ul>
 <h3>Methods</h3>
 <dl>
+<dt id="ml4teens.blocks.img.videoSource.VideoSource.close"><code class="name flex">
+<span>def <span class="ident">close</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def close(self):
+    self.reset();</code></pre>
+</details>
+</dd>
 <dt id="ml4teens.blocks.img.videoSource.VideoSource.reset"><code class="name flex">
 <span>def <span class="ident">reset</span></span>(<span>self)</span>
 </code></dt>
@@ -547,6 +610,7 @@ class VideoSource(Block):
        
     self._fd    =None;
     self._source=None;
+    self._device=None;
     self._fuente=None;
     self._istemp=None;
     self._tm    =None;
@@ -554,7 +618,7 @@ class VideoSource(Block):
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.videoSource.VideoSource.signal_begin"><code class="name flex">
-<span>def <span class="ident">signal_begin</span></span>(<span>self, data='d15274632a0ecff09068abaaeaa480e0784be077726d11c3cbb44e40f12931b3')</span>
+<span>def <span class="ident">signal_begin</span></span>(<span>self, data='5daf5acd18f0e15fa04c6cf1c6dfd96ef8528b47bdcfe4d085593a86d49299b5')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -573,7 +637,7 @@ class VideoSource(Block):
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.videoSource.VideoSource.signal_dims"><code class="name flex">
-<span>def <span class="ident">signal_dims</span></span>(<span>self, data='e0ac68ea7dacf604d7da01ec06154cd0499de76e37102eccb44c004e537fb0f9')</span>
+<span>def <span class="ident">signal_dims</span></span>(<span>self, data='b88520f92feb4aa601a0f6109f5dc06fb7846448aacca21c7cd620362fd8157a')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -592,7 +656,7 @@ class VideoSource(Block):
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.videoSource.VideoSource.signal_end"><code class="name flex">
-<span>def <span class="ident">signal_end</span></span>(<span>self, data='abebb8a6a8a1d4b9049f9935672cb464f2ad84068657873702c1c7650d395f58')</span>
+<span>def <span class="ident">signal_end</span></span>(<span>self, data='6d07fcbb19dc14e462a381955eacc83727f54394b6c9aac235ba1cddd4cff80f')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -611,7 +675,7 @@ class VideoSource(Block):
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.videoSource.VideoSource.signal_frame"><code class="name flex">
-<span>def <span class="ident">signal_frame</span></span>(<span>self, data='3789f3ba17b92d12a865b3523dc2dfea483100d6d4f249b9f4d694a69508c676')</span>
+<span>def <span class="ident">signal_frame</span></span>(<span>self, data='683c3a7b8d72dc912864805bbaae19cff30d404f630517a5c57b78df25be1cfe')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -630,7 +694,7 @@ class VideoSource(Block):
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.videoSource.VideoSource.signal_info"><code class="name flex">
-<span>def <span class="ident">signal_info</span></span>(<span>self, data='b3cd0a539dff7fc8a21f95b73f1ee71a9fe8cb3cc9a2d8f3a8f56c4608325514')</span>
+<span>def <span class="ident">signal_info</span></span>(<span>self, data='264962adc9e4ca98105388939423da1071bd1502d3061504507b9e77f0ed9adb')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -648,8 +712,8 @@ class VideoSource(Block):
           Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
 </details>
 </dd>
-<dt id="ml4teens.blocks.img.videoSource.VideoSource.signal_source"><code class="name flex">
-<span>def <span class="ident">signal_source</span></span>(<span>self, data='fef65f8b58479ea1d2fcc8ac849ee0d4869aca793d9333f13a25b2fa97d54a9e')</span>
+<dt id="ml4teens.blocks.img.videoSource.VideoSource.slot_close"><code class="name flex">
+<span>def <span class="ident">slot_close</span></span>(<span>self, _slot, data)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -657,14 +721,30 @@ class VideoSource(Block):
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def wrapper(self, data=_unique_):
-    using=self.checkSignalUsage(name);
-    if data is _unique_:
-       return using;
-    else:
-       if using:
-          data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+<pre><code class="python">def wrapper(self, _slot, data):
+    try:
+      assert name == _slot;
+      debug.print(f&#34;Ejecutando {self._fullClassName}::slot(&#39;{_slot}&#39;,{type(data).__name__})&#39;&#34;);
+      assert func is not None;
+      assert callable(func);
+      
+      done=func(self, _slot, data);
+      
+      if self.params.done is not None:
+         if callable(self.params.done):
+            done=self.params.done(data);
+         else:
+            done=self.params.done;
+         self.signal_done(done);
+      else:
+         if done is not None:
+            self.signal_done(done);
+         
+    except Exception as e:
+      debug.print(f&#34;{cls}:: Excepción: &#39;{e}&#39;&#34;, exception=e);
+      
+    finally:
+      pass;</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.videoSource.VideoSource.slot_next"><code class="name flex">
@@ -688,13 +768,12 @@ class VideoSource(Block):
       if self.params.done is not None:
          if callable(self.params.done):
             done=self.params.done(data);
-            self.signal_done(done);
          else:
             done=self.params.done;
-            self.signal_done(done);
+         self.signal_done(done);
       else:
-         if bool(done) is True: # SUGGEST: enviar el valor de &#39;done&#39; si no es None.
-            self.signal_done(f&#34;{self._fullClassName}::{_slot}&#34;);
+         if done is not None:
+            self.signal_done(done);
          
     except Exception as e:
       debug.print(f&#34;{cls}:: Excepción: &#39;{e}&#39;&#34;, exception=e);
@@ -724,13 +803,12 @@ class VideoSource(Block):
       if self.params.done is not None:
          if callable(self.params.done):
             done=self.params.done(data);
-            self.signal_done(done);
          else:
             done=self.params.done;
-            self.signal_done(done);
+         self.signal_done(done);
       else:
-         if bool(done) is True: # SUGGEST: enviar el valor de &#39;done&#39; si no es None.
-            self.signal_done(f&#34;{self._fullClassName}::{_slot}&#34;);
+         if done is not None:
+            self.signal_done(done);
          
     except Exception as e:
       debug.print(f&#34;{cls}:: Excepción: &#39;{e}&#39;&#34;, exception=e);
@@ -768,13 +846,14 @@ class VideoSource(Block):
 <li>
 <h4><code><a title="ml4teens.blocks.img.videoSource.VideoSource" href="#ml4teens.blocks.img.videoSource.VideoSource">VideoSource</a></code></h4>
 <ul class="two-column">
+<li><code><a title="ml4teens.blocks.img.videoSource.VideoSource.close" href="#ml4teens.blocks.img.videoSource.VideoSource.close">close</a></code></li>
 <li><code><a title="ml4teens.blocks.img.videoSource.VideoSource.reset" href="#ml4teens.blocks.img.videoSource.VideoSource.reset">reset</a></code></li>
 <li><code><a title="ml4teens.blocks.img.videoSource.VideoSource.signal_begin" href="#ml4teens.blocks.img.videoSource.VideoSource.signal_begin">signal_begin</a></code></li>
 <li><code><a title="ml4teens.blocks.img.videoSource.VideoSource.signal_dims" href="#ml4teens.blocks.img.videoSource.VideoSource.signal_dims">signal_dims</a></code></li>
 <li><code><a title="ml4teens.blocks.img.videoSource.VideoSource.signal_end" href="#ml4teens.blocks.img.videoSource.VideoSource.signal_end">signal_end</a></code></li>
 <li><code><a title="ml4teens.blocks.img.videoSource.VideoSource.signal_frame" href="#ml4teens.blocks.img.videoSource.VideoSource.signal_frame">signal_frame</a></code></li>
 <li><code><a title="ml4teens.blocks.img.videoSource.VideoSource.signal_info" href="#ml4teens.blocks.img.videoSource.VideoSource.signal_info">signal_info</a></code></li>
-<li><code><a title="ml4teens.blocks.img.videoSource.VideoSource.signal_source" href="#ml4teens.blocks.img.videoSource.VideoSource.signal_source">signal_source</a></code></li>
+<li><code><a title="ml4teens.blocks.img.videoSource.VideoSource.slot_close" href="#ml4teens.blocks.img.videoSource.VideoSource.slot_close">slot_close</a></code></li>
 <li><code><a title="ml4teens.blocks.img.videoSource.VideoSource.slot_next" href="#ml4teens.blocks.img.videoSource.VideoSource.slot_next">slot_next</a></code></li>
 <li><code><a title="ml4teens.blocks.img.videoSource.VideoSource.slot_source" href="#ml4teens.blocks.img.videoSource.VideoSource.slot_source">slot_source</a></code></li>
 </ul>

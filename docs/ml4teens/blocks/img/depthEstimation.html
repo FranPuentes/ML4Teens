@@ -141,7 +141,7 @@ class DepthEstimation(Block):
 <h3>Methods</h3>
 <dl>
 <dt id="ml4teens.blocks.img.depthEstimation.DepthEstimation.signal_image"><code class="name flex">
-<span>def <span class="ident">signal_image</span></span>(<span>self, data='90a0fb5af9b7e185f58b54a3a179b44effcd93b051286867d3045f85d85d6296')</span>
+<span>def <span class="ident">signal_image</span></span>(<span>self, data='3021ba4b8ec6f43e6f735092c754f296b03a9b0133da4eeb2202e1ef127c0826')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -180,13 +180,12 @@ class DepthEstimation(Block):
       if self.params.done is not None:
          if callable(self.params.done):
             done=self.params.done(data);
-            self.signal_done(done);
          else:
             done=self.params.done;
-            self.signal_done(done);
+         self.signal_done(done);
       else:
-         if bool(done) is True: # SUGGEST: enviar el valor de &#39;done&#39; si no es None.
-            self.signal_done(f&#34;{self._fullClassName}::{_slot}&#34;);
+         if done is not None:
+            self.signal_done(done);
          
     except Exception as e:
       debug.print(f&#34;{cls}:: Excepción: &#39;{e}&#39;&#34;, exception=e);

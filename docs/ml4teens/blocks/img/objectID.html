@@ -112,9 +112,9 @@ class ObjectID(Block):
           A Boxes dictionary containing the detection bounding boxes, classes and confidences.
           &#34;&#34;&#34;
           boxes=[{
-                  &#34;class&#34;:(int(r),self._model.names[int(r)]),
-                  &#34;conf&#34;:float(c),
-                  &#34;xyxy&#34;:[float(_) for _ in k] 
+                  &#34;kind&#34;  : (int(r),self._model.names[int(r)]),
+                  &#34;trust&#34; : float(c),
+                  &#34;xyxy&#34;  : [float(_) for _ in k] 
                  }
                  for r,c,k in zip(data.cls,data.conf,data.xyxyn)];
                  
@@ -234,9 +234,9 @@ boxes -&gt; object</p>
           A Boxes dictionary containing the detection bounding boxes, classes and confidences.
           &#34;&#34;&#34;
           boxes=[{
-                  &#34;class&#34;:(int(r),self._model.names[int(r)]),
-                  &#34;conf&#34;:float(c),
-                  &#34;xyxy&#34;:[float(_) for _ in k] 
+                  &#34;kind&#34;  : (int(r),self._model.names[int(r)]),
+                  &#34;trust&#34; : float(c),
+                  &#34;xyxy&#34;  : [float(_) for _ in k] 
                  }
                  for r,c,k in zip(data.cls,data.conf,data.xyxyn)];
                  
@@ -264,7 +264,7 @@ boxes -&gt; object</p>
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.objectID.ObjectID.signal_boxes"><code class="name flex">
-<span>def <span class="ident">signal_boxes</span></span>(<span>self, data='3b550f45a0f3073155b9b58ca5592d3059dd7200a73df76c551e6d5680b45a10')</span>
+<span>def <span class="ident">signal_boxes</span></span>(<span>self, data='c81e3b5e96281ba717dd5b37624125f100fa75db17eed938883a3d04c355f5bc')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -283,7 +283,7 @@ boxes -&gt; object</p>
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.objectID.ObjectID.signal_image"><code class="name flex">
-<span>def <span class="ident">signal_image</span></span>(<span>self, data='87961459f47a982f0b8e2e7ecfb96e48d487f9327e52ae6a5045ac1bd72c1b44')</span>
+<span>def <span class="ident">signal_image</span></span>(<span>self, data='06052ee6f637512289b3f63767d2cdf3385aac5f651affdb053ba2ca840b37f5')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -322,13 +322,12 @@ boxes -&gt; object</p>
       if self.params.done is not None:
          if callable(self.params.done):
             done=self.params.done(data);
-            self.signal_done(done);
          else:
             done=self.params.done;
-            self.signal_done(done);
+         self.signal_done(done);
       else:
-         if bool(done) is True: # SUGGEST: enviar el valor de &#39;done&#39; si no es None.
-            self.signal_done(f&#34;{self._fullClassName}::{_slot}&#34;);
+         if done is not None:
+            self.signal_done(done);
          
     except Exception as e:
       debug.print(f&#34;{cls}:: Excepción: &#39;{e}&#39;&#34;, exception=e);

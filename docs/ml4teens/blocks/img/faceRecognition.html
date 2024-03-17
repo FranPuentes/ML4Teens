@@ -761,7 +761,7 @@ def similarity(emb1, emb2):
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.faceRecognition.FaceRecognition.signal_image"><code class="name flex">
-<span>def <span class="ident">signal_image</span></span>(<span>self, data='86e49fcaeea3fef192ed01c43e4ab29dfd685cd2937d9b11a8d5173dab20b134')</span>
+<span>def <span class="ident">signal_image</span></span>(<span>self, data='9a5d911bca68b18c76f0845604dcb3526b77fa24f8dd75a2e5c866ee66d34526')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -780,7 +780,7 @@ def similarity(emb1, emb2):
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.faceRecognition.FaceRecognition.signal_recognized"><code class="name flex">
-<span>def <span class="ident">signal_recognized</span></span>(<span>self, data='45665e540803f89c44dbd8da0b36e112c63bde317dcecbba5a29705a9a6d2b4e')</span>
+<span>def <span class="ident">signal_recognized</span></span>(<span>self, data='f4be21a99970443ffafc95d1bc54120bdff9bc09470c7d855091b6a7c0c8ee89')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -799,7 +799,7 @@ def similarity(emb1, emb2):
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.faceRecognition.FaceRecognition.signal_reference"><code class="name flex">
-<span>def <span class="ident">signal_reference</span></span>(<span>self, data='76d1d62a0be084a26249d94ba867d78e49afdaaaffb95f82655574223d14fe33')</span>
+<span>def <span class="ident">signal_reference</span></span>(<span>self, data='85e8e1dbbb52076933e213f73885aa05e61e43969eb7f7bbae770bf6f1307fee')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -838,13 +838,12 @@ def similarity(emb1, emb2):
       if self.params.done is not None:
          if callable(self.params.done):
             done=self.params.done(data);
-            self.signal_done(done);
          else:
             done=self.params.done;
-            self.signal_done(done);
+         self.signal_done(done);
       else:
-         if bool(done) is True: # SUGGEST: enviar el valor de &#39;done&#39; si no es None.
-            self.signal_done(f&#34;{self._fullClassName}::{_slot}&#34;);
+         if done is not None:
+            self.signal_done(done);
          
     except Exception as e:
       debug.print(f&#34;{cls}:: Excepción: &#39;{e}&#39;&#34;, exception=e);
@@ -874,13 +873,12 @@ def similarity(emb1, emb2):
       if self.params.done is not None:
          if callable(self.params.done):
             done=self.params.done(data);
-            self.signal_done(done);
          else:
             done=self.params.done;
-            self.signal_done(done);
+         self.signal_done(done);
       else:
-         if bool(done) is True: # SUGGEST: enviar el valor de &#39;done&#39; si no es None.
-            self.signal_done(f&#34;{self._fullClassName}::{_slot}&#34;);
+         if done is not None:
+            self.signal_done(done);
          
     except Exception as e:
       debug.print(f&#34;{cls}:: Excepción: &#39;{e}&#39;&#34;, exception=e);

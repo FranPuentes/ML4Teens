@@ -273,7 +273,7 @@ boxes -&gt; object</p>
 <h3>Methods</h3>
 <dl>
 <dt id="ml4teens.blocks.img.objectCLS.ObjectCLS.signal_class"><code class="name flex">
-<span>def <span class="ident">signal_class</span></span>(<span>self, data='134a17556f47952ed4e109067a731982e7e4600a2fd63367214bf3e8827f92c1')</span>
+<span>def <span class="ident">signal_class</span></span>(<span>self, data='12936243c1ef09de90eff89e1b6fca06d816ddb31af12dffdbc9dfd3cb72044b')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -292,7 +292,7 @@ boxes -&gt; object</p>
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.objectCLS.ObjectCLS.signal_classes"><code class="name flex">
-<span>def <span class="ident">signal_classes</span></span>(<span>self, data='529153a47cc2d752d2e35ba65d8a03a0b4815616769f49cfcff7236bf89c1ad0')</span>
+<span>def <span class="ident">signal_classes</span></span>(<span>self, data='535360a5e9421376861632c123e8a97ca4655f46c403a211600aacf894c33969')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -311,7 +311,7 @@ boxes -&gt; object</p>
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.objectCLS.ObjectCLS.signal_end"><code class="name flex">
-<span>def <span class="ident">signal_end</span></span>(<span>self, data='2c61f6de3ed6ff65bef76920c963ae76aa789bd21653e8e66f02046fb2598474')</span>
+<span>def <span class="ident">signal_end</span></span>(<span>self, data='4fa29a896cebd132b078cb67d55fd8ea5fb51472c2b33f467d6982f3ab7103cb')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -330,7 +330,7 @@ boxes -&gt; object</p>
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.objectCLS.ObjectCLS.signal_image"><code class="name flex">
-<span>def <span class="ident">signal_image</span></span>(<span>self, data='838ae962a84fc2bdcfa4197acfc1e4a886bb36aa5a9487b8e08f6776463a28fe')</span>
+<span>def <span class="ident">signal_image</span></span>(<span>self, data='20c5aa31e7fe7fca635ef50c05dfbf9b1b7aec7bc621ce4e15a644b54afbc3d4')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -369,13 +369,12 @@ boxes -&gt; object</p>
       if self.params.done is not None:
          if callable(self.params.done):
             done=self.params.done(data);
-            self.signal_done(done);
          else:
             done=self.params.done;
-            self.signal_done(done);
+         self.signal_done(done);
       else:
-         if bool(done) is True: # SUGGEST: enviar el valor de &#39;done&#39; si no es None.
-            self.signal_done(f&#34;{self._fullClassName}::{_slot}&#34;);
+         if done is not None:
+            self.signal_done(done);
          
     except Exception as e:
       debug.print(f&#34;{cls}:: Excepción: &#39;{e}&#39;&#34;, exception=e);
@@ -405,13 +404,12 @@ boxes -&gt; object</p>
       if self.params.done is not None:
          if callable(self.params.done):
             done=self.params.done(data);
-            self.signal_done(done);
          else:
             done=self.params.done;
-            self.signal_done(done);
+         self.signal_done(done);
       else:
-         if bool(done) is True: # SUGGEST: enviar el valor de &#39;done&#39; si no es None.
-            self.signal_done(f&#34;{self._fullClassName}::{_slot}&#34;);
+         if done is not None:
+            self.signal_done(done);
          
     except Exception as e:
       debug.print(f&#34;{cls}:: Excepción: &#39;{e}&#39;&#34;, exception=e);

@@ -109,7 +109,7 @@ class SingleChannel(Block):
 <h3>Methods</h3>
 <dl>
 <dt id="ml4teens.blocks.img.singleChannel.SingleChannel.signal_image"><code class="name flex">
-<span>def <span class="ident">signal_image</span></span>(<span>self, data='239b153b2d2bba373106d185199d5b991b15883955d0081283fe32166c3348ac')</span>
+<span>def <span class="ident">signal_image</span></span>(<span>self, data='7bb5e1345040ba376414dd5e3b7269c325f600c8bcf6bb4f50d063bf8485736e')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -148,13 +148,12 @@ class SingleChannel(Block):
       if self.params.done is not None:
          if callable(self.params.done):
             done=self.params.done(data);
-            self.signal_done(done);
          else:
             done=self.params.done;
-            self.signal_done(done);
+         self.signal_done(done);
       else:
-         if bool(done) is True: # SUGGEST: enviar el valor de &#39;done&#39; si no es None.
-            self.signal_done(f&#34;{self._fullClassName}::{_slot}&#34;);
+         if done is not None:
+            self.signal_done(done);
          
     except Exception as e:
       debug.print(f&#34;{cls}:: Excepción: &#39;{e}&#39;&#34;, exception=e);

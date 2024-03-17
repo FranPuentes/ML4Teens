@@ -260,7 +260,7 @@ Acumula la iteracción hasta que recibe un nuevo "context".</p></div>
 <h3>Methods</h3>
 <dl>
 <dt id="ml4teens.blocks.txt.oaiChat.OAIChat.signal_answer"><code class="name flex">
-<span>def <span class="ident">signal_answer</span></span>(<span>self, data='0614eb2eacb042711fad356812d92f3ff6191c4865648f60df4c2291f20c94db')</span>
+<span>def <span class="ident">signal_answer</span></span>(<span>self, data='5d433c71115b80b9301c022ba6a41ff93317b15585ede4f7cd212e7083ac7d80')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -299,13 +299,12 @@ Acumula la iteracción hasta que recibe un nuevo "context".</p></div>
       if self.params.done is not None:
          if callable(self.params.done):
             done=self.params.done(data);
-            self.signal_done(done);
          else:
             done=self.params.done;
-            self.signal_done(done);
+         self.signal_done(done);
       else:
-         if bool(done) is True: # SUGGEST: enviar el valor de &#39;done&#39; si no es None.
-            self.signal_done(f&#34;{self._fullClassName}::{_slot}&#34;);
+         if done is not None:
+            self.signal_done(done);
          
     except Exception as e:
       debug.print(f&#34;{cls}:: Excepción: &#39;{e}&#39;&#34;, exception=e);
@@ -335,13 +334,12 @@ Acumula la iteracción hasta que recibe un nuevo "context".</p></div>
       if self.params.done is not None:
          if callable(self.params.done):
             done=self.params.done(data);
-            self.signal_done(done);
          else:
             done=self.params.done;
-            self.signal_done(done);
+         self.signal_done(done);
       else:
-         if bool(done) is True: # SUGGEST: enviar el valor de &#39;done&#39; si no es None.
-            self.signal_done(f&#34;{self._fullClassName}::{_slot}&#34;);
+         if done is not None:
+            self.signal_done(done);
          
     except Exception as e:
       debug.print(f&#34;{cls}:: Excepción: &#39;{e}&#39;&#34;, exception=e);

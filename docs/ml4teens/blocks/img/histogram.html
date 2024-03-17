@@ -184,7 +184,7 @@ class Histogram(Block):
 <h3>Methods</h3>
 <dl>
 <dt id="ml4teens.blocks.img.histogram.Histogram.signal_histogram"><code class="name flex">
-<span>def <span class="ident">signal_histogram</span></span>(<span>self, data='74cfde2e14cc1f90f07b2e9519f27c6ddd858fd329a190d1420115f200f73236')</span>
+<span>def <span class="ident">signal_histogram</span></span>(<span>self, data='d9db50bc7b3fe893784da00ef09f5f1f2927377449223b921da9fd0d6c01417f')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -223,13 +223,12 @@ class Histogram(Block):
       if self.params.done is not None:
          if callable(self.params.done):
             done=self.params.done(data);
-            self.signal_done(done);
          else:
             done=self.params.done;
-            self.signal_done(done);
+         self.signal_done(done);
       else:
-         if bool(done) is True: # SUGGEST: enviar el valor de &#39;done&#39; si no es None.
-            self.signal_done(f&#34;{self._fullClassName}::{_slot}&#34;);
+         if done is not None:
+            self.signal_done(done);
          
     except Exception as e:
       debug.print(f&#34;{cls}:: Excepción: &#39;{e}&#39;&#34;, exception=e);

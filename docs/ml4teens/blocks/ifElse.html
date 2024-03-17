@@ -168,7 +168,7 @@ La expresión también puede ser un texto, con un avariable local lamada 'data'.
 <h3>Methods</h3>
 <dl>
 <dt id="ml4teens.blocks.ifElse.IfElse.signal_bool"><code class="name flex">
-<span>def <span class="ident">signal_bool</span></span>(<span>self, data='e2c5ce8559569e4ed510bcb5fd10efe46f9072785e5ed1f33fcdde6e04583238')</span>
+<span>def <span class="ident">signal_bool</span></span>(<span>self, data='9f8e927d2da04cf25b3875118c2681a98b253f92dfb36e119bfb18c9221419c6')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -187,7 +187,7 @@ La expresión también puede ser un texto, con un avariable local lamada 'data'.
 </details>
 </dd>
 <dt id="ml4teens.blocks.ifElse.IfElse.signal_false"><code class="name flex">
-<span>def <span class="ident">signal_false</span></span>(<span>self, data='5d3369a507732e008467659313eda1db377876a49fce256747f95cf70361fccf')</span>
+<span>def <span class="ident">signal_false</span></span>(<span>self, data='871303bf3f15d5d83d5c14bae291b9387fa4b4a01b1d0c796bc53d32e44fe3f6')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -206,7 +206,7 @@ La expresión también puede ser un texto, con un avariable local lamada 'data'.
 </details>
 </dd>
 <dt id="ml4teens.blocks.ifElse.IfElse.signal_true"><code class="name flex">
-<span>def <span class="ident">signal_true</span></span>(<span>self, data='3b55e0c632110b6b6ca34975c51c4381328c04e4c2bdd1bd92377a98bc87ba4e')</span>
+<span>def <span class="ident">signal_true</span></span>(<span>self, data='1cef3016a4c82acb0096c0b9863c646fd565d6775d531a2f83abc5d838d81a07')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -245,13 +245,12 @@ La expresión también puede ser un texto, con un avariable local lamada 'data'.
       if self.params.done is not None:
          if callable(self.params.done):
             done=self.params.done(data);
-            self.signal_done(done);
          else:
             done=self.params.done;
-            self.signal_done(done);
+         self.signal_done(done);
       else:
-         if bool(done) is True: # SUGGEST: enviar el valor de &#39;done&#39; si no es None.
-            self.signal_done(f&#34;{self._fullClassName}::{_slot}&#34;);
+         if done is not None:
+            self.signal_done(done);
          
     except Exception as e:
       debug.print(f&#34;{cls}:: Excepción: &#39;{e}&#39;&#34;, exception=e);

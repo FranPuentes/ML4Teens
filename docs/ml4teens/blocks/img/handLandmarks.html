@@ -450,7 +450,7 @@ def names(cls, idx):
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.handLandmarks.HandLandmarks.signal_end"><code class="name flex">
-<span>def <span class="ident">signal_end</span></span>(<span>self, data='e79054e77de6de8ae34f609db40d8666f30a36584111598ea39e9c21471a6e7d')</span>
+<span>def <span class="ident">signal_end</span></span>(<span>self, data='83b9f271c166b447158e9d902cc8637d9344ef17a1ac58b59a18c7bc153890f6')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -469,7 +469,7 @@ def names(cls, idx):
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.handLandmarks.HandLandmarks.signal_image"><code class="name flex">
-<span>def <span class="ident">signal_image</span></span>(<span>self, data='c324db66837f619b1e69795872e75a1dd5ff5f75664c6b5ee06bc0f4e4f0641e')</span>
+<span>def <span class="ident">signal_image</span></span>(<span>self, data='2f6f89ad50e4a2c21ce6bb39505cc43d183f9b3b80cd53f5e5abb683c8025157')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -488,7 +488,7 @@ def names(cls, idx):
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.handLandmarks.HandLandmarks.signal_landmark"><code class="name flex">
-<span>def <span class="ident">signal_landmark</span></span>(<span>self, data='8454ea484e6133193602a30159c0f882f9abad81820b18e92063910378c3c8b3')</span>
+<span>def <span class="ident">signal_landmark</span></span>(<span>self, data='860b6e920dbfff53d37735b89740a5c7cfbdbbffa5272ff36c6016e518b62470')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -507,7 +507,7 @@ def names(cls, idx):
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.handLandmarks.HandLandmarks.signal_landmarks"><code class="name flex">
-<span>def <span class="ident">signal_landmarks</span></span>(<span>self, data='77b4a1a22384c6a4af3098db8fdaf23f7494b98b4792b7e0cbd2155771e4d931')</span>
+<span>def <span class="ident">signal_landmarks</span></span>(<span>self, data='528c12610e90bf5e0f31daa83211816f1856c3125f6e2dbc47e987e7366f3795')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -546,13 +546,12 @@ def names(cls, idx):
       if self.params.done is not None:
          if callable(self.params.done):
             done=self.params.done(data);
-            self.signal_done(done);
          else:
             done=self.params.done;
-            self.signal_done(done);
+         self.signal_done(done);
       else:
-         if bool(done) is True: # SUGGEST: enviar el valor de &#39;done&#39; si no es None.
-            self.signal_done(f&#34;{self._fullClassName}::{_slot}&#34;);
+         if done is not None:
+            self.signal_done(done);
          
     except Exception as e:
       debug.print(f&#34;{cls}:: Excepción: &#39;{e}&#39;&#34;, exception=e);
@@ -582,13 +581,12 @@ def names(cls, idx):
       if self.params.done is not None:
          if callable(self.params.done):
             done=self.params.done(data);
-            self.signal_done(done);
          else:
             done=self.params.done;
-            self.signal_done(done);
+         self.signal_done(done);
       else:
-         if bool(done) is True: # SUGGEST: enviar el valor de &#39;done&#39; si no es None.
-            self.signal_done(f&#34;{self._fullClassName}::{_slot}&#34;);
+         if done is not None:
+            self.signal_done(done);
          
     except Exception as e:
       debug.print(f&#34;{cls}:: Excepción: &#39;{e}&#39;&#34;, exception=e);

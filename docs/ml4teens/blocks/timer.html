@@ -185,7 +185,7 @@ SIGNALS: "event" y "end"</p></div>
 <h3>Methods</h3>
 <dl>
 <dt id="ml4teens.blocks.timer.Timer.signal_end"><code class="name flex">
-<span>def <span class="ident">signal_end</span></span>(<span>self, data='032d8d86753a017fd9fdab5850a631697d6662aab5a8aa905b80744b53f9a0e1')</span>
+<span>def <span class="ident">signal_end</span></span>(<span>self, data='7c5e3903a07a2333d7c1db41b7792dedb29f667c1b6dfe1548253781f6fcb561')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -204,7 +204,7 @@ SIGNALS: "event" y "end"</p></div>
 </details>
 </dd>
 <dt id="ml4teens.blocks.timer.Timer.signal_event"><code class="name flex">
-<span>def <span class="ident">signal_event</span></span>(<span>self, data='34051b3270a5c26ceebf97f2556c6069c6055610027a5bc0c57be2da10b5d4b8')</span>
+<span>def <span class="ident">signal_event</span></span>(<span>self, data='68d0a6bcf062874d7dac0ac28d2ee4fbb78bade6b3b8860d6a084c184e668b9e')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -243,13 +243,12 @@ SIGNALS: "event" y "end"</p></div>
       if self.params.done is not None:
          if callable(self.params.done):
             done=self.params.done(data);
-            self.signal_done(done);
          else:
             done=self.params.done;
-            self.signal_done(done);
+         self.signal_done(done);
       else:
-         if bool(done) is True: # SUGGEST: enviar el valor de &#39;done&#39; si no es None.
-            self.signal_done(f&#34;{self._fullClassName}::{_slot}&#34;);
+         if done is not None:
+            self.signal_done(done);
          
     except Exception as e:
       debug.print(f&#34;{cls}:: Excepción: &#39;{e}&#39;&#34;, exception=e);
@@ -279,13 +278,12 @@ SIGNALS: "event" y "end"</p></div>
       if self.params.done is not None:
          if callable(self.params.done):
             done=self.params.done(data);
-            self.signal_done(done);
          else:
             done=self.params.done;
-            self.signal_done(done);
+         self.signal_done(done);
       else:
-         if bool(done) is True: # SUGGEST: enviar el valor de &#39;done&#39; si no es None.
-            self.signal_done(f&#34;{self._fullClassName}::{_slot}&#34;);
+         if done is not None:
+            self.signal_done(done);
          
     except Exception as e:
       debug.print(f&#34;{cls}:: Excepción: &#39;{e}&#39;&#34;, exception=e);
@@ -315,13 +313,12 @@ SIGNALS: "event" y "end"</p></div>
       if self.params.done is not None:
          if callable(self.params.done):
             done=self.params.done(data);
-            self.signal_done(done);
          else:
             done=self.params.done;
-            self.signal_done(done);
+         self.signal_done(done);
       else:
-         if bool(done) is True: # SUGGEST: enviar el valor de &#39;done&#39; si no es None.
-            self.signal_done(f&#34;{self._fullClassName}::{_slot}&#34;);
+         if done is not None:
+            self.signal_done(done);
          
     except Exception as e:
       debug.print(f&#34;{cls}:: Excepción: &#39;{e}&#39;&#34;, exception=e);
@@ -351,13 +348,12 @@ SIGNALS: "event" y "end"</p></div>
       if self.params.done is not None:
          if callable(self.params.done):
             done=self.params.done(data);
-            self.signal_done(done);
          else:
             done=self.params.done;
-            self.signal_done(done);
+         self.signal_done(done);
       else:
-         if bool(done) is True: # SUGGEST: enviar el valor de &#39;done&#39; si no es None.
-            self.signal_done(f&#34;{self._fullClassName}::{_slot}&#34;);
+         if done is not None:
+            self.signal_done(done);
          
     except Exception as e:
       debug.print(f&#34;{cls}:: Excepción: &#39;{e}&#39;&#34;, exception=e);

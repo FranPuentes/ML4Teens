@@ -34,17 +34,6 @@ _enabled=False;
 _startsWith=None;
 
 #===============================================================================
-def _notebook():
-    try:
-        from IPython import get_ipython;
-        ipython = get_ipython();
-        if &#39;IPKernelApp&#39; not in ipython.config: return False;
-        if &#39;VSCODE_PID&#39; in os.environ:          return False;
-        return True
-    except (ImportError, AttributeError):
-        return False
-
-#===============================================================================
 def enable(startsWith:str=None):
     global _enabled;
     global _startsWith;
@@ -80,6 +69,7 @@ def print(*args, **kwargs):
          if _startsWith is None or (_startsWith is not None and message.startswith(_startsWith)):
             builtins.print(message, end=&#39;&#39;, flush=True);
          buffer.close();   
+
          </code></pre>
 </details>
 </section>

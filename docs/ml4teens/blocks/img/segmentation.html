@@ -173,7 +173,7 @@ class Segmentation(Block):
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.segmentation.Segmentation.signal_image"><code class="name flex">
-<span>def <span class="ident">signal_image</span></span>(<span>self, data='0586897bda0cafb990651eb0cce35e1b7a106157719578e6098722befbedf437')</span>
+<span>def <span class="ident">signal_image</span></span>(<span>self, data='9c9c1c3c8f93cf19ed0ab7d0f79cdb56e5a9d8d8cdf8754db7be5f0387ebabf4')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -192,7 +192,7 @@ class Segmentation(Block):
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.segmentation.Segmentation.signal_mask"><code class="name flex">
-<span>def <span class="ident">signal_mask</span></span>(<span>self, data='e08323443868b90fc411227b463bdd67e62da23a0021e49f67a30577dfee74dd')</span>
+<span>def <span class="ident">signal_mask</span></span>(<span>self, data='4bc371842bbfb8d94368efff6d613a41ce667505837d834aab8ffecfa1828223')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -231,13 +231,12 @@ class Segmentation(Block):
       if self.params.done is not None:
          if callable(self.params.done):
             done=self.params.done(data);
-            self.signal_done(done);
          else:
             done=self.params.done;
-            self.signal_done(done);
+         self.signal_done(done);
       else:
-         if bool(done) is True: # SUGGEST: enviar el valor de &#39;done&#39; si no es None.
-            self.signal_done(f&#34;{self._fullClassName}::{_slot}&#34;);
+         if done is not None:
+            self.signal_done(done);
          
     except Exception as e:
       debug.print(f&#34;{cls}:: Excepción: &#39;{e}&#39;&#34;, exception=e);
