@@ -1,3 +1,6 @@
+
+import PIL;
+
 from PIL.Image import Image;
 from PIL       import ImageOps, ImageChops, ImageMath, ImageFilter;
 
@@ -106,6 +109,13 @@ class ImageOp(Block):
 
           elif op in ["multiply","*"]:
                imagen = ImageChops.multiply(left, right);
+
+          elif op in ["mask"]:
+               rgb    = left.convert("RGB");
+               L      = right.convert('L');
+               L      = L.resize(rgb.size);
+               r, g, b = rgb.split();
+               imagen = PIL.Image.merge("RGBA", (r, g, b, L));
 
           elif op in ["blend"]:
                imagen = ImageChops.blend(left, right, **params);
@@ -276,6 +286,8 @@ class ImageOp(Block):
           left =self._left;
           if left and right:
              imagen=self._op2(left, right, self._op, self._kwargs);
+             self._left=None;
+             self._right=None;
              return imagen;
           return None;      
 
@@ -284,16 +296,18 @@ class ImageOp(Block):
       def slot_left(self, slot, data):
           self._left=data;
           imagen=self._binary();
-          self.signal_image(imagen);
-          self.signal_left(imagen);
+          if imagen is not None:
+             self.signal_image(imagen);
+             self.signal_left(imagen);
 
       #-------------------------------------------------------------------------
       @Block.slot("right", {Image})
       def slot_right(self, slot, data):
           self._right=data;
           imagen=self._binary();
-          self.signal_image(imagen);
-          self.signal_right(imagen);
+          if imagen is not None:
+             self.signal_image(imagen);
+             self.signal_right(imagen);
 
       #-------------------------------------------------------------------------
       # SIGNALS & RUN

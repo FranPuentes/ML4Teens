@@ -30,7 +30,7 @@ class Histogram(Block):
                 plt.xlabel('Intensidad del Pixel');
                 plt.ylabel('Frecuencia');
 
-                plt.constrained_layout();
+                #plt.constrained_layout();
                 
              elif len(image.shape) == 3:
                 fig, axs = plt.subplots(nrows=3, ncols=1, figsize=self.params.figsize or (10, 12), constrained_layout=True);
