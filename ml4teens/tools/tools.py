@@ -1,7 +1,8 @@
-import sys, io;
+import sys, os, io;
 from PIL import Image;
 import requests;
 from io import BytesIO;
+import tempfile;
 
 #===============================================================================
 def image_from_url(url:str, mode:str=None, width:int=None, height:int=None):
@@ -108,3 +109,37 @@ def uploadFiles():
            _files.append(item["name"]);
 
     return tuple(_files);
+
+#===============================================================================
+class UrlDownload:
+
+      def __init__(self, url:str, filename=None, autoremove=True):
+          self._autoremove=autoremove;
+          response = requests.get(url);
+          response.raise_for_status();
+          if filename is None:
+             with tempfile.NamedTemporaryFile(delete=False, delete_on_close=False) as temp:
+                  temp.write(response.content);
+                  self._filename=temp.name;
+          else:
+             with open(filename,"wb") as fd:
+                  fd.write(response.content);
+                  self._filename=filename;
+
+      def __del__(self):
+          try:
+            if self._autoremove:
+               os.remove(self._filename);
+          except:
+            pass;
+
+      def __str__(self):
+          return self._filename;
+
+      @property
+      def filename(self):
+          return self._filename;
+
+      @property
+      def autoremove(self):
+          return self._autoremove;

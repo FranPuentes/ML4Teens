@@ -8,3 +8,4 @@ from .tools      import runnigInGoogleColab;
 from .tools      import runnigInJupyterLike;
 from .tools      import runningInNotebook;
 from .tools      import uploadFiles;
+from .tools      import UrlDownload;
