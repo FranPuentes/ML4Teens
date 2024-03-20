@@ -10,3 +10,4 @@ from .tools      import runningInNotebook;
 from .tools      import uploadFiles;
 from .tools      import UrlDownload;
 from .tools      import searchFilename;
+from .tools      import searchPattern;

@@ -1,4 +1,5 @@
 import sys, os, io;
+import fnmatch;
 from PIL import Image;
 import requests;
 from io import BytesIO;
@@ -158,4 +159,20 @@ def searchFilename(path, filename):
         if filename in archivos:
            return os.path.join(raiz, nombre_archivo);
     return None;
+
+#===============================================================================
+def searchPattern(path, pattern):
+    """
+    Busca archivos de forma recursiva en un directorio y devuelve su path absoluto.
+
+    :param path: El path del directorio en el que empezar la búsqueda.
+    :param pattern: El patrón del nombre de los archivos a buscar.
+    :return: Una lista con los paths absolutos de los archivos.
+    """
+    rt=[];
+    for raiz, directorios, archivos in os.walk(path):
+        for archivo in archivos:
+            if fnmatch.fnmatch(archivo, pattern):
+               rt.append(os.path.join(raiz, archivo));
+    return rt;
     
