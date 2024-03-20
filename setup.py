@@ -25,7 +25,7 @@ setup(
                        "seaborn",
                        "cohere",
                        "tiktoken",
-                       "gradio",
+                       "gradio==3.47.1",
                        #"imgbeddings==0.1.0",
                      ],
     include_package_data=True,
