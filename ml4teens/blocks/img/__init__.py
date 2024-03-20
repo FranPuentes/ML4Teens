@@ -25,4 +25,4 @@ from .distance          import Distance
 from .similarity        import Similarity
 from .threshold         import Threshold
 from .histogram         import Histogram
-
+from .yoloTrain         import YoloTrain
