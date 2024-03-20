@@ -157,7 +157,7 @@ def searchFilename(path, filename):
     """
     for raiz, directorios, archivos in os.walk(path):
         if filename in archivos:
-           return os.path.join(raiz, nombre_archivo);
+           return os.path.join(raiz, filename);
     return None;
 
 #===============================================================================
