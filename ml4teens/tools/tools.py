@@ -143,3 +143,19 @@ class UrlDownload:
       @property
       def autoremove(self):
           return self._autoremove;
+
+
+#===============================================================================
+def searchFilename(path, filename):
+    """
+    Busca un archivo de forma recursiva en un directorio y devuelve su path absoluto.
+
+    :param path: El path del directorio en el que empezar la búsqueda.
+    :param filename: El nombre del archivo a buscar.
+    :return: El path absoluto del archivo si se encuentra, o None si no se encuentra.
+    """
+    for raiz, directorios, archivos in os.walk(path):
+        if filename in archivos:
+           return os.path.join(raiz, nombre_archivo);
+    return None;
+    

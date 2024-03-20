@@ -9,3 +9,4 @@ from .tools      import runnigInJupyterLike;
 from .tools      import runningInNotebook;
 from .tools      import uploadFiles;
 from .tools      import UrlDownload;
+from .tools      import searchFilename;
