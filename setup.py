@@ -27,6 +27,7 @@ setup(
                        "tiktoken",
                        "gradio==3.47.1",
                        #"imgbeddings==0.1.0",
+                       "PyYAML",
                      ],
     include_package_data=True,
     
