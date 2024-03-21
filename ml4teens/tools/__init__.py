@@ -11,3 +11,4 @@ from .tools      import uploadFiles;
 from .tools      import UrlDownload;
 from .tools      import searchFilename;
 from .tools      import searchPattern;
+from .tools      import CocoDataset;

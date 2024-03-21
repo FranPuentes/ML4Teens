@@ -5,6 +5,13 @@ import requests;
 from io import BytesIO;
 import tempfile;
 
+import glob;
+import json;
+import shutil;
+import zipfile;
+
+from itertools import accumulate;
+
 #===============================================================================
 def image_from_url(url:str, mode:str=None, width:int=None, height:int=None):
     """
@@ -175,4 +182,102 @@ def searchPattern(path, pattern):
             if fnmatch.fnmatch(archivo, pattern):
                rt.append(os.path.join(raiz, archivo));
     return rt;
+
+#===============================================================================
+class CocoDataset:
+
+      def __init__(self, dataset:str):
+          assert os.path.isdir(dataset), f"No existe el directorio del dataset: {dataset}";
+          self._dataset = dataset;
+          files = glob.glob(os.path.join(dataset, '*.json'), recursive=False);
+          assert len(files)==1, "No encuentro el fichero (*.json) de anotaciones";
+          imagesPath = os.path.join(dataset, 'images');
+          assert os.path.isdir(imagesPath), "No existe el directorio 'images' en el dataset";          
+          self._annotations = self._load_annotations(files[0]);
+
+      def _load_annotations(self, filename):
+          with open(filename, 'r', encoding='utf-8') as fd:
+               data = json.load(fd);
+               return data;
+
+      def _split(self, l, f=(80,15,5)):
+          assert type(l) is int and l>=3;
+          assert len(f)==3 and all([type(n) is int for n in f]);
+          assert sum(f)==100, f"El split '{f}' debe sumar 100";
+          f=list(accumulate([0]+[int(l*n/100.0) for n in f]));
+          r=list(range(0,l));
+          return set(r[:f[1]]), set(r[f[1]:f[2]]), set(r[f[2]:]);
+
+      def export(self, target, to="yolo", split=(80,15,5), compress=False):
+          if target.endswith('.zip'):
+             target=os.path.abspath(target);
+             path, filename = os.path.split(target);
+             basename, ext = os.path.splitext(filename);
+             assert not os.path.exists(os.path.join(path,basename)), f"El path '{os.path.join(path,basename)}' existe";
+             target=os.path.join(path,basename);
+             compress=True;
+
+          if to.lower()=="yolo":
+             os.makedirs(target, exist_ok=True);
+             os.makedirs(os.path.join(target,"train"), exist_ok=True);
+             os.makedirs(os.path.join(target,"val"  ), exist_ok=True);
+             os.makedirs(os.path.join(target,"test" ), exist_ok=True);
+             images     =sorted(self._annotations["images"     ],key=lambda x: x["id"]);
+             annotations=sorted(self._annotations["annotations"],key=lambda x: x["image_id"]);
+             train,val,test=self._split(len(images),split);
+             for i, image in enumerate(images):
+                 if   i in train: dest=os.path.join(target,"train");
+                 elif i in val:   dest=os.path.join(target,"val");
+                 elif i in test:  dest=os.path.join(target,"test");
+                 else:            raise RuntimeError("Error interno");
+                 shutil.copy(os.path.join(self._dataset,image["file_name"]), dest);
+                 
+                 width =image["width" ];
+                 height=image["height"];
+                 
+                 ann=[];
+                 for annotation in annotations:
+                     if annotation["image_id"] == image["id"]:
+                        label_id =annotation["category_id"];
+                        x1,y1,w,h=annotation["bbox"];
+                        assert label_id>0;
+                        ann.append({"id":label_id-1,
+                                    "cx":(x1+w/2)/width,
+                                    "cy":(y1+h/2)/height,
+                                    "bw":(w/width),
+                                    "bh":(h/height),
+                                   });
+                 
+                 basename    = os.path.join(self._dataset,image["file_name"]);
+                 basename    = os.path.basename(basename);
+                 basename, _ = os.path.splitext(basename);
+                 basename    = f"{basename}.txt";
+                 with open(os.path.join(dest,basename),"wt") as fd:
+                      for a in ann:
+                          print(f"{a['id']} {a['cx']} {a['cy']} {a['bw']} {a['bh']}", file=fd);
+
+             labels=[k["name"] for k in sorted(self._annotations["categories"],key=lambda x: x["id"])];
+             with open(os.path.join(target,"dataset.yaml"),"wt",encoding="utf-8") as fd:
+                  print(f"#path: {target}", file=fd);
+                  print(f"train: ./train",  file=fd);
+                  print(f"val: ./val",      file=fd);
+                  print(f"test: ./test",    file=fd);
+                  print( "",                file=fd);
+                  print(f"names: {labels}", file=fd);
+            
+          if compress:
+             zip_target=f"{target}.zip";
+             with zipfile.ZipFile(zip_target, 'w', zipfile.ZIP_DEFLATED) as zipf:
+                  longitud_ruta_base = len(os.path.dirname(target));
+                  nombre_directorio_fuente = os.path.basename(target);
+                  for raiz, _, archivos in os.walk(target):
+                      for archivo in archivos:
+                          ruta_completa = os.path.join(raiz, archivo);
+                          nombre_archivo_zip = ruta_completa[longitud_ruta_base + 1:];
+                          zipf.write(ruta_completa, nombre_archivo_zip);
+             return zip_target;
+
+          else:   
+             return target;
+
     
