@@ -1,4 +1,4 @@
-import os, numpy as np;
+import os, math, numpy as np;
 import PIL;
 
 import cv2;
@@ -15,7 +15,7 @@ from mediapipe.tasks.python import vision;
 from ...core import Block;
 
 #===============================================================================
-class HandLandmarks(Block):
+class HandFeatures(Block):
 
       #-------------------------------------------------------------------------
       def __init__(self, **kwargs):
@@ -24,12 +24,10 @@ class HandLandmarks(Block):
           cwd = os.path.dirname(__file__);
           mwd = os.path.join(cwd, '../../models');
           fwd = os.path.join(cwd, '../../fonts');
-
+          
           base_options = python.BaseOptions(model_asset_path=os.path.join(mwd,'hand_landmarker.task'));
-          #base_options = python.BaseOptions(model_asset_path=model_asset_path=os.path.join(mwd,'hand_landmark_full.tflite'));
           options = vision.HandLandmarkerOptions(base_options=base_options, num_hands=2);
           self._model = vision.HandLandmarker.create_from_options(options);
-          self._queue=[];
 
       #-------------------------------------------------------------------------
       def draw_landmarks_on_image(rgb_image, results):
@@ -64,6 +62,13 @@ class HandLandmarks(Block):
               cv2.putText(annotated_image, f"{handedness[0].category_name}", (text_x, text_y), cv2.FONT_HERSHEY_DUPLEX, FONT_SIZE, HANDEDNESS_TEXT_COLOR, FONT_THICKNESS, cv2.LINE_AA);
 
           return annotated_image
+          
+      @classmethod    
+      def normalize_names(cls, *args):
+          rt="";
+          for arg in args:
+              rt += "".join([s.capitalize() for s in arg.split()]);
+          return rt;    
       
       @classmethod    
       def names(cls, idx):
@@ -96,50 +101,31 @@ class HandLandmarks(Block):
       @Block.slot("image", {Image})
       def slot_image(self, slot, data):
           
-          self._queue = [];
-          
           if data:
              image = data.convert('RGB');  
              image = mp.Image(image_format=mp.ImageFormat.SRGB, data=np.asarray(image));
              results = self._model.detect(image);
               
-             rt=[];
+             rt=[]; 
              for idx in range(len(results.hand_landmarks)):
-                 hand_landmarks = results.hand_landmarks[idx];
-                 handedness = results.handedness[idx];
+                 landmarks = results.hand_landmarks[idx];
+                 prefix    = results.handedness[idx][0].category_name;
                  
-                 hand={"kind":f"hand::{handedness[0].category_name}", "trust":handedness[0].score, "xyz":[], "visibility":[], "presence":[], "names":[] };
-                 
-                 for l, lm in enumerate(hand_landmarks):
-                     hand["xyz"       ].append((lm.x, lm.y, lm.z));
-                     hand["visibility"].append(lm.visibility);
-                     hand["presence"  ].append(lm.presence);
-                     hand["names"     ].append(self.names(l));
+                 wrist = None;
+                 for idx, lm in enumerate(landmarks):
+                     name=HandFeatures.normalize_names(prefix,self.names(idx));
+                     if wrist is None:
+                        wrist=[lm.x, lm.y, lm.z];
+                        rt.append({"index":idx, "score":0.0, "name":name});
+                     else:
+                        score= math.sqrt((wrist[0]-lm.x)**2 + (wrist[1]-lm.y)**2 + (wrist[2]-lm.z)**2);
+                        rt.append({"index":idx, "score":score, "name":name});
                     
-                 rt.append(hand);
-                 
-             self._queue += rt;
-             self.signal_landmarks(rt);
+             self.signal_features(rt);
               
-             try:
-               landmark=self._queue.pop(0);
-               self.signal_landmark(landmark);
-                 
-             except IndexError:
-               self.signal_end(True);
-                    
              if self.signal_image():
-                salida = HandLandmarks.draw_landmarks_on_image(image.numpy_view(), results)
+                salida = HandFeatures.draw_landmarks_on_image(image.numpy_view(), results)
                 self.signal_image(PIL.Image.fromarray(salida));
-
-      #-------------------------------------------------------------------------
-      @Block.slot("next", {object})
-      def slot_next(self, slot, data):
-          try:
-            landmark=self._queue.pop(0);
-            self.signal_landmark(landmark);
-          except IndexError:
-            self.signal_end(True);
 
       #-------------------------------------------------------------------------
       # SIGNALS
@@ -149,16 +135,7 @@ class HandLandmarks(Block):
           return data;
 
       #-------------------------------------------------------------------------
-      @Block.signal("landmarks", list)
-      def signal_landmarks(self, data):
+      @Block.signal("features", list)
+      def signal_features(self, data):
           return data;
 
-      #-------------------------------------------------------------------------
-      @Block.signal("landmark", dict)
-      def signal_landmark(self, data):
-          return data;
-          
-      #-------------------------------------------------------------------------
-      @Block.signal("end", bool)
-      def signal_end(self, data):
-          return data;

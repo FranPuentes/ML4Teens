@@ -18,6 +18,7 @@ from .poseEstimation    import PoseEstimation
 from .faceBoxing        import FaceBoxing
 from .faceLandmarks     import FaceLandmarks
 from .faceRecognition   import FaceRecognition
+from .handFeatures      import HandFeatures
 from .handLandmarks     import HandLandmarks
 from .handGestures      import HandGestures
 from .embedding         import Embedding
