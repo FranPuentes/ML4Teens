@@ -26,10 +26,19 @@
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">import sys, io;
+<pre><code class="python">import sys, os, io;
+import fnmatch;
 from PIL import Image;
 import requests;
 from io import BytesIO;
+import tempfile;
+
+import glob;
+import json;
+import shutil;
+import zipfile;
+
+from itertools import accumulate;
 
 #===============================================================================
 def image_from_url(url:str, mode:str=None, width:int=None, height:int=None):
@@ -135,7 +144,171 @@ def uploadFiles():
        for item in uploader.value:
            _files.append(item[&#34;name&#34;]);
 
-    return tuple(_files);</code></pre>
+    return tuple(_files);
+
+#===============================================================================
+class UrlDownload:
+
+      def __init__(self, url:str, filename=None, autoremove=True):
+          self._autoremove=autoremove;
+          response = requests.get(url);
+          response.raise_for_status();
+          if filename is None:
+             with tempfile.NamedTemporaryFile(delete=False, delete_on_close=False) as temp:
+                  temp.write(response.content);
+                  self._filename=temp.name;
+          else:
+             with open(filename,&#34;wb&#34;) as fd:
+                  fd.write(response.content);
+                  self._filename=filename;
+
+      def __del__(self):
+          try:
+            if self._autoremove:
+               os.remove(self._filename);
+          except:
+            pass;
+
+      def __str__(self):
+          return self._filename;
+
+      @property
+      def filename(self):
+          return self._filename;
+
+      @property
+      def autoremove(self):
+          return self._autoremove;
+
+
+#===============================================================================
+def searchFilename(path, filename):
+    &#34;&#34;&#34;
+    Busca un archivo de forma recursiva en un directorio y devuelve su path absoluto.
+
+    :param path: El path del directorio en el que empezar la búsqueda.
+    :param filename: El nombre del archivo a buscar.
+    :return: El path absoluto del archivo si se encuentra, o None si no se encuentra.
+    &#34;&#34;&#34;
+    for raiz, directorios, archivos in os.walk(path):
+        if filename in archivos:
+           return os.path.join(raiz, filename);
+    return None;
+
+#===============================================================================
+def searchPattern(path, pattern):
+    &#34;&#34;&#34;
+    Busca archivos de forma recursiva en un directorio y devuelve su path absoluto.
+
+    :param path: El path del directorio en el que empezar la búsqueda.
+    :param pattern: El patrón del nombre de los archivos a buscar.
+    :return: Una lista con los paths absolutos de los archivos.
+    &#34;&#34;&#34;
+    rt=[];
+    for raiz, directorios, archivos in os.walk(path):
+        for archivo in archivos:
+            if fnmatch.fnmatch(archivo, pattern):
+               rt.append(os.path.join(raiz, archivo));
+    return rt;
+
+#===============================================================================
+class CocoDataset:
+
+      def __init__(self, dataset:str):
+          assert os.path.isdir(dataset), f&#34;No existe el directorio del dataset: {dataset}&#34;;
+          self._dataset = dataset;
+          files = glob.glob(os.path.join(dataset, &#39;*.json&#39;), recursive=False);
+          assert len(files)==1, &#34;No encuentro el fichero (*.json) de anotaciones&#34;;
+          imagesPath = os.path.join(dataset, &#39;images&#39;);
+          assert os.path.isdir(imagesPath), &#34;No existe el directorio &#39;images&#39; en el dataset&#34;;          
+          self._annotations = self._load_annotations(files[0]);
+
+      def _load_annotations(self, filename):
+          with open(filename, &#39;r&#39;, encoding=&#39;utf-8&#39;) as fd:
+               data = json.load(fd);
+               return data;
+
+      def _split(self, l, f=(80,15,5)):
+          assert type(l) is int and l&gt;=3;
+          assert len(f)==3 and all([type(n) is int for n in f]);
+          assert sum(f)==100, f&#34;El split &#39;{f}&#39; debe sumar 100&#34;;
+          f=list(accumulate([0]+[int(l*n/100.0) for n in f]));
+          r=list(range(0,l));
+          return set(r[:f[1]]), set(r[f[1]:f[2]]), set(r[f[2]:]);
+
+      def export(self, target, to=&#34;yolo&#34;, split=(80,15,5), compress=False):
+          if target.endswith(&#39;.zip&#39;):
+             target=os.path.abspath(target);
+             path, filename = os.path.split(target);
+             basename, ext = os.path.splitext(filename);
+             assert not os.path.exists(os.path.join(path,basename)), f&#34;El path &#39;{os.path.join(path,basename)}&#39; existe&#34;;
+             target=os.path.join(path,basename);
+             compress=True;
+
+          if to.lower()==&#34;yolo&#34;:
+             os.makedirs(target, exist_ok=True);
+             os.makedirs(os.path.join(target,&#34;train&#34;), exist_ok=True);
+             os.makedirs(os.path.join(target,&#34;val&#34;  ), exist_ok=True);
+             os.makedirs(os.path.join(target,&#34;test&#34; ), exist_ok=True);
+             images     =sorted(self._annotations[&#34;images&#34;     ],key=lambda x: x[&#34;id&#34;]);
+             annotations=sorted(self._annotations[&#34;annotations&#34;],key=lambda x: x[&#34;image_id&#34;]);
+             train,val,test=self._split(len(images),split);
+             for i, image in enumerate(images):
+                 if   i in train: dest=os.path.join(target,&#34;train&#34;);
+                 elif i in val:   dest=os.path.join(target,&#34;val&#34;);
+                 elif i in test:  dest=os.path.join(target,&#34;test&#34;);
+                 else:            raise RuntimeError(&#34;Error interno&#34;);
+                 shutil.copy(os.path.join(self._dataset,image[&#34;file_name&#34;]), dest);
+                 
+                 width =image[&#34;width&#34; ];
+                 height=image[&#34;height&#34;];
+                 
+                 ann=[];
+                 for annotation in annotations:
+                     if annotation[&#34;image_id&#34;] == image[&#34;id&#34;]:
+                        label_id =annotation[&#34;category_id&#34;];
+                        x1,y1,w,h=annotation[&#34;bbox&#34;];
+                        assert label_id&gt;0;
+                        ann.append({&#34;id&#34;:label_id-1,
+                                    &#34;cx&#34;:(x1+w/2)/width,
+                                    &#34;cy&#34;:(y1+h/2)/height,
+                                    &#34;bw&#34;:(w/width),
+                                    &#34;bh&#34;:(h/height),
+                                   });
+                 
+                 basename    = os.path.join(self._dataset,image[&#34;file_name&#34;]);
+                 basename    = os.path.basename(basename);
+                 basename, _ = os.path.splitext(basename);
+                 basename    = f&#34;{basename}.txt&#34;;
+                 with open(os.path.join(dest,basename),&#34;wt&#34;) as fd:
+                      for a in ann:
+                          print(f&#34;{a[&#39;id&#39;]} {a[&#39;cx&#39;]} {a[&#39;cy&#39;]} {a[&#39;bw&#39;]} {a[&#39;bh&#39;]}&#34;, file=fd);
+
+             labels=[k[&#34;name&#34;] for k in sorted(self._annotations[&#34;categories&#34;],key=lambda x: x[&#34;id&#34;])];
+             with open(os.path.join(target,&#34;dataset.yaml&#34;),&#34;wt&#34;,encoding=&#34;utf-8&#34;) as fd:
+                  print(f&#34;#path: {target}&#34;, file=fd);
+                  print(f&#34;train: ./train&#34;,  file=fd);
+                  print(f&#34;val: ./val&#34;,      file=fd);
+                  print(f&#34;test: ./test&#34;,    file=fd);
+                  print( &#34;&#34;,                file=fd);
+                  print(f&#34;names: {labels}&#34;, file=fd);
+            
+          if compress:
+             zip_target=f&#34;{target}.zip&#34;;
+             with zipfile.ZipFile(zip_target, &#39;w&#39;, zipfile.ZIP_DEFLATED) as zipf:
+                  longitud_ruta_base = len(os.path.dirname(target));
+                  nombre_directorio_fuente = os.path.basename(target);
+                  for raiz, _, archivos in os.walk(target):
+                      for archivo in archivos:
+                          ruta_completa = os.path.join(raiz, archivo);
+                          nombre_archivo_zip = ruta_completa[longitud_ruta_base + 1:];
+                          zipf.write(ruta_completa, nombre_archivo_zip);
+             return zip_target;
+
+          else:   
+             return target;
+
+    </code></pre>
 </details>
 </section>
 <section>
@@ -324,6 +497,60 @@ def uploadFiles():
     return False</code></pre>
 </details>
 </dd>
+<dt id="ml4teens.tools.tools.searchFilename"><code class="name flex">
+<span>def <span class="ident">searchFilename</span></span>(<span>path, filename)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Busca un archivo de forma recursiva en un directorio y devuelve su path absoluto.</p>
+<p>:param path: El path del directorio en el que empezar la búsqueda.
+:param filename: El nombre del archivo a buscar.
+:return: El path absoluto del archivo si se encuentra, o None si no se encuentra.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def searchFilename(path, filename):
+    &#34;&#34;&#34;
+    Busca un archivo de forma recursiva en un directorio y devuelve su path absoluto.
+
+    :param path: El path del directorio en el que empezar la búsqueda.
+    :param filename: El nombre del archivo a buscar.
+    :return: El path absoluto del archivo si se encuentra, o None si no se encuentra.
+    &#34;&#34;&#34;
+    for raiz, directorios, archivos in os.walk(path):
+        if filename in archivos:
+           return os.path.join(raiz, filename);
+    return None;</code></pre>
+</details>
+</dd>
+<dt id="ml4teens.tools.tools.searchPattern"><code class="name flex">
+<span>def <span class="ident">searchPattern</span></span>(<span>path, pattern)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Busca archivos de forma recursiva en un directorio y devuelve su path absoluto.</p>
+<p>:param path: El path del directorio en el que empezar la búsqueda.
+:param pattern: El patrón del nombre de los archivos a buscar.
+:return: Una lista con los paths absolutos de los archivos.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def searchPattern(path, pattern):
+    &#34;&#34;&#34;
+    Busca archivos de forma recursiva en un directorio y devuelve su path absoluto.
+
+    :param path: El path del directorio en el que empezar la búsqueda.
+    :param pattern: El patrón del nombre de los archivos a buscar.
+    :return: Una lista con los paths absolutos de los archivos.
+    &#34;&#34;&#34;
+    rt=[];
+    for raiz, directorios, archivos in os.walk(path):
+        for archivo in archivos:
+            if fnmatch.fnmatch(archivo, pattern):
+               rt.append(os.path.join(raiz, archivo));
+    return rt;</code></pre>
+</details>
+</dd>
 <dt id="ml4teens.tools.tools.uploadFiles"><code class="name flex">
 <span>def <span class="ident">uploadFiles</span></span>(<span>)</span>
 </code></dt>
@@ -362,6 +589,272 @@ def uploadFiles():
 </dl>
 </section>
 <section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="ml4teens.tools.tools.CocoDataset"><code class="flex name class">
+<span>class <span class="ident">CocoDataset</span></span>
+<span>(</span><span>dataset: str)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class CocoDataset:
+
+      def __init__(self, dataset:str):
+          assert os.path.isdir(dataset), f&#34;No existe el directorio del dataset: {dataset}&#34;;
+          self._dataset = dataset;
+          files = glob.glob(os.path.join(dataset, &#39;*.json&#39;), recursive=False);
+          assert len(files)==1, &#34;No encuentro el fichero (*.json) de anotaciones&#34;;
+          imagesPath = os.path.join(dataset, &#39;images&#39;);
+          assert os.path.isdir(imagesPath), &#34;No existe el directorio &#39;images&#39; en el dataset&#34;;          
+          self._annotations = self._load_annotations(files[0]);
+
+      def _load_annotations(self, filename):
+          with open(filename, &#39;r&#39;, encoding=&#39;utf-8&#39;) as fd:
+               data = json.load(fd);
+               return data;
+
+      def _split(self, l, f=(80,15,5)):
+          assert type(l) is int and l&gt;=3;
+          assert len(f)==3 and all([type(n) is int for n in f]);
+          assert sum(f)==100, f&#34;El split &#39;{f}&#39; debe sumar 100&#34;;
+          f=list(accumulate([0]+[int(l*n/100.0) for n in f]));
+          r=list(range(0,l));
+          return set(r[:f[1]]), set(r[f[1]:f[2]]), set(r[f[2]:]);
+
+      def export(self, target, to=&#34;yolo&#34;, split=(80,15,5), compress=False):
+          if target.endswith(&#39;.zip&#39;):
+             target=os.path.abspath(target);
+             path, filename = os.path.split(target);
+             basename, ext = os.path.splitext(filename);
+             assert not os.path.exists(os.path.join(path,basename)), f&#34;El path &#39;{os.path.join(path,basename)}&#39; existe&#34;;
+             target=os.path.join(path,basename);
+             compress=True;
+
+          if to.lower()==&#34;yolo&#34;:
+             os.makedirs(target, exist_ok=True);
+             os.makedirs(os.path.join(target,&#34;train&#34;), exist_ok=True);
+             os.makedirs(os.path.join(target,&#34;val&#34;  ), exist_ok=True);
+             os.makedirs(os.path.join(target,&#34;test&#34; ), exist_ok=True);
+             images     =sorted(self._annotations[&#34;images&#34;     ],key=lambda x: x[&#34;id&#34;]);
+             annotations=sorted(self._annotations[&#34;annotations&#34;],key=lambda x: x[&#34;image_id&#34;]);
+             train,val,test=self._split(len(images),split);
+             for i, image in enumerate(images):
+                 if   i in train: dest=os.path.join(target,&#34;train&#34;);
+                 elif i in val:   dest=os.path.join(target,&#34;val&#34;);
+                 elif i in test:  dest=os.path.join(target,&#34;test&#34;);
+                 else:            raise RuntimeError(&#34;Error interno&#34;);
+                 shutil.copy(os.path.join(self._dataset,image[&#34;file_name&#34;]), dest);
+                 
+                 width =image[&#34;width&#34; ];
+                 height=image[&#34;height&#34;];
+                 
+                 ann=[];
+                 for annotation in annotations:
+                     if annotation[&#34;image_id&#34;] == image[&#34;id&#34;]:
+                        label_id =annotation[&#34;category_id&#34;];
+                        x1,y1,w,h=annotation[&#34;bbox&#34;];
+                        assert label_id&gt;0;
+                        ann.append({&#34;id&#34;:label_id-1,
+                                    &#34;cx&#34;:(x1+w/2)/width,
+                                    &#34;cy&#34;:(y1+h/2)/height,
+                                    &#34;bw&#34;:(w/width),
+                                    &#34;bh&#34;:(h/height),
+                                   });
+                 
+                 basename    = os.path.join(self._dataset,image[&#34;file_name&#34;]);
+                 basename    = os.path.basename(basename);
+                 basename, _ = os.path.splitext(basename);
+                 basename    = f&#34;{basename}.txt&#34;;
+                 with open(os.path.join(dest,basename),&#34;wt&#34;) as fd:
+                      for a in ann:
+                          print(f&#34;{a[&#39;id&#39;]} {a[&#39;cx&#39;]} {a[&#39;cy&#39;]} {a[&#39;bw&#39;]} {a[&#39;bh&#39;]}&#34;, file=fd);
+
+             labels=[k[&#34;name&#34;] for k in sorted(self._annotations[&#34;categories&#34;],key=lambda x: x[&#34;id&#34;])];
+             with open(os.path.join(target,&#34;dataset.yaml&#34;),&#34;wt&#34;,encoding=&#34;utf-8&#34;) as fd:
+                  print(f&#34;#path: {target}&#34;, file=fd);
+                  print(f&#34;train: ./train&#34;,  file=fd);
+                  print(f&#34;val: ./val&#34;,      file=fd);
+                  print(f&#34;test: ./test&#34;,    file=fd);
+                  print( &#34;&#34;,                file=fd);
+                  print(f&#34;names: {labels}&#34;, file=fd);
+            
+          if compress:
+             zip_target=f&#34;{target}.zip&#34;;
+             with zipfile.ZipFile(zip_target, &#39;w&#39;, zipfile.ZIP_DEFLATED) as zipf:
+                  longitud_ruta_base = len(os.path.dirname(target));
+                  nombre_directorio_fuente = os.path.basename(target);
+                  for raiz, _, archivos in os.walk(target):
+                      for archivo in archivos:
+                          ruta_completa = os.path.join(raiz, archivo);
+                          nombre_archivo_zip = ruta_completa[longitud_ruta_base + 1:];
+                          zipf.write(ruta_completa, nombre_archivo_zip);
+             return zip_target;
+
+          else:   
+             return target;</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="ml4teens.tools.tools.CocoDataset.export"><code class="name flex">
+<span>def <span class="ident">export</span></span>(<span>self, target, to='yolo', split=(80, 15, 5), compress=False)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def export(self, target, to=&#34;yolo&#34;, split=(80,15,5), compress=False):
+    if target.endswith(&#39;.zip&#39;):
+       target=os.path.abspath(target);
+       path, filename = os.path.split(target);
+       basename, ext = os.path.splitext(filename);
+       assert not os.path.exists(os.path.join(path,basename)), f&#34;El path &#39;{os.path.join(path,basename)}&#39; existe&#34;;
+       target=os.path.join(path,basename);
+       compress=True;
+
+    if to.lower()==&#34;yolo&#34;:
+       os.makedirs(target, exist_ok=True);
+       os.makedirs(os.path.join(target,&#34;train&#34;), exist_ok=True);
+       os.makedirs(os.path.join(target,&#34;val&#34;  ), exist_ok=True);
+       os.makedirs(os.path.join(target,&#34;test&#34; ), exist_ok=True);
+       images     =sorted(self._annotations[&#34;images&#34;     ],key=lambda x: x[&#34;id&#34;]);
+       annotations=sorted(self._annotations[&#34;annotations&#34;],key=lambda x: x[&#34;image_id&#34;]);
+       train,val,test=self._split(len(images),split);
+       for i, image in enumerate(images):
+           if   i in train: dest=os.path.join(target,&#34;train&#34;);
+           elif i in val:   dest=os.path.join(target,&#34;val&#34;);
+           elif i in test:  dest=os.path.join(target,&#34;test&#34;);
+           else:            raise RuntimeError(&#34;Error interno&#34;);
+           shutil.copy(os.path.join(self._dataset,image[&#34;file_name&#34;]), dest);
+           
+           width =image[&#34;width&#34; ];
+           height=image[&#34;height&#34;];
+           
+           ann=[];
+           for annotation in annotations:
+               if annotation[&#34;image_id&#34;] == image[&#34;id&#34;]:
+                  label_id =annotation[&#34;category_id&#34;];
+                  x1,y1,w,h=annotation[&#34;bbox&#34;];
+                  assert label_id&gt;0;
+                  ann.append({&#34;id&#34;:label_id-1,
+                              &#34;cx&#34;:(x1+w/2)/width,
+                              &#34;cy&#34;:(y1+h/2)/height,
+                              &#34;bw&#34;:(w/width),
+                              &#34;bh&#34;:(h/height),
+                             });
+           
+           basename    = os.path.join(self._dataset,image[&#34;file_name&#34;]);
+           basename    = os.path.basename(basename);
+           basename, _ = os.path.splitext(basename);
+           basename    = f&#34;{basename}.txt&#34;;
+           with open(os.path.join(dest,basename),&#34;wt&#34;) as fd:
+                for a in ann:
+                    print(f&#34;{a[&#39;id&#39;]} {a[&#39;cx&#39;]} {a[&#39;cy&#39;]} {a[&#39;bw&#39;]} {a[&#39;bh&#39;]}&#34;, file=fd);
+
+       labels=[k[&#34;name&#34;] for k in sorted(self._annotations[&#34;categories&#34;],key=lambda x: x[&#34;id&#34;])];
+       with open(os.path.join(target,&#34;dataset.yaml&#34;),&#34;wt&#34;,encoding=&#34;utf-8&#34;) as fd:
+            print(f&#34;#path: {target}&#34;, file=fd);
+            print(f&#34;train: ./train&#34;,  file=fd);
+            print(f&#34;val: ./val&#34;,      file=fd);
+            print(f&#34;test: ./test&#34;,    file=fd);
+            print( &#34;&#34;,                file=fd);
+            print(f&#34;names: {labels}&#34;, file=fd);
+      
+    if compress:
+       zip_target=f&#34;{target}.zip&#34;;
+       with zipfile.ZipFile(zip_target, &#39;w&#39;, zipfile.ZIP_DEFLATED) as zipf:
+            longitud_ruta_base = len(os.path.dirname(target));
+            nombre_directorio_fuente = os.path.basename(target);
+            for raiz, _, archivos in os.walk(target):
+                for archivo in archivos:
+                    ruta_completa = os.path.join(raiz, archivo);
+                    nombre_archivo_zip = ruta_completa[longitud_ruta_base + 1:];
+                    zipf.write(ruta_completa, nombre_archivo_zip);
+       return zip_target;
+
+    else:   
+       return target;</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="ml4teens.tools.tools.UrlDownload"><code class="flex name class">
+<span>class <span class="ident">UrlDownload</span></span>
+<span>(</span><span>url: str, filename=None, autoremove=True)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class UrlDownload:
+
+      def __init__(self, url:str, filename=None, autoremove=True):
+          self._autoremove=autoremove;
+          response = requests.get(url);
+          response.raise_for_status();
+          if filename is None:
+             with tempfile.NamedTemporaryFile(delete=False, delete_on_close=False) as temp:
+                  temp.write(response.content);
+                  self._filename=temp.name;
+          else:
+             with open(filename,&#34;wb&#34;) as fd:
+                  fd.write(response.content);
+                  self._filename=filename;
+
+      def __del__(self):
+          try:
+            if self._autoremove:
+               os.remove(self._filename);
+          except:
+            pass;
+
+      def __str__(self):
+          return self._filename;
+
+      @property
+      def filename(self):
+          return self._filename;
+
+      @property
+      def autoremove(self):
+          return self._autoremove;</code></pre>
+</details>
+<h3>Instance variables</h3>
+<dl>
+<dt id="ml4teens.tools.tools.UrlDownload.autoremove"><code class="name">var <span class="ident">autoremove</span></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def autoremove(self):
+    return self._autoremove;</code></pre>
+</details>
+</dd>
+<dt id="ml4teens.tools.tools.UrlDownload.filename"><code class="name">var <span class="ident">filename</span></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def filename(self):
+    return self._filename;</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
 </section>
 </article>
 <nav id="sidebar">
@@ -382,7 +875,26 @@ def uploadFiles():
 <li><code><a title="ml4teens.tools.tools.runnigInGoogleColab" href="#ml4teens.tools.tools.runnigInGoogleColab">runnigInGoogleColab</a></code></li>
 <li><code><a title="ml4teens.tools.tools.runnigInJupyterLike" href="#ml4teens.tools.tools.runnigInJupyterLike">runnigInJupyterLike</a></code></li>
 <li><code><a title="ml4teens.tools.tools.runningInNotebook" href="#ml4teens.tools.tools.runningInNotebook">runningInNotebook</a></code></li>
+<li><code><a title="ml4teens.tools.tools.searchFilename" href="#ml4teens.tools.tools.searchFilename">searchFilename</a></code></li>
+<li><code><a title="ml4teens.tools.tools.searchPattern" href="#ml4teens.tools.tools.searchPattern">searchPattern</a></code></li>
 <li><code><a title="ml4teens.tools.tools.uploadFiles" href="#ml4teens.tools.tools.uploadFiles">uploadFiles</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="ml4teens.tools.tools.CocoDataset" href="#ml4teens.tools.tools.CocoDataset">CocoDataset</a></code></h4>
+<ul class="">
+<li><code><a title="ml4teens.tools.tools.CocoDataset.export" href="#ml4teens.tools.tools.CocoDataset.export">export</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="ml4teens.tools.tools.UrlDownload" href="#ml4teens.tools.tools.UrlDownload">UrlDownload</a></code></h4>
+<ul class="">
+<li><code><a title="ml4teens.tools.tools.UrlDownload.autoremove" href="#ml4teens.tools.tools.UrlDownload.autoremove">autoremove</a></code></li>
+<li><code><a title="ml4teens.tools.tools.UrlDownload.filename" href="#ml4teens.tools.tools.UrlDownload.filename">filename</a></code></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

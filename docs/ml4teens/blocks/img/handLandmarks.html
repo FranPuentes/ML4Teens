@@ -136,11 +136,10 @@ class HandLandmarks(Block):
                  hand_landmarks = results.hand_landmarks[idx];
                  handedness = results.handedness[idx];
                  
-                 hand={&#34;kind&#34;:f&#34;hand::{handedness[0].category_name}&#34;, &#34;trust&#34;:handedness[0].score, &#34;xy&#34;:[], &#34;z&#34;:[], &#34;visibility&#34;:[], &#34;presence&#34;:[], &#34;names&#34;:[] };
+                 hand={&#34;kind&#34;:f&#34;hand::{handedness[0].category_name}&#34;, &#34;trust&#34;:handedness[0].score, &#34;xyz&#34;:[], &#34;visibility&#34;:[], &#34;presence&#34;:[], &#34;names&#34;:[] };
                  
                  for l, lm in enumerate(hand_landmarks):
-                     hand[&#34;xy&#34;        ].append((lm.x, lm.y));
-                     hand[&#34;z&#34;         ].append(lm.z);
+                     hand[&#34;xyz&#34;       ].append((lm.x, lm.y, lm.z));
                      hand[&#34;visibility&#34;].append(lm.visibility);
                      hand[&#34;presence&#34;  ].append(lm.presence);
                      hand[&#34;names&#34;     ].append(self.names(l));
@@ -305,11 +304,10 @@ class HandLandmarks(Block):
                  hand_landmarks = results.hand_landmarks[idx];
                  handedness = results.handedness[idx];
                  
-                 hand={&#34;kind&#34;:f&#34;hand::{handedness[0].category_name}&#34;, &#34;trust&#34;:handedness[0].score, &#34;xy&#34;:[], &#34;z&#34;:[], &#34;visibility&#34;:[], &#34;presence&#34;:[], &#34;names&#34;:[] };
+                 hand={&#34;kind&#34;:f&#34;hand::{handedness[0].category_name}&#34;, &#34;trust&#34;:handedness[0].score, &#34;xyz&#34;:[], &#34;visibility&#34;:[], &#34;presence&#34;:[], &#34;names&#34;:[] };
                  
                  for l, lm in enumerate(hand_landmarks):
-                     hand[&#34;xy&#34;        ].append((lm.x, lm.y));
-                     hand[&#34;z&#34;         ].append(lm.z);
+                     hand[&#34;xyz&#34;       ].append((lm.x, lm.y, lm.z));
                      hand[&#34;visibility&#34;].append(lm.visibility);
                      hand[&#34;presence&#34;  ].append(lm.presence);
                      hand[&#34;names&#34;     ].append(self.names(l));
@@ -450,7 +448,7 @@ def names(cls, idx):
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.handLandmarks.HandLandmarks.signal_end"><code class="name flex">
-<span>def <span class="ident">signal_end</span></span>(<span>self, data='83b9f271c166b447158e9d902cc8637d9344ef17a1ac58b59a18c7bc153890f6')</span>
+<span>def <span class="ident">signal_end</span></span>(<span>self, data='317a5e599d93f72cf2aef6eb75914af92fbc5afdb24a5a368d4a3901cd121463')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -469,7 +467,7 @@ def names(cls, idx):
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.handLandmarks.HandLandmarks.signal_image"><code class="name flex">
-<span>def <span class="ident">signal_image</span></span>(<span>self, data='2f6f89ad50e4a2c21ce6bb39505cc43d183f9b3b80cd53f5e5abb683c8025157')</span>
+<span>def <span class="ident">signal_image</span></span>(<span>self, data='b729dd350802ff45b3cfb14ec9ab0e2bbaa052566c006caf761617648b22303b')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -488,7 +486,7 @@ def names(cls, idx):
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.handLandmarks.HandLandmarks.signal_landmark"><code class="name flex">
-<span>def <span class="ident">signal_landmark</span></span>(<span>self, data='860b6e920dbfff53d37735b89740a5c7cfbdbbffa5272ff36c6016e518b62470')</span>
+<span>def <span class="ident">signal_landmark</span></span>(<span>self, data='0c5f87994dd49acbb8b1c7e9556c057aeaca43cd3b01d25a41faeabe2cf8350d')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -507,7 +505,7 @@ def names(cls, idx):
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.handLandmarks.HandLandmarks.signal_landmarks"><code class="name flex">
-<span>def <span class="ident">signal_landmarks</span></span>(<span>self, data='528c12610e90bf5e0f31daa83211816f1856c3125f6e2dbc47e987e7366f3795')</span>
+<span>def <span class="ident">signal_landmarks</span></span>(<span>self, data='43497abcf0a948d54ed4a6a8d9c93b51f580c5ae49802217f871b5e06389d4f9')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>

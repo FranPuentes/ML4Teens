@@ -26,7 +26,9 @@
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">from PIL.Image import Image;
+<pre><code class="python">import PIL;
+
+from PIL.Image import Image;
 from PIL       import ImageOps, ImageChops, ImageMath, ImageFilter;
 
 from ...core import Block;
@@ -134,6 +136,13 @@ class ImageOp(Block):
 
           elif op in [&#34;multiply&#34;,&#34;*&#34;]:
                imagen = ImageChops.multiply(left, right);
+
+          elif op in [&#34;mask&#34;]:
+               rgb    = left.convert(&#34;RGB&#34;);
+               L      = right.convert(&#39;L&#39;);
+               L      = L.resize(rgb.size);
+               r, g, b = rgb.split();
+               imagen = PIL.Image.merge(&#34;RGBA&#34;, (r, g, b, L));
 
           elif op in [&#34;blend&#34;]:
                imagen = ImageChops.blend(left, right, **params);
@@ -304,6 +313,8 @@ class ImageOp(Block):
           left =self._left;
           if left and right:
              imagen=self._op2(left, right, self._op, self._kwargs);
+             self._left=None;
+             self._right=None;
              return imagen;
           return None;      
 
@@ -312,16 +323,18 @@ class ImageOp(Block):
       def slot_left(self, slot, data):
           self._left=data;
           imagen=self._binary();
-          self.signal_image(imagen);
-          self.signal_left(imagen);
+          if imagen is not None:
+             self.signal_image(imagen);
+             self.signal_left(imagen);
 
       #-------------------------------------------------------------------------
       @Block.slot(&#34;right&#34;, {Image})
       def slot_right(self, slot, data):
           self._right=data;
           imagen=self._binary();
-          self.signal_image(imagen);
-          self.signal_right(imagen);
+          if imagen is not None:
+             self.signal_image(imagen);
+             self.signal_right(imagen);
 
       #-------------------------------------------------------------------------
       # SIGNALS &amp; RUN
@@ -464,6 +477,13 @@ class ImageOp(Block):
           elif op in [&#34;multiply&#34;,&#34;*&#34;]:
                imagen = ImageChops.multiply(left, right);
 
+          elif op in [&#34;mask&#34;]:
+               rgb    = left.convert(&#34;RGB&#34;);
+               L      = right.convert(&#39;L&#39;);
+               L      = L.resize(rgb.size);
+               r, g, b = rgb.split();
+               imagen = PIL.Image.merge(&#34;RGBA&#34;, (r, g, b, L));
+
           elif op in [&#34;blend&#34;]:
                imagen = ImageChops.blend(left, right, **params);
 
@@ -633,6 +653,8 @@ class ImageOp(Block):
           left =self._left;
           if left and right:
              imagen=self._op2(left, right, self._op, self._kwargs);
+             self._left=None;
+             self._right=None;
              return imagen;
           return None;      
 
@@ -641,16 +663,18 @@ class ImageOp(Block):
       def slot_left(self, slot, data):
           self._left=data;
           imagen=self._binary();
-          self.signal_image(imagen);
-          self.signal_left(imagen);
+          if imagen is not None:
+             self.signal_image(imagen);
+             self.signal_left(imagen);
 
       #-------------------------------------------------------------------------
       @Block.slot(&#34;right&#34;, {Image})
       def slot_right(self, slot, data):
           self._right=data;
           imagen=self._binary();
-          self.signal_image(imagen);
-          self.signal_right(imagen);
+          if imagen is not None:
+             self.signal_image(imagen);
+             self.signal_right(imagen);
 
       #-------------------------------------------------------------------------
       # SIGNALS &amp; RUN
@@ -677,7 +701,7 @@ class ImageOp(Block):
 <h3>Methods</h3>
 <dl>
 <dt id="ml4teens.blocks.img.imageOp.ImageOp.signal_image"><code class="name flex">
-<span>def <span class="ident">signal_image</span></span>(<span>self, data='f8ce2c25d08e3f99101252eac09886644c006aa39beb151a09908d0769acbfc3')</span>
+<span>def <span class="ident">signal_image</span></span>(<span>self, data='f044830ceff31a7a860b15faf634c8cf3373f359b20c82c43c3ce68a4fd6dfdb')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -696,7 +720,7 @@ class ImageOp(Block):
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.imageOp.ImageOp.signal_left"><code class="name flex">
-<span>def <span class="ident">signal_left</span></span>(<span>self, data='ea790d2f0fd1a3e7e367d509dc88adfd75864b8b954be695ecc11514a6bf3679')</span>
+<span>def <span class="ident">signal_left</span></span>(<span>self, data='4b242a4580d7051837f0c8a2e5586b8ff9059026c5044882a80a3ef3941461cb')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -715,7 +739,7 @@ class ImageOp(Block):
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.imageOp.ImageOp.signal_right"><code class="name flex">
-<span>def <span class="ident">signal_right</span></span>(<span>self, data='0a0d0d33d2a29a86631b2187bc146e47753173f78e336b70b90fb425c7a8b485')</span>
+<span>def <span class="ident">signal_right</span></span>(<span>self, data='0ab21f75484bc18aa0c29e989c8a5421e30390057f94aea90c0c395300d1319f')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>

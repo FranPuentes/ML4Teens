@@ -140,11 +140,10 @@ class HandGestures(Block):
                     hand_landmarks = results.hand_landmarks[idx];
                     handedness = results.handedness[idx];
                      
-                    hand={&#34;kind&#34;:f&#34;hand::{handedness[0].category_name}&#34;, &#34;trust&#34;:handedness[0].score, &#34;xy&#34;:[], &#34;z&#34;:[], &#34;visibility&#34;:[], &#34;presence&#34;:[], &#34;names&#34;:[] };
+                    hand={&#34;kind&#34;:f&#34;hand::{handedness[0].category_name}&#34;, &#34;trust&#34;:handedness[0].score, &#34;xyz&#34;:[], &#34;visibility&#34;:[], &#34;presence&#34;:[], &#34;names&#34;:[] };
                      
                     for l, lm in enumerate(hand_landmarks):
-                        hand[&#34;xy&#34;        ].append((lm.x, lm.y));
-                        hand[&#34;z&#34;         ].append(lm.z);
+                        hand[&#34;xyz&#34;       ].append((lm.x, lm.y, lm.z));
                         hand[&#34;visibility&#34;].append(lm.visibility);
                         hand[&#34;presence&#34;  ].append(lm.presence);
                         hand[&#34;names&#34;     ].append(self.names(l));
@@ -319,11 +318,10 @@ class HandGestures(Block):
                     hand_landmarks = results.hand_landmarks[idx];
                     handedness = results.handedness[idx];
                      
-                    hand={&#34;kind&#34;:f&#34;hand::{handedness[0].category_name}&#34;, &#34;trust&#34;:handedness[0].score, &#34;xy&#34;:[], &#34;z&#34;:[], &#34;visibility&#34;:[], &#34;presence&#34;:[], &#34;names&#34;:[] };
+                    hand={&#34;kind&#34;:f&#34;hand::{handedness[0].category_name}&#34;, &#34;trust&#34;:handedness[0].score, &#34;xyz&#34;:[], &#34;visibility&#34;:[], &#34;presence&#34;:[], &#34;names&#34;:[] };
                      
                     for l, lm in enumerate(hand_landmarks):
-                        hand[&#34;xy&#34;        ].append((lm.x, lm.y));
-                        hand[&#34;z&#34;         ].append(lm.z);
+                        hand[&#34;xyz&#34;       ].append((lm.x, lm.y, lm.z));
                         hand[&#34;visibility&#34;].append(lm.visibility);
                         hand[&#34;presence&#34;  ].append(lm.presence);
                         hand[&#34;names&#34;     ].append(self.names(l));
@@ -470,7 +468,7 @@ def names(cls, idx):
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.handGestures.HandGestures.signal_end"><code class="name flex">
-<span>def <span class="ident">signal_end</span></span>(<span>self, data='39666f3f0d4e26ab64b1f817ef83657e76e5a9cdf4f31188953d4d1f8516e1fa')</span>
+<span>def <span class="ident">signal_end</span></span>(<span>self, data='891a501d197df5b3d2ddafab452d10a12061233863e4851cafbc23eb7ff4929d')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -489,7 +487,7 @@ def names(cls, idx):
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.handGestures.HandGestures.signal_gesture"><code class="name flex">
-<span>def <span class="ident">signal_gesture</span></span>(<span>self, data='c7127e2513741b31da1730d762bf7ceaf6c9887d2659e4168064d8b52f6b7d2d')</span>
+<span>def <span class="ident">signal_gesture</span></span>(<span>self, data='33709d42dd7b794bbd51b43939043dd098bc28d18e7d095baee7665b2be11600')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -508,7 +506,7 @@ def names(cls, idx):
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.handGestures.HandGestures.signal_image"><code class="name flex">
-<span>def <span class="ident">signal_image</span></span>(<span>self, data='5b79940c69efcf37091612c4d124b75d721a6e4ff7be8f26b50a0485c4968d23')</span>
+<span>def <span class="ident">signal_image</span></span>(<span>self, data='470946c1a6829eab4e8a4fae82aa11ac6ed17bccd11a489931550726185276eb')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -527,7 +525,7 @@ def names(cls, idx):
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.handGestures.HandGestures.signal_landmark"><code class="name flex">
-<span>def <span class="ident">signal_landmark</span></span>(<span>self, data='e929880dcf79d0bf0a1c043c4f1858cb7a067e90468c4cc733ff23fc3c6aa3b2')</span>
+<span>def <span class="ident">signal_landmark</span></span>(<span>self, data='3255f32617da79a61db4386e07715b7a6bbc35d5f9dbbb5972d099e4dc42657a')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -546,7 +544,7 @@ def names(cls, idx):
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.handGestures.HandGestures.signal_landmarks"><code class="name flex">
-<span>def <span class="ident">signal_landmarks</span></span>(<span>self, data='dfbc2dde7202a1cc6ef53b12310ecc63136c509889eeec639a056a40ad507c6c')</span>
+<span>def <span class="ident">signal_landmarks</span></span>(<span>self, data='d85c295851363f43fe4160e317364d47954c53f549e43506b845cca52bfa74b4')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
