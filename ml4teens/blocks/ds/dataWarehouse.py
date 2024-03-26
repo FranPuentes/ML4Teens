@@ -19,7 +19,7 @@ class DataWarehouse(Block):
       
       Parámetros:
       * self.params.filename: nombre del fichero por defecto.
-      * self.params.label_name: nombre de la etiqueta por defecto.
+      * self.params.label_name: nombre de la etiqueta, por defecto es "__TARGET__".
       * self.params.label: valor de la etiqueta por defecto.
       
       TODO:
