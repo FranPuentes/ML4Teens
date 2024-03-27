@@ -9,8 +9,6 @@ from mediapipe import solutions;
 from mediapipe.framework.formats import landmark_pb2;
 
 import mediapipe as mp;
-from mediapipe.tasks import python;
-from mediapipe.tasks.python import vision;
 
 from ...core import Block;
 
@@ -25,10 +23,24 @@ class HandGestures(Block):
           mwd = os.path.join(cwd, '../../models');
           fwd = os.path.join(cwd, '../../fonts');
 
+          from mediapipe.tasks        import python;
+          from mediapipe.tasks.python import vision;
+
+          VisionRunningMode = vision.RunningMode;
+          
+          self.num_hands    = self.params.hands or 2;
+          self.running_mode = VisionRunningMode.IMAGE;
+          self.running_mode = VisionRunningMode.IMAGE if self.params.image else self.running_mode;
+          self.running_mode = VisionRunningMode.VIDEO if self.params.video else self.running_mode;
+          
+          options={ "num_hands": self.num_hands,
+                    "running_mode": self.running_mode,
+                  };
+
           base_options = python.BaseOptions(model_asset_path=os.path.join(mwd,'gesture_recognizer.task'));
-          options = vision.GestureRecognizerOptions(base_options=base_options, num_hands=2);
-          self._model = vision.GestureRecognizer.create_from_options(options);
-          self._queue = [];
+          self._model  = vision.GestureRecognizer.create_from_options(vision.GestureRecognizerOptions(base_options=base_options, **options));
+          self._queue  = [];
+          self._ms     = 0;
 
       #-------------------------------------------------------------------------
       def draw_landmarks_on_image(rgb_image, results):
@@ -97,10 +109,18 @@ class HandGestures(Block):
           
           self._queue = [];
           
+          from mediapipe.tasks        import python;
+          from mediapipe.tasks.python import vision;
+          
+          VisionRunningMode = vision.RunningMode;
+          
           if data:
+             ms=self.params.ms or 33;
              image = data.convert('RGB');  
              image = mp.Image(image_format=mp.ImageFormat.SRGB, data=np.asarray(image));
-             results = self._model.recognize(image);
+             if self.running_mode==VisionRunningMode.IMAGE: results = self._model.recognize(image);
+             if self.running_mode==VisionRunningMode.VIDEO: results = self._model.recognize(image,self._ms);
+             self._ms+=ms;
              
              topg = results.gestures[0][0];
              self.signal_gesture( (topg.score, topg.category_name) );

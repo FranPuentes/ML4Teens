@@ -5,12 +5,10 @@ import cv2;
 
 from PIL.Image import Image;
 
+import mediapipe as mp;
+
 from mediapipe import solutions;
 from mediapipe.framework.formats import landmark_pb2;
-
-import mediapipe as mp;
-from mediapipe.tasks import python;
-from mediapipe.tasks.python import vision;
 
 from ...core import Block;
 
@@ -24,20 +22,33 @@ class HandLandmarks(Block):
           cwd = os.path.dirname(__file__);
           mwd = os.path.join(cwd, '../../models');
           fwd = os.path.join(cwd, '../../fonts');
+          
+          from mediapipe.tasks        import python;
+          from mediapipe.tasks.python import vision;
+          
+          VisionRunningMode = vision.RunningMode;
+          
+          self.num_hands    = self.params.hands or 2;
+          self.running_mode = VisionRunningMode.IMAGE;
+          self.running_mode = VisionRunningMode.IMAGE if self.params.image else self.running_mode;
+          self.running_mode = VisionRunningMode.VIDEO if self.params.video else self.running_mode;
+          
+          options={ "num_hands": self.num_hands,
+                    "running_mode": self.running_mode,
+                  };
 
           base_options = python.BaseOptions(model_asset_path=os.path.join(mwd,'hand_landmarker.task'));
-          #base_options = python.BaseOptions(model_asset_path=model_asset_path=os.path.join(mwd,'hand_landmark_full.tflite'));
-          options = vision.HandLandmarkerOptions(base_options=base_options, num_hands=2);
-          self._model = vision.HandLandmarker.create_from_options(options);
+          self._model  = vision.HandLandmarker.create_from_options(vision.HandLandmarkerOptions(base_options=base_options, **options));
+          self._ms=0;
           self._queue=[];
 
       #-------------------------------------------------------------------------
       def draw_landmarks_on_image(rgb_image, results):
 
-          MARGIN = 10;  # pixels
+          MARGIN = 10;
           FONT_SIZE = 1;
           FONT_THICKNESS = 1;
-          HANDEDNESS_TEXT_COLOR = (88, 205, 54); # vibrant green
+          HANDEDNESS_TEXT_COLOR = (88, 205, 54);
 
           hand_landmarks_list = results.hand_landmarks;
           handedness_list = results.handedness;
@@ -98,11 +109,19 @@ class HandLandmarks(Block):
           
           self._queue = [];
           
+          from mediapipe.tasks        import python;
+          from mediapipe.tasks.python import vision;
+          
+          VisionRunningMode = vision.RunningMode;
+          
           if data:
+             ms=self.params.ms or 33;
              image = data.convert('RGB');  
              image = mp.Image(image_format=mp.ImageFormat.SRGB, data=np.asarray(image));
-             results = self._model.detect(image);
-              
+             if self.running_mode==VisionRunningMode.IMAGE: results = self._model.detect(image);
+             if self.running_mode==VisionRunningMode.VIDEO: results = self._model.detect_for_video(image,self._ms);
+             self._ms+=ms;
+            
              rt=[];
              for idx in range(len(results.hand_landmarks)):
                  hand_landmarks = results.hand_landmarks[idx];
