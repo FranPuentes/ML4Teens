@@ -3,5 +3,5 @@ from .dataLabelizer  import DataLabelizer;
 from .dataWarehouse  import DataWarehouse;
 from .splitColumns   import SplitColumns;
 from .clustering     import Clustering;
-from .plot           import Plot;
+from .plot2D         import Plot2D;
 

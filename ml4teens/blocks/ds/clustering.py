@@ -54,7 +54,7 @@ class Clustering(Block):
           
       #-------------------------------------------------------------------------
       @Block.slot("dataframe", {pd.DataFrame})
-      def slot_label(self, slot, data):
+      def slot_dataframe(self, slot, data):
           if data is not None:
              df=data.copy();
 
