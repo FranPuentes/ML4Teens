@@ -280,4 +280,18 @@ class CocoDataset:
           else:   
              return target;
 
+#===============================================================================
+def splitDict(criteria, **kwargs):
+    """
+    Divide (split) un diccionario según un criterio (criteria) en forma de lista de claves.
+    Devuelve una tupla con dos diccionarios: aquellos key:value que cumplen los criterior y aquellos que no.
+    """
+    rt=({},{});
+    for key in kwargs:
+        if key in criteria: rt[0][key]=kwargs[key];
+        else:               rt[1][key]=kwargs[key];
+    return rt;    
+    
+    
+    
     

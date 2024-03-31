@@ -1,4 +1,5 @@
 import openai;
+import json;
 
 from openai import OpenAI;
 
@@ -51,10 +52,10 @@ class OAIChat(Block):
       def __init__(self, **kwargs):
           super().__init__(**kwargs);
           context=Context.instance;
-          self._client =OpenAI(api_key=self.params.api_key or context["OPENAI_KEY"],
+          self._client =OpenAI(api_key=self.params.token or context["OPENAI_TOKEN"],
                                max_retries=self.params.max_retries or 2,
                                timeout=self.params.timeout or 10.0,
-                               base_url=self.params.base_url);
+                               base_url=self.params.proxy or context["OPENAI_PROXY"]);
           self._context=self.params.context or "";
           self._history=[];
 
@@ -71,6 +72,7 @@ class OAIChat(Block):
       def slot_question(self, slot, data):
          
           if data is not None and isinstance(data,(str,)):
+             if len(self._history)==0:  self._history.append("");
              self._history.append(data);
              messages=[];
     
@@ -80,10 +82,16 @@ class OAIChat(Block):
                  elif (i%2)==0: messages.append({"role":"assistant", "content":h});
     
              try:
+               """
                response="";
                for token in self.OAI_QUERY(self._client, messages):
                    if token is not None: response += token;
                    else:                 break;
+               """
+               response = self._client.chat.completions.create(messages=messages, model=self.params.model or "gpt-3.5-turbo");
+               if isinstance(response, str):
+                  response=json.loads(response);               
+               response = response.choices[0].message.content;
     
              except Exception as e:
                print(e, flush=True);  
