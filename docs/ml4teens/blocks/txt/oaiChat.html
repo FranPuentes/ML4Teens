@@ -27,6 +27,7 @@
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">import openai;
+import json;
 
 from openai import OpenAI;
 
@@ -79,10 +80,10 @@ class OAIChat(Block):
       def __init__(self, **kwargs):
           super().__init__(**kwargs);
           context=Context.instance;
-          self._client =OpenAI(api_key=self.params.api_key or context[&#34;OPENAI_KEY&#34;],
+          self._client =OpenAI(api_key=self.params.token or context[&#34;OPENAI_TOKEN&#34;],
                                max_retries=self.params.max_retries or 2,
                                timeout=self.params.timeout or 10.0,
-                               base_url=self.params.base_url);
+                               base_url=self.params.proxy or context[&#34;OPENAI_PROXY&#34;]);
           self._context=self.params.context or &#34;&#34;;
           self._history=[];
 
@@ -99,6 +100,7 @@ class OAIChat(Block):
       def slot_question(self, slot, data):
          
           if data is not None and isinstance(data,(str,)):
+             if len(self._history)==0:  self._history.append(&#34;&#34;);
              self._history.append(data);
              messages=[];
     
@@ -108,10 +110,16 @@ class OAIChat(Block):
                  elif (i%2)==0: messages.append({&#34;role&#34;:&#34;assistant&#34;, &#34;content&#34;:h});
     
              try:
+               &#34;&#34;&#34;
                response=&#34;&#34;;
                for token in self.OAI_QUERY(self._client, messages):
                    if token is not None: response += token;
                    else:                 break;
+               &#34;&#34;&#34;
+               response = self._client.chat.completions.create(messages=messages, model=self.params.model or &#34;gpt-3.5-turbo&#34;);
+               if isinstance(response, str):
+                  response=json.loads(response);               
+               response = response.choices[0].message.content;
     
              except Exception as e:
                print(e, flush=True);  
@@ -195,10 +203,10 @@ Acumula la iteracción hasta que recibe un nuevo "context".</p></div>
       def __init__(self, **kwargs):
           super().__init__(**kwargs);
           context=Context.instance;
-          self._client =OpenAI(api_key=self.params.api_key or context[&#34;OPENAI_KEY&#34;],
+          self._client =OpenAI(api_key=self.params.token or context[&#34;OPENAI_TOKEN&#34;],
                                max_retries=self.params.max_retries or 2,
                                timeout=self.params.timeout or 10.0,
-                               base_url=self.params.base_url);
+                               base_url=self.params.proxy or context[&#34;OPENAI_PROXY&#34;]);
           self._context=self.params.context or &#34;&#34;;
           self._history=[];
 
@@ -215,6 +223,7 @@ Acumula la iteracción hasta que recibe un nuevo "context".</p></div>
       def slot_question(self, slot, data):
          
           if data is not None and isinstance(data,(str,)):
+             if len(self._history)==0:  self._history.append(&#34;&#34;);
              self._history.append(data);
              messages=[];
     
@@ -224,10 +233,16 @@ Acumula la iteracción hasta que recibe un nuevo "context".</p></div>
                  elif (i%2)==0: messages.append({&#34;role&#34;:&#34;assistant&#34;, &#34;content&#34;:h});
     
              try:
+               &#34;&#34;&#34;
                response=&#34;&#34;;
                for token in self.OAI_QUERY(self._client, messages):
                    if token is not None: response += token;
                    else:                 break;
+               &#34;&#34;&#34;
+               response = self._client.chat.completions.create(messages=messages, model=self.params.model or &#34;gpt-3.5-turbo&#34;);
+               if isinstance(response, str):
+                  response=json.loads(response);               
+               response = response.choices[0].message.content;
     
              except Exception as e:
                print(e, flush=True);  
@@ -260,7 +275,7 @@ Acumula la iteracción hasta que recibe un nuevo "context".</p></div>
 <h3>Methods</h3>
 <dl>
 <dt id="ml4teens.blocks.txt.oaiChat.OAIChat.signal_answer"><code class="name flex">
-<span>def <span class="ident">signal_answer</span></span>(<span>self, data='c8525bf42f64fd669f8b46173208f61feb4ddef684e46da15f1e54c743a2be0e')</span>
+<span>def <span class="ident">signal_answer</span></span>(<span>self, data='0569334ba8ebecbf84eaaec8e30f2b0f5cf98a96dc4b18fb4a77bb7e2f2517dc')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>

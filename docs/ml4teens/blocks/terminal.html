@@ -54,7 +54,7 @@ class Terminal(Block):
 
       #-------------------------------------------------------------------------
       def __print(self, message, plus_style):
-          style =f&#34;border:1px black; padding: 5px; margin: 3px; {plus_style}&#34;;
+          style =f&#34;border:1px black; padding: 5px; margin: 3px; font-family: monospace; {plus_style}&#34;;
           if isinstance(message, (bool,int,float,str)):
              pass;
           else:
@@ -63,17 +63,29 @@ class Terminal(Block):
              pp.pprint(message);
              message = buffer.getvalue();
           
-          message=escape(str(message));
-          display( HTML(f&#34;&lt;pre style=&#39;{style}&#39;&gt;{message}&lt;/pre&gt;&#34;) );
+          if bool(self.params.p):
+             message=escape(str(message));
+             for p in message.split(&#39;\n&#39;):
+                 if p.strip(): 
+                    display( HTML(f&#34;&lt;p style=&#39;{style}&#39;&gt;{p.strip()}&lt;/p&gt;&#34;) );
+          else:
+             message=escape(str(message));
+             display( HTML(f&#34;&lt;p style=&#39;{style}&#39;&gt;{message}&lt;/p&gt;&#34;) );
 
       #-------------------------------------------------------------------------
       @Block.slot(&#34;stdout&#34;, {str,list,set,tuple,dict,object})
-      def slot_stdin(self, slot, data):
+      def slot_stdout(self, slot, data):
           message=data if not(data is None or (type(data)==str and data==&#39;&#39;)) else self.params.message;
           self.__print(message,self._outstyle);
           if self.params.dump:
              style=&#34;background-color: blue; color: white&#34;;
              self.__print(self.params,style);
+
+      #-------------------------------------------------------------------------
+      @Block.slot(&#34;out&#34;, {str,list,set,tuple,dict,object})
+      def slot_out(self, slot, data):
+          message=data if not(data is None or (type(data)==str and data==&#39;&#39;)) else self.params.message;
+          self.__print(message,self._outstyle);
 
       #-------------------------------------------------------------------------
       @Block.slot(&#34;stderr&#34;, {str,list,set,tuple,dict,object})
@@ -82,7 +94,13 @@ class Terminal(Block):
           self.__print(message,self._errstyle);
           if self.params.dump:
              style=&#34;background-color: blue; color: white&#34;;
-             self.__print(self.params,style);</code></pre>
+             self.__print(self.params,style);
+
+      #-------------------------------------------------------------------------
+      @Block.slot(&#34;error&#34;, {str,list,set,tuple,dict,object})
+      def slot_err(self, slot, data):
+          message=data if not(data is None or data==&#39;&#39;) else self.params.message;
+          self.__print(message,self._errstyle);</code></pre>
 </details>
 </section>
 <section>
@@ -135,7 +153,7 @@ class Terminal(Block):
 
       #-------------------------------------------------------------------------
       def __print(self, message, plus_style):
-          style =f&#34;border:1px black; padding: 5px; margin: 3px; {plus_style}&#34;;
+          style =f&#34;border:1px black; padding: 5px; margin: 3px; font-family: monospace; {plus_style}&#34;;
           if isinstance(message, (bool,int,float,str)):
              pass;
           else:
@@ -144,17 +162,29 @@ class Terminal(Block):
              pp.pprint(message);
              message = buffer.getvalue();
           
-          message=escape(str(message));
-          display( HTML(f&#34;&lt;pre style=&#39;{style}&#39;&gt;{message}&lt;/pre&gt;&#34;) );
+          if bool(self.params.p):
+             message=escape(str(message));
+             for p in message.split(&#39;\n&#39;):
+                 if p.strip(): 
+                    display( HTML(f&#34;&lt;p style=&#39;{style}&#39;&gt;{p.strip()}&lt;/p&gt;&#34;) );
+          else:
+             message=escape(str(message));
+             display( HTML(f&#34;&lt;p style=&#39;{style}&#39;&gt;{message}&lt;/p&gt;&#34;) );
 
       #-------------------------------------------------------------------------
       @Block.slot(&#34;stdout&#34;, {str,list,set,tuple,dict,object})
-      def slot_stdin(self, slot, data):
+      def slot_stdout(self, slot, data):
           message=data if not(data is None or (type(data)==str and data==&#39;&#39;)) else self.params.message;
           self.__print(message,self._outstyle);
           if self.params.dump:
              style=&#34;background-color: blue; color: white&#34;;
              self.__print(self.params,style);
+
+      #-------------------------------------------------------------------------
+      @Block.slot(&#34;out&#34;, {str,list,set,tuple,dict,object})
+      def slot_out(self, slot, data):
+          message=data if not(data is None or (type(data)==str and data==&#39;&#39;)) else self.params.message;
+          self.__print(message,self._outstyle);
 
       #-------------------------------------------------------------------------
       @Block.slot(&#34;stderr&#34;, {str,list,set,tuple,dict,object})
@@ -163,7 +193,13 @@ class Terminal(Block):
           self.__print(message,self._errstyle);
           if self.params.dump:
              style=&#34;background-color: blue; color: white&#34;;
-             self.__print(self.params,style);</code></pre>
+             self.__print(self.params,style);
+
+      #-------------------------------------------------------------------------
+      @Block.slot(&#34;error&#34;, {str,list,set,tuple,dict,object})
+      def slot_err(self, slot, data):
+          message=data if not(data is None or data==&#39;&#39;) else self.params.message;
+          self.__print(message,self._errstyle);</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -172,6 +208,76 @@ class Terminal(Block):
 </ul>
 <h3>Methods</h3>
 <dl>
+<dt id="ml4teens.blocks.terminal.Terminal.slot_err"><code class="name flex">
+<span>def <span class="ident">slot_err</span></span>(<span>self, _slot, data)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def wrapper(self, _slot, data):
+    try:
+      assert name == _slot;
+      debug.print(f&#34;Ejecutando {self._fullClassName}::slot(&#39;{_slot}&#39;,{type(data).__name__})&#39;&#34;);
+      assert func is not None;
+      assert callable(func);
+      
+      done=func(self, _slot, data);
+      
+      if self.params.done is not None:
+         if callable(self.params.done):
+            done=self.params.done(data);
+         else:
+            done=self.params.done;
+         self.signal_done(done);
+      else:
+         if done is not None:
+            self.signal_done(done);
+         
+    except Exception as e:
+      debug.print(f&#34;{cls}:: Excepción: &#39;{e}&#39;&#34;, exception=e);
+      
+    finally:
+      pass;</code></pre>
+</details>
+</dd>
+<dt id="ml4teens.blocks.terminal.Terminal.slot_out"><code class="name flex">
+<span>def <span class="ident">slot_out</span></span>(<span>self, _slot, data)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def wrapper(self, _slot, data):
+    try:
+      assert name == _slot;
+      debug.print(f&#34;Ejecutando {self._fullClassName}::slot(&#39;{_slot}&#39;,{type(data).__name__})&#39;&#34;);
+      assert func is not None;
+      assert callable(func);
+      
+      done=func(self, _slot, data);
+      
+      if self.params.done is not None:
+         if callable(self.params.done):
+            done=self.params.done(data);
+         else:
+            done=self.params.done;
+         self.signal_done(done);
+      else:
+         if done is not None:
+            self.signal_done(done);
+         
+    except Exception as e:
+      debug.print(f&#34;{cls}:: Excepción: &#39;{e}&#39;&#34;, exception=e);
+      
+    finally:
+      pass;</code></pre>
+</details>
+</dd>
 <dt id="ml4teens.blocks.terminal.Terminal.slot_stderr"><code class="name flex">
 <span>def <span class="ident">slot_stderr</span></span>(<span>self, _slot, data)</span>
 </code></dt>
@@ -207,8 +313,8 @@ class Terminal(Block):
       pass;</code></pre>
 </details>
 </dd>
-<dt id="ml4teens.blocks.terminal.Terminal.slot_stdin"><code class="name flex">
-<span>def <span class="ident">slot_stdin</span></span>(<span>self, _slot, data)</span>
+<dt id="ml4teens.blocks.terminal.Terminal.slot_stdout"><code class="name flex">
+<span>def <span class="ident">slot_stdout</span></span>(<span>self, _slot, data)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -276,8 +382,10 @@ class Terminal(Block):
 <li>
 <h4><code><a title="ml4teens.blocks.terminal.Terminal" href="#ml4teens.blocks.terminal.Terminal">Terminal</a></code></h4>
 <ul class="">
+<li><code><a title="ml4teens.blocks.terminal.Terminal.slot_err" href="#ml4teens.blocks.terminal.Terminal.slot_err">slot_err</a></code></li>
+<li><code><a title="ml4teens.blocks.terminal.Terminal.slot_out" href="#ml4teens.blocks.terminal.Terminal.slot_out">slot_out</a></code></li>
 <li><code><a title="ml4teens.blocks.terminal.Terminal.slot_stderr" href="#ml4teens.blocks.terminal.Terminal.slot_stderr">slot_stderr</a></code></li>
-<li><code><a title="ml4teens.blocks.terminal.Terminal.slot_stdin" href="#ml4teens.blocks.terminal.Terminal.slot_stdin">slot_stdin</a></code></li>
+<li><code><a title="ml4teens.blocks.terminal.Terminal.slot_stdout" href="#ml4teens.blocks.terminal.Terminal.slot_stdout">slot_stdout</a></code></li>
 </ul>
 </li>
 </ul>

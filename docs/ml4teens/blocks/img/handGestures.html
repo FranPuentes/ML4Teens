@@ -37,8 +37,6 @@ from mediapipe import solutions;
 from mediapipe.framework.formats import landmark_pb2;
 
 import mediapipe as mp;
-from mediapipe.tasks import python;
-from mediapipe.tasks.python import vision;
 
 from ...core import Block;
 
@@ -53,10 +51,24 @@ class HandGestures(Block):
           mwd = os.path.join(cwd, &#39;../../models&#39;);
           fwd = os.path.join(cwd, &#39;../../fonts&#39;);
 
+          from mediapipe.tasks        import python;
+          from mediapipe.tasks.python import vision;
+
+          VisionRunningMode = vision.RunningMode;
+          
+          self.num_hands    = self.params.hands or 2;
+          self.running_mode = VisionRunningMode.IMAGE;
+          self.running_mode = VisionRunningMode.IMAGE if self.params.image else self.running_mode;
+          self.running_mode = VisionRunningMode.VIDEO if self.params.video else self.running_mode;
+          
+          options={ &#34;num_hands&#34;: self.num_hands,
+                    &#34;running_mode&#34;: self.running_mode,
+                  };
+
           base_options = python.BaseOptions(model_asset_path=os.path.join(mwd,&#39;gesture_recognizer.task&#39;));
-          options = vision.GestureRecognizerOptions(base_options=base_options, num_hands=2);
-          self._model = vision.GestureRecognizer.create_from_options(options);
-          self._queue = [];
+          self._model  = vision.GestureRecognizer.create_from_options(vision.GestureRecognizerOptions(base_options=base_options, **options));
+          self._queue  = [];
+          self._ms     = 0;
 
       #-------------------------------------------------------------------------
       def draw_landmarks_on_image(rgb_image, results):
@@ -125,10 +137,18 @@ class HandGestures(Block):
           
           self._queue = [];
           
+          from mediapipe.tasks        import python;
+          from mediapipe.tasks.python import vision;
+          
+          VisionRunningMode = vision.RunningMode;
+          
           if data:
+             ms=self.params.ms or 33;
              image = data.convert(&#39;RGB&#39;);  
              image = mp.Image(image_format=mp.ImageFormat.SRGB, data=np.asarray(image));
-             results = self._model.recognize(image);
+             if self.running_mode==VisionRunningMode.IMAGE: results = self._model.recognize(image);
+             if self.running_mode==VisionRunningMode.VIDEO: results = self._model.recognize(image,self._ms);
+             self._ms+=ms;
              
              topg = results.gestures[0][0];
              self.signal_gesture( (topg.score, topg.category_name) );
@@ -231,10 +251,24 @@ class HandGestures(Block):
           mwd = os.path.join(cwd, &#39;../../models&#39;);
           fwd = os.path.join(cwd, &#39;../../fonts&#39;);
 
+          from mediapipe.tasks        import python;
+          from mediapipe.tasks.python import vision;
+
+          VisionRunningMode = vision.RunningMode;
+          
+          self.num_hands    = self.params.hands or 2;
+          self.running_mode = VisionRunningMode.IMAGE;
+          self.running_mode = VisionRunningMode.IMAGE if self.params.image else self.running_mode;
+          self.running_mode = VisionRunningMode.VIDEO if self.params.video else self.running_mode;
+          
+          options={ &#34;num_hands&#34;: self.num_hands,
+                    &#34;running_mode&#34;: self.running_mode,
+                  };
+
           base_options = python.BaseOptions(model_asset_path=os.path.join(mwd,&#39;gesture_recognizer.task&#39;));
-          options = vision.GestureRecognizerOptions(base_options=base_options, num_hands=2);
-          self._model = vision.GestureRecognizer.create_from_options(options);
-          self._queue = [];
+          self._model  = vision.GestureRecognizer.create_from_options(vision.GestureRecognizerOptions(base_options=base_options, **options));
+          self._queue  = [];
+          self._ms     = 0;
 
       #-------------------------------------------------------------------------
       def draw_landmarks_on_image(rgb_image, results):
@@ -303,10 +337,18 @@ class HandGestures(Block):
           
           self._queue = [];
           
+          from mediapipe.tasks        import python;
+          from mediapipe.tasks.python import vision;
+          
+          VisionRunningMode = vision.RunningMode;
+          
           if data:
+             ms=self.params.ms or 33;
              image = data.convert(&#39;RGB&#39;);  
              image = mp.Image(image_format=mp.ImageFormat.SRGB, data=np.asarray(image));
-             results = self._model.recognize(image);
+             if self.running_mode==VisionRunningMode.IMAGE: results = self._model.recognize(image);
+             if self.running_mode==VisionRunningMode.VIDEO: results = self._model.recognize(image,self._ms);
+             self._ms+=ms;
              
              topg = results.gestures[0][0];
              self.signal_gesture( (topg.score, topg.category_name) );
@@ -468,7 +510,7 @@ def names(cls, idx):
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.handGestures.HandGestures.signal_end"><code class="name flex">
-<span>def <span class="ident">signal_end</span></span>(<span>self, data='891a501d197df5b3d2ddafab452d10a12061233863e4851cafbc23eb7ff4929d')</span>
+<span>def <span class="ident">signal_end</span></span>(<span>self, data='2377f05fade19f4f94703974b070b69c36069790b392f47d3c27e09b20f3c2e1')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -487,7 +529,7 @@ def names(cls, idx):
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.handGestures.HandGestures.signal_gesture"><code class="name flex">
-<span>def <span class="ident">signal_gesture</span></span>(<span>self, data='33709d42dd7b794bbd51b43939043dd098bc28d18e7d095baee7665b2be11600')</span>
+<span>def <span class="ident">signal_gesture</span></span>(<span>self, data='5d38efd829c068cb2260e0a5cba8fd2dfda82c80deb4c9aeac34264eecd085c1')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -506,7 +548,7 @@ def names(cls, idx):
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.handGestures.HandGestures.signal_image"><code class="name flex">
-<span>def <span class="ident">signal_image</span></span>(<span>self, data='470946c1a6829eab4e8a4fae82aa11ac6ed17bccd11a489931550726185276eb')</span>
+<span>def <span class="ident">signal_image</span></span>(<span>self, data='df6aedcc1504caa976e104a25d845d571d61442501b86fec6d943bc0e6e46651')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -525,7 +567,7 @@ def names(cls, idx):
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.handGestures.HandGestures.signal_landmark"><code class="name flex">
-<span>def <span class="ident">signal_landmark</span></span>(<span>self, data='3255f32617da79a61db4386e07715b7a6bbc35d5f9dbbb5972d099e4dc42657a')</span>
+<span>def <span class="ident">signal_landmark</span></span>(<span>self, data='7cafef7574cce7995de097d2178e918138f6b1dc460636fcd623a66b3e8c0380')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -544,7 +586,7 @@ def names(cls, idx):
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.handGestures.HandGestures.signal_landmarks"><code class="name flex">
-<span>def <span class="ident">signal_landmarks</span></span>(<span>self, data='d85c295851363f43fe4160e317364d47954c53f549e43506b845cca52bfa74b4')</span>
+<span>def <span class="ident">signal_landmarks</span></span>(<span>self, data='bebccdf603ce601792e9537ddd33e6c1ec81d5c7a3e36be28c07d1f73071a836')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>

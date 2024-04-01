@@ -33,12 +33,10 @@ import cv2;
 
 from PIL.Image import Image;
 
+import mediapipe as mp;
+
 from mediapipe import solutions;
 from mediapipe.framework.formats import landmark_pb2;
-
-import mediapipe as mp;
-from mediapipe.tasks import python;
-from mediapipe.tasks.python import vision;
 
 from ...core import Block;
 
@@ -52,20 +50,33 @@ class HandLandmarks(Block):
           cwd = os.path.dirname(__file__);
           mwd = os.path.join(cwd, &#39;../../models&#39;);
           fwd = os.path.join(cwd, &#39;../../fonts&#39;);
+          
+          from mediapipe.tasks        import python;
+          from mediapipe.tasks.python import vision;
+          
+          VisionRunningMode = vision.RunningMode;
+          
+          self.num_hands    = self.params.hands or 2;
+          self.running_mode = VisionRunningMode.IMAGE;
+          self.running_mode = VisionRunningMode.IMAGE if self.params.image else self.running_mode;
+          self.running_mode = VisionRunningMode.VIDEO if self.params.video else self.running_mode;
+          
+          options={ &#34;num_hands&#34;: self.num_hands,
+                    &#34;running_mode&#34;: self.running_mode,
+                  };
 
           base_options = python.BaseOptions(model_asset_path=os.path.join(mwd,&#39;hand_landmarker.task&#39;));
-          #base_options = python.BaseOptions(model_asset_path=model_asset_path=os.path.join(mwd,&#39;hand_landmark_full.tflite&#39;));
-          options = vision.HandLandmarkerOptions(base_options=base_options, num_hands=2);
-          self._model = vision.HandLandmarker.create_from_options(options);
+          self._model  = vision.HandLandmarker.create_from_options(vision.HandLandmarkerOptions(base_options=base_options, **options));
+          self._ms=0;
           self._queue=[];
 
       #-------------------------------------------------------------------------
       def draw_landmarks_on_image(rgb_image, results):
 
-          MARGIN = 10;  # pixels
+          MARGIN = 10;
           FONT_SIZE = 1;
           FONT_THICKNESS = 1;
-          HANDEDNESS_TEXT_COLOR = (88, 205, 54); # vibrant green
+          HANDEDNESS_TEXT_COLOR = (88, 205, 54);
 
           hand_landmarks_list = results.hand_landmarks;
           handedness_list = results.handedness;
@@ -126,11 +137,19 @@ class HandLandmarks(Block):
           
           self._queue = [];
           
+          from mediapipe.tasks        import python;
+          from mediapipe.tasks.python import vision;
+          
+          VisionRunningMode = vision.RunningMode;
+          
           if data:
+             ms=self.params.ms or 33;
              image = data.convert(&#39;RGB&#39;);  
              image = mp.Image(image_format=mp.ImageFormat.SRGB, data=np.asarray(image));
-             results = self._model.detect(image);
-              
+             if self.running_mode==VisionRunningMode.IMAGE: results = self._model.detect(image);
+             if self.running_mode==VisionRunningMode.VIDEO: results = self._model.detect_for_video(image,self._ms);
+             self._ms+=ms;
+            
              rt=[];
              for idx in range(len(results.hand_landmarks)):
                  hand_landmarks = results.hand_landmarks[idx];
@@ -220,20 +239,33 @@ class HandLandmarks(Block):
           cwd = os.path.dirname(__file__);
           mwd = os.path.join(cwd, &#39;../../models&#39;);
           fwd = os.path.join(cwd, &#39;../../fonts&#39;);
+          
+          from mediapipe.tasks        import python;
+          from mediapipe.tasks.python import vision;
+          
+          VisionRunningMode = vision.RunningMode;
+          
+          self.num_hands    = self.params.hands or 2;
+          self.running_mode = VisionRunningMode.IMAGE;
+          self.running_mode = VisionRunningMode.IMAGE if self.params.image else self.running_mode;
+          self.running_mode = VisionRunningMode.VIDEO if self.params.video else self.running_mode;
+          
+          options={ &#34;num_hands&#34;: self.num_hands,
+                    &#34;running_mode&#34;: self.running_mode,
+                  };
 
           base_options = python.BaseOptions(model_asset_path=os.path.join(mwd,&#39;hand_landmarker.task&#39;));
-          #base_options = python.BaseOptions(model_asset_path=model_asset_path=os.path.join(mwd,&#39;hand_landmark_full.tflite&#39;));
-          options = vision.HandLandmarkerOptions(base_options=base_options, num_hands=2);
-          self._model = vision.HandLandmarker.create_from_options(options);
+          self._model  = vision.HandLandmarker.create_from_options(vision.HandLandmarkerOptions(base_options=base_options, **options));
+          self._ms=0;
           self._queue=[];
 
       #-------------------------------------------------------------------------
       def draw_landmarks_on_image(rgb_image, results):
 
-          MARGIN = 10;  # pixels
+          MARGIN = 10;
           FONT_SIZE = 1;
           FONT_THICKNESS = 1;
-          HANDEDNESS_TEXT_COLOR = (88, 205, 54); # vibrant green
+          HANDEDNESS_TEXT_COLOR = (88, 205, 54);
 
           hand_landmarks_list = results.hand_landmarks;
           handedness_list = results.handedness;
@@ -294,11 +326,19 @@ class HandLandmarks(Block):
           
           self._queue = [];
           
+          from mediapipe.tasks        import python;
+          from mediapipe.tasks.python import vision;
+          
+          VisionRunningMode = vision.RunningMode;
+          
           if data:
+             ms=self.params.ms or 33;
              image = data.convert(&#39;RGB&#39;);  
              image = mp.Image(image_format=mp.ImageFormat.SRGB, data=np.asarray(image));
-             results = self._model.detect(image);
-              
+             if self.running_mode==VisionRunningMode.IMAGE: results = self._model.detect(image);
+             if self.running_mode==VisionRunningMode.VIDEO: results = self._model.detect_for_video(image,self._ms);
+             self._ms+=ms;
+            
              rt=[];
              for idx in range(len(results.hand_landmarks)):
                  hand_landmarks = results.hand_landmarks[idx];
@@ -415,10 +455,10 @@ def names(cls, idx):
 </summary>
 <pre><code class="python">def draw_landmarks_on_image(rgb_image, results):
 
-    MARGIN = 10;  # pixels
+    MARGIN = 10;
     FONT_SIZE = 1;
     FONT_THICKNESS = 1;
-    HANDEDNESS_TEXT_COLOR = (88, 205, 54); # vibrant green
+    HANDEDNESS_TEXT_COLOR = (88, 205, 54);
 
     hand_landmarks_list = results.hand_landmarks;
     handedness_list = results.handedness;
@@ -448,7 +488,7 @@ def names(cls, idx):
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.handLandmarks.HandLandmarks.signal_end"><code class="name flex">
-<span>def <span class="ident">signal_end</span></span>(<span>self, data='317a5e599d93f72cf2aef6eb75914af92fbc5afdb24a5a368d4a3901cd121463')</span>
+<span>def <span class="ident">signal_end</span></span>(<span>self, data='91a6a22bf30d261900a1654b614a8a3f897574a8adf2206dd80c7a40b3c987c9')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -467,7 +507,7 @@ def names(cls, idx):
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.handLandmarks.HandLandmarks.signal_image"><code class="name flex">
-<span>def <span class="ident">signal_image</span></span>(<span>self, data='b729dd350802ff45b3cfb14ec9ab0e2bbaa052566c006caf761617648b22303b')</span>
+<span>def <span class="ident">signal_image</span></span>(<span>self, data='ec6001ddc14cd430727a195b3b59a09b2266b1260498b240434b833fa27b90ce')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -486,7 +526,7 @@ def names(cls, idx):
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.handLandmarks.HandLandmarks.signal_landmark"><code class="name flex">
-<span>def <span class="ident">signal_landmark</span></span>(<span>self, data='0c5f87994dd49acbb8b1c7e9556c057aeaca43cd3b01d25a41faeabe2cf8350d')</span>
+<span>def <span class="ident">signal_landmark</span></span>(<span>self, data='39efcbf66a8b3ae82b185c13ebdce0c537e4c7a1ca6e1de78f2ef139dbd9f6e8')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -505,7 +545,7 @@ def names(cls, idx):
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.handLandmarks.HandLandmarks.signal_landmarks"><code class="name flex">
-<span>def <span class="ident">signal_landmarks</span></span>(<span>self, data='43497abcf0a948d54ed4a6a8d9c93b51f580c5ae49802217f871b5e06389d4f9')</span>
+<span>def <span class="ident">signal_landmarks</span></span>(<span>self, data='f6282bfb13f2975021927155dc85e07cedac85f7480a095a5de0c3a51e0f946d')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>

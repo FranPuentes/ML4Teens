@@ -308,6 +308,20 @@ class CocoDataset:
           else:   
              return target;
 
+#===============================================================================
+def splitDict(criteria, **kwargs):
+    &#34;&#34;&#34;
+    Divide (split) un diccionario según un criterio (criteria) en forma de lista de claves.
+    Devuelve una tupla con dos diccionarios: aquellos key:value que cumplen los criterior y aquellos que no.
+    &#34;&#34;&#34;
+    rt=({},{});
+    for key in kwargs:
+        if key in criteria: rt[0][key]=kwargs[key];
+        else:               rt[1][key]=kwargs[key];
+    return rt;    
+    
+    
+    
     </code></pre>
 </details>
 </section>
@@ -549,6 +563,28 @@ class CocoDataset:
             if fnmatch.fnmatch(archivo, pattern):
                rt.append(os.path.join(raiz, archivo));
     return rt;</code></pre>
+</details>
+</dd>
+<dt id="ml4teens.tools.tools.splitDict"><code class="name flex">
+<span>def <span class="ident">splitDict</span></span>(<span>criteria, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Divide (split) un diccionario según un criterio (criteria) en forma de lista de claves.
+Devuelve una tupla con dos diccionarios: aquellos key:value que cumplen los criterior y aquellos que no.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def splitDict(criteria, **kwargs):
+    &#34;&#34;&#34;
+    Divide (split) un diccionario según un criterio (criteria) en forma de lista de claves.
+    Devuelve una tupla con dos diccionarios: aquellos key:value que cumplen los criterior y aquellos que no.
+    &#34;&#34;&#34;
+    rt=({},{});
+    for key in kwargs:
+        if key in criteria: rt[0][key]=kwargs[key];
+        else:               rt[1][key]=kwargs[key];
+    return rt;    </code></pre>
 </details>
 </dd>
 <dt id="ml4teens.tools.tools.uploadFiles"><code class="name flex">
@@ -877,6 +913,7 @@ def filename(self):
 <li><code><a title="ml4teens.tools.tools.runningInNotebook" href="#ml4teens.tools.tools.runningInNotebook">runningInNotebook</a></code></li>
 <li><code><a title="ml4teens.tools.tools.searchFilename" href="#ml4teens.tools.tools.searchFilename">searchFilename</a></code></li>
 <li><code><a title="ml4teens.tools.tools.searchPattern" href="#ml4teens.tools.tools.searchPattern">searchPattern</a></code></li>
+<li><code><a title="ml4teens.tools.tools.splitDict" href="#ml4teens.tools.tools.splitDict">splitDict</a></code></li>
 <li><code><a title="ml4teens.tools.tools.uploadFiles" href="#ml4teens.tools.tools.uploadFiles">uploadFiles</a></code></li>
 </ul>
 </li>
