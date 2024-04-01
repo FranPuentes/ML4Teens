@@ -29,6 +29,8 @@ setup(
                        #"imgbeddings==0.1.0",
                        "PyYAML",
                        "librosa",
+                       "webrtcvad",
+                       "sounddevice",
                      ],
     include_package_data=True,
     
