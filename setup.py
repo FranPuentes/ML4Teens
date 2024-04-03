@@ -16,7 +16,7 @@ setup(
                        "pandas>=1.3.4",
                        #"transformers>=4.37",
                        "transformers",
-                       "torch==2.2.1",
+                       "torch==2.2.2",   # <------------ si algo falla pasa a 2.2.1
                        "mediapipe>=0.10.9",
                        "jupyter_ui_poll",
                        "openai",
@@ -31,6 +31,7 @@ setup(
                        "librosa",
                        "webrtcvad",
                        "sounddevice",
+                       "openai-whisper",
                      ],
     include_package_data=True,
     

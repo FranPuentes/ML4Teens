@@ -1,3 +1,3 @@
 
 from .inputText import InputText;
-from .oaiChat   import OAIChat;
+from .oaiChat   import OAI_Chat;

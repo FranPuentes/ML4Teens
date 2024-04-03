@@ -7,7 +7,7 @@ from ...core import Context;
 from ...core import Block;
 
 ################################################################################
-class OAIChat(Block):
+class OAI_Chat(Block):
       """
       Recibe una 'question' y responde con un 'answer'.
       Acumula la iteracción hasta que recibe un nuevo "context".
