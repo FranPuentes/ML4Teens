@@ -39,10 +39,10 @@ class Terminal(Block):
              message=escape(str(message));
              for p in message.split('\n'):
                  if p.strip(): 
-                    display( HTML(f"<p style='{style}'>{p.strip()}</p>") );
+                    display( HTML(f"<p style='{style}'>{p.strip()}</p>"), display_id=self._id if not self.params.feed else None);
           else:
              message=escape(str(message));
-             display( HTML(f"<p style='{style}'>{message}</p>") );
+             display( HTML(f"<p style='{style}'>{message}</p>"), display_id=self._id if not self.params.feed else None );
 
       #-------------------------------------------------------------------------
       @Block.slot("stdout", {str,list,set,tuple,dict,object})

@@ -122,7 +122,8 @@ class VideoSource(Block):
              self._device=None;
              
              if self._source.startswith("http"):
-                with requests.get(self._source, stream=True) as r:
+                headers = { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101 Firefox/91.0' }
+                with requests.get(self._source, stream=True, headers=headers) as r:
                      r.raise_for_status();
                      with NamedTemporaryFile(delete=False, suffix='.mp4') as f:
                           for chunk in r.iter_content(chunk_size=65536//8):

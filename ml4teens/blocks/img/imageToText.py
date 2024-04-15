@@ -12,10 +12,10 @@ class ImageToText(Block):
           super().__init__();
 
           self.model_name="Salesforce/blip-image-captioning-base";
-          if "model_name" in kwargs:
-             if kwargs["model_name"].lower() in ["small", "s" ]: self.model_name="Salesforce/blip-image-captioning-base";
-             if kwargs["model_name"].lower() in ["base",  "b" ]: self.model_name="Salesforce/blip-image-captioning-base";
-             if kwargs["model_name"].lower() in ["large", "l" ]: self.model_name="Salesforce/blip-image-captioning-large";
+          if "model" in kwargs:
+             if kwargs["model"].lower() in ["small", "s" ]: self.model_name="Salesforce/blip-image-captioning-base";
+             if kwargs["model"].lower() in ["base",  "b" ]: self.model_name="Salesforce/blip-image-captioning-base";
+             if kwargs["model"].lower() in ["large", "l" ]: self.model_name="Salesforce/blip-image-captioning-large";
 
           for key in ["caption"]:
               if key in kwargs:
@@ -33,7 +33,7 @@ class ImageToText(Block):
       @Block.slot("image", {Image})
       def slot_image(self, slot, data):
           
-          caption=self.params.caption or self.token["caption"].data;
+          caption=self.params.caption # or self.token["caption"].data;
 
           if caption:
              inputs = self.processor(data, caption, return_tensors="pt");
