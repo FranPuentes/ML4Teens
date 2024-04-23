@@ -9,6 +9,6 @@ from .value    import Value;
 from .values   import Values;
 
 from .         import img;
-from .         import txt;
+from .         import nlp;
 from .         import ds;
 
