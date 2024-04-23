@@ -1,8 +1,6 @@
 
-import ml4teens as ml;
-
-from ml4teens.core  import Block;
-from ml4teens.tools import tools;
+from ...core  import Block;
+from ...tools import tools;
 
 class TfIdf(Block):
 
