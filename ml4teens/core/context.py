@@ -394,13 +394,14 @@ class Context:
               raise RuntimeError(f"No existe la señal '{sname}' en {source._fullClassName}");
                
     #-----------------------------------------------------------------------------------------
-    def wait(self, timeout=1):
+    def wait(self, forever=1):
         """
         Inicia el loop asíncrono y procesa los mensajes enviados por medio de la cola del contexto uno a uno.
         Se supone que el usuario ha colocado en la cola, previamente, mensajes para inicial la red.
         Si no hay mensajes en la cola, finaliza.
         Puede volver a invocarse, con nuevos mensajes encolados.
         """
+        #TODO si 'forever' es True, mostrar una forma elegante de salir del bucle.
         
         try:
           timestamp=time.time();        
@@ -417,10 +418,16 @@ class Context:
                    
                    except queue.Empty:
                    
-                     diff=(time.time()-timestamp);
-                     if diff>timeout: break;
-                     else:            continue;
+                     if isinstance(forever, int):
+                        timeout=max(0,forever);
+                        diff=(time.time()-timestamp);
+                        if diff>timeout: break;
+                        else:            continue;
+                     else:
+                        if bool(forever) is True: continue;
+                        else:                     break;
                      
+                   timestamp=time.time();
                    tm, target, sname, data, mods = event;
                    target.run(sname, data, mods);
                                     
