@@ -125,7 +125,6 @@ class VAD(Block):
                  chunk[:source.size]=source;
                  self._process(chunk);
              self._process(None);
-          print("VAD finalizado!", flush=True);
 
       @Block.signal("segment",np.ndarray, sync=True)
       def signal_segment(self, data):
