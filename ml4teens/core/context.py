@@ -74,7 +74,7 @@ class Context:
            rwd   = os.path.join(cwd, '..');
            mwd   = os.path.join(rwd, 'models');
            
-           gdata = { "VoiceSampleRate":32000,
+           gdata = { "AudioSampleRate":32000,
                      "VadChunkTime":10,
                      "GPU":torch.cuda.is_available(),
                      "RootDirectory":rwd,
@@ -116,6 +116,12 @@ class Context:
     @property
     def gpus(self):
         return torch.cuda.device_count() if torch.cuda.is_available() else 0;
+        
+    #-----------------------------------------------------------------------------------------
+    @property
+    def device(self):
+        if torch.cuda.is_available(): return "cuda";
+        else:                         return "cpu";
         
     #-----------------------------------------------------------------------------------------
     @property
@@ -407,50 +413,55 @@ class Context:
               raise RuntimeError(f"No existe la señal '{sname}' en {source._fullClassName}");
                
     #-----------------------------------------------------------------------------------------
-    def wait(self, forever=1):
+    def wait(self, forever=1, sync=False): 
         """
         Inicia el loop asíncrono y procesa los mensajes enviados por medio de la cola del contexto uno a uno.
         Se supone que el usuario ha colocado en la cola, previamente, mensajes para inicial la red.
         Si no hay mensajes en la cola, finaliza.
         Puede volver a invocarse, con nuevos mensajes encolados.
-        """
-        #TODO si 'forever' es True, mostrar una forma elegante de salir del bucle.
-        
+        """       
+        signals=0;
         try:
           timestamp=time.time();        
-          debug.print("Entrando en el bucle de eventos.", flush=True);
+          if sync is False: debug.print(f"Entrando en el bucle de eventos (forever:{forever}).", flush=True);
           while True:
                 try:
                 
-                   with ui_events() as poll:
-                        poll(10);
+                   with ui_events() as poll: poll(10);
                 
                    try:
-                     debug.print("Esperando por un nuevo evento ...");
-                     event=self._queue.get(True,0.5);
+                     #if sync is False: debug.print("Esperando por un nuevo evento ...", flush=True);
+                     event=self._queue.get(True,0.5 if sync is False else 0);
                    
                    except queue.Empty:
                    
-                     if isinstance(forever, int):
+                     if type(forever) is int:
                         timeout=max(0,forever);
                         diff=(time.time()-timestamp);
                         if diff>timeout: break;
                         else:            continue;
+                        
                      else:
                         if bool(forever) is True: continue;
                         else:                     break;
-                     
+                   
+                   signals+=1;  
                    timestamp=time.time();
                    tm, target, sname, data, mods = event;
                    target.run(sname, data, mods);
                                     
                 except KeyboardInterrupt as e:
                    debug.print("Interrumpido por el/la usuario/a.");
+                   signals=signals*(-1);
+                   break;
                    
                 except Exception as e:
                    debug.print(f"Excepción ejecutando un slot: {e}");
+                   signals=signals*(-1);
+                   break;
           
-          return self;
+          if sync is False: debug.print("Saliendo del bucle de eventos.", flush=True);
+          return signals;
           
         finally:
           while not self._queue.empty(): self._queue.get();

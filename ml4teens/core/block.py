@@ -220,7 +220,7 @@ class Block(ABC):
 
       #-------------------------------------------------------------------------
       @staticmethod
-      def signal(name, typedecl):
+      def signal(name, typedecl, sync=False):
           def decorador(func):
               cls=Block._classNameFrom(func);
               if cls not in Block._slots:   Block._slots  [cls]=Slots  ();
@@ -235,6 +235,8 @@ class Block(ABC):
                      if using:
                         data=func(self,data);
                         Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+                        if sync:
+                           Context.instance.wait(forever=0, sync=sync);
               return wrapper;
           return decorador;
 
