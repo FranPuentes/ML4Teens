@@ -5,6 +5,7 @@ import queue;
 import time;
 import json;
 import torch;
+import numpy as np;
 
 from IPython.display import display;
 from IPython.display import HTML, Javascript;
@@ -26,6 +27,13 @@ Un MetaBlock identifica (bloque,slot) de entrada y (bloque,signal) de salida.
 ¿Cómo hacerlo sin repetir código?
 
 """
+class ReadOnlyNamespace:
+
+    def __init__(self, **kwargs):
+        self.__dict__.update(kwargs);
+    
+    def __setattr__(self, name, value):
+        raise AttributeError("No se permite modificar el valor de los datos globales");
 
 #-------------------------------------------------------------------------------
 # Es un singleton (ver TODO).
@@ -59,15 +67,25 @@ class Context:
         if not cls._instance:
            cls._instance = super(Context, cls).__new__(cls);
            cls._instance.listeners={};
-           cls._allowGPU = torch.cuda.is_available();
            #cls.__html__();
-           cls._queue=queue.PriorityQueue();
+           cls._queue   = queue.PriorityQueue();
            
            cwd   = os.path.dirname(__file__);
-           mwd   = os.path.join(cwd, '../models');
-           cache = os.path.join(mwd,"cache");
-           os.makedirs(cache, exist_ok=True);
-           os.environ['TRANSFORMERS_CACHE'] = cache;
+           rwd   = os.path.join(cwd, '..');
+           mwd   = os.path.join(rwd, 'models');
+           
+           gdata = { "VoiceSampleRate":32000,
+                     "VadChunkTime":10,
+                     "GPU":torch.cuda.is_available(),
+                     "RootDirectory":rwd,
+                     "ModelsDirectory":mwd,
+                   };
+                          
+           cls._default=ReadOnlyNamespace(**gdata);
+           
+           #cache = os.path.join(mwd,"cache");
+           #os.makedirs(cache, exist_ok=True);
+           #os.environ['TRANSFORMERS_CACHE'] = cache;
         return cls._instance;
 
     #-----------------------------------------------------------------------------------------
@@ -86,23 +104,18 @@ class Context:
         
     #-----------------------------------------------------------------------------------------
     @property
-    def allowGPU(self):
-        return self._allowGPU;
-        
-    #-----------------------------------------------------------------------------------------
-    @allowGPU.setter
-    def allowGPU(self, value):
-        self._allowGPU = bool(value);
+    def default(self):
+        return self._default;
         
     #-----------------------------------------------------------------------------------------
     @property
     def gpu(self):
-        return self._allowGPU and torch.cuda.is_available();
+        return torch.cuda.is_available();
         
     #-----------------------------------------------------------------------------------------
     @property
     def gpus(self):
-        return torch.cuda.device_count() if (self._allowGPU and torch.cuda.is_available()) else 0;
+        return torch.cuda.device_count() if torch.cuda.is_available() else 0;
         
     #-----------------------------------------------------------------------------------------
     @property

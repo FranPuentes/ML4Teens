@@ -132,9 +132,11 @@ class Block(ABC):
 
       #-------------------------------------------------------------------------
       def __init__(self, **kwargs):
+          self._context      =Context();
           self._fullClassName=Block._classNameFrom(self.__init__);
           self._signal_mods  ={};
           self._params       =StackedDicts(**kwargs);
+          
           self._id="ID"+''.join(random.choice(string.ascii_letters + string.digits) for _ in range(16));
 
           cls=self._fullClassName;
@@ -162,6 +164,11 @@ class Block(ABC):
       def params(self):
           return self._params;
 
+      #-------------------------------------------------------------------------
+      @property
+      def context(self):
+          return self._context;
+          
       #-------------------------------------------------------------------------
       @property
       def signals(self):
