@@ -5,6 +5,9 @@ import soundfile as sf
 import librosa;
 import requests;
 
+# https://github.com/NeonGeckoCom/nsnet2-denoiser
+from nsnet2_denoiser import NSnet2Enhancer;
+
 from tqdm import tqdm;
 from io import BytesIO;
 
@@ -14,9 +17,10 @@ from ...core  import Block;
 class AudioSource(Block):
 
       def __init__(self, **kwargs):
-          params, self._rest = tools.splitDict(["resample", "denoise", "enhance"], **kwargs);
+          params, self._rest = tools.splitDict(["resample", "enhance", "vf"], **kwargs);
           super().__init__(**params);
-          self._iface=None;
+          self._enhancer = NSnet2Enhancer(fs=self.context.default.AudioSampleRate);
+          self._iface    = None;
 
       def _close(self):
           if self._iface is not None:
@@ -31,11 +35,15 @@ class AudioSource(Block):
              data = data.astype(np.float32);
              data = data / np.max(np.abs(data));
 
-             if self.params.denoise or self.params.enhance:
-                pass;
-             
              data = librosa.resample(data, orig_sr=sr, target_sr=self.context.default.AudioSampleRate, res_type=self.params.resample or "soxr_hq");
 
+             if self.params.enhance or False:
+                data = self._enhancer(data, self.context.default.AudioSampleRate);
+                
+             if self.params.vf is not None:
+                factor=max(1,float(self.params.vf));
+                data=data*factor;
+             
              self.signal_audio(data);
 
              return data;

@@ -33,8 +33,9 @@ setup(
                        "librosa",
                        "webrtcvad",
                        "sounddevice",
-                       "openai-whisper",
+                       "accelerate",
                        "ffmpeg",
+                       "nsnet2-denoiser",
                      ],
     include_package_data=True,
     

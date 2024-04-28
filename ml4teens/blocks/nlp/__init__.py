@@ -5,4 +5,4 @@ from .tfidf       import TfIdf;
 from .similarity  import Similarity;
 from .audioPlayer import AudioPlayer;
 from .audioSource import AudioSource;
-from .vad         import VAD;
+from .transcribe  import Transcribe;

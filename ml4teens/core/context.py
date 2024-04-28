@@ -74,7 +74,7 @@ class Context:
            rwd   = os.path.join(cwd, '..');
            mwd   = os.path.join(rwd, 'models');
            
-           gdata = { "AudioSampleRate":32000,
+           gdata = { "AudioSampleRate":48000,
                      "VadChunkTime":10,
                      "GPU":torch.cuda.is_available(),
                      "RootDirectory":rwd,
