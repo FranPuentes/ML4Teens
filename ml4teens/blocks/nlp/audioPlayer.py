@@ -10,14 +10,19 @@ from ...core  import Block;
 class AudioPlayer(Block):
 
       def __init__(self, **kwargs):
-          params, self._rest = tools.splitDict(["close","pause","play","autoplay"], **kwargs);
+          params, self._rest = tools.splitDict(["autoplay"], **kwargs);
           super().__init__(**params);
           self._cache = [];
           self._offset=0;
           self._stream=None;
           self._paused=False;
           self._info  =None;
-
+          self._buttons=None;
+             
+      def _createInterface(self):
+      
+          if self._buttons is not None: return;
+      
           import ipywidgets as widgets;
           from IPython.display import display;
 
@@ -32,43 +37,34 @@ class AudioPlayer(Block):
               return button;
 
           self._buttons={"start":None, "pause":None, "stop":None };
+          
           buttons=[];
 
-          if bool(self.params.play) is True:
-             text="▶ start";
-             if self.params.play is str and len(self.params.play)>0:
-                text=self.params.play;
-             button = create_button(text,'lightcoral',lambda _: self._start());
-             button.disabled=True;
-             self._buttons["play"]=button;
-             buttons.append(button);
+          text="▶ start";
+          button = create_button(text,'coral',lambda _: self._start());
+          button.disabled=True;
+          self._buttons["play"]=button;
+          buttons.append(button);
 
-          if bool(self.params.pause) is True:
-             text="⏸ pause";
-             if self.params.pause is str and len(self.params.pause)>0:
-                text=self.params.pause;
-             button = create_button(text,'lightcoral',lambda _: self._pause());
-             button.disabled=True;
-             self._buttons["pause"]=button;
-             buttons.append(button);
+          text="⏸ pause";
+          button = create_button(text,'coral',lambda _: self._pause());
+          button.disabled=True;
+          self._buttons["pause"]=button;
+          buttons.append(button);
 
-          if bool(self.params.close) is True:
-             text="⏹ stop";
-             if self.params.close is str and len(self.params.close)>0:
-                text=self.params.close;
-             button = create_button(text,'coral',lambda _: self._stop());
-             button.disabled=True;
-             self._buttons["stop"]=button;
-             buttons.append(button);
+          text="⏹ stop";
+          button = create_button(text,'red',lambda _: self._stop());
+          button.disabled=True;
+          self._buttons["stop"]=button;
+          buttons.append(button);
 
-          if buttons:
-             label = widgets.Label(value="AudioPlayer:");
-             label.style.font_weight = 'bold';
-             box = widgets.VBox([label,widgets.HBox(buttons)]);
-             box.layout.border = '2px solid red';
-             box.layout.padding = '10px';
-             box.layout.margin = '10px';
-             display(box);
+          label = widgets.Label(value="AudioPlayer:");
+          label.style.font_weight = 'bold';
+          box = widgets.VBox([label,widgets.HBox(buttons)]);
+          box.layout.border = '2px solid black';
+          box.layout.padding = '10px';
+          box.layout.margin = '10px';
+          display(box);          
 
       def _callback(self, outdata, frames, time, status):
           try:
@@ -146,6 +142,7 @@ class AudioPlayer(Block):
       def slot_segment(self, slot, data):
           if data is not None:
              self._cache.append(data);
+             self._createInterface();
              if self.params.autoplay or True:
                 self._start(data);
                 return True;

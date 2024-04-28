@@ -17,6 +17,7 @@ setup(
                        #"transformers>=4.37",
                        "transformers",
                        "torch==2.2.2",   # <------------ si algo falla pasa a 2.2.1
+                       "torchaudio",
                        "mediapipe>=0.10.9",
                        "jupyter_ui_poll",
                        "openai",

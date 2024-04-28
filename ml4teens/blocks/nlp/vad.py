@@ -28,12 +28,12 @@ class VAD(Block):
       """
 
       def __init__(self, **kwargs):
-          params, self._rest = tools.splitDict(["aggressiveness","silence","patience"], **kwargs);
+          params, self._rest = tools.splitDict(["aggressiveness","silence","patience","note"], **kwargs);
           super().__init__(**params);
           self._chunkTime  = self.context.default.VadChunkTime;
           self._sampleRate = self.context.default.AudioSampleRate;
           self._chunkSize  = int(self._sampleRate*self._chunkTime/1000);
-          self._vad        = webrtcvad.Vad(self.params.aggressiveness or 2);
+          self._vad        = webrtcvad.Vad(self.params.aggressiveness or 1);
           self._silence    = math.ceil((self.params.silence  or 0.75)/(self.context.default.VadChunkTime/1000));
           self._patience   = math.ceil((self.params.patience or 5.00)/(self.context.default.VadChunkTime/1000))*self._chunkSize;
           self._buffer     = np.ndarray(0, dtype=np.int16);
@@ -41,22 +41,40 @@ class VAD(Block):
           self._s          = 0;
           self._c          = 0;
 
-      def generate_tone(self, note, octave, duration):
-          sr = self.context.default.AudioSampleRate;
-          a4_freq, tones_from_a4 = 440, 12 * (octave - 4) + (note - 9);
-          frequency = a4_freq * 2 ** (tones_from_a4 / 12);
-          duration = int(duration);
-          audio = np.linspace(0, duration, duration * sr);
-          audio = (20000 * np.sin(audio * (2 * np.pi * frequency))).astype(np.int16);
-          return audio;
+      def generate_tone(self):
+          if self.params.note or False:
+             notes = ["DO", "DO#", "RE", "RE#", "MI", "FA", "FA#", "SOL", "SOL#", "LA", "LA#", "SI"];
+             note=4;
+             if type(self.params.note) is str:
+                note=''.join([n.strip() for n in self.params.note.upper().split()]);
+                if note in notes: note=notes.index(note);
+                else:             note=4; # MI
+             octave=5;
+             duration=1;
+             sr = self.context.default.AudioSampleRate;
+             a4_freq, tones_from_a4 = 440, 12 * (octave - 4) + (note - 9);
+             frequency = a4_freq * 2 ** (tones_from_a4 / 12);
+             duration = int(duration);
+             audio = np.linspace(0, duration, duration * sr);
+             audio = (20000 * np.sin(audio * (2 * np.pi * frequency))).astype(np.int16);
+             return audio;
+          else:   
+             audio = np.ndarray(0, dtype=np.int16);
+             return audio;
 
       def _process(self, chunk):
 
-          if chunk is not None:
-             vad=self._vad.is_speech(chunk.tobytes(), self.context.default.AudioSampleRate);
-          else:
-             chunk=np.zeros(self._chunkSize, dtype=np.int16);
-             vad=False;
+          if chunk is None:
+             if self._buffer.size > 0:
+                self.signal_segment(self._buffer);
+                self._pattern.append('#');
+                self.signal_pattern(''.join(self._pattern));
+                self._pattern=list();
+                self._buffer = np.ndarray(0, dtype=np.int16);
+                self._s=0;
+             return;
+                
+          vad=self._vad.is_speech(chunk.tobytes(), self.context.default.AudioSampleRate);
 
           if   self._s == 0:
                if bool(vad) is False:
@@ -86,7 +104,7 @@ class VAD(Block):
                         self._buffer = np.concatenate((self._buffer, chunk));
                         self._s=1;
                      else:
-                        self._buffer = np.concatenate((self._buffer, self.generate_tone(4, 5, 1)));
+                        self._buffer = np.concatenate((self._buffer, self.generate_tone()));
                         self.signal_segment(self._buffer);
                         self._pattern.append('#');
                         self.signal_pattern(''.join(self._pattern));

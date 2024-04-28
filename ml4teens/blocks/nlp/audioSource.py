@@ -4,9 +4,9 @@ import numpy as np
 import soundfile as sf
 import librosa;
 import requests;
-from io import BytesIO;
 
-#from resemble_enhance.enhancer.inference import denoise, enhance;
+from tqdm import tqdm;
+from io import BytesIO;
 
 from ...tools import tools;
 from ...core  import Block;
@@ -31,15 +31,9 @@ class AudioSource(Block):
              data = data.astype(np.float32);
              data = data / np.max(np.abs(data));
 
-             #if self.params.denoise or self.params.enhance:
-             #   denoising=False;
-             #   nfe=64;            # range(1, 128+1, 1)
-             #   solver="Midpoint"; # ["Midpoint", "RK4", "Euler"]
-             #   tau=0.5;           # range(0, 1, 0.01)
-             #   device="cpu"; #self.context.default.device;
-             #   if self.params.denoise: data, sr = denoise(data, sr, device);
-             #   if self.params.enhance: data, sr = enhance(data, sr, device, nfe=nfe, solver=solver, lambd=0.9 if denoising else 0.1, tau=tau);
-
+             if self.params.denoise or self.params.enhance:
+                pass;
+             
              data = librosa.resample(data, orig_sr=sr, target_sr=self.context.default.AudioSampleRate, res_type=self.params.resample or "soxr_hq");
 
              self.signal_audio(data);
