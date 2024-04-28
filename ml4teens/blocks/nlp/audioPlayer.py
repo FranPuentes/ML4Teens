@@ -16,7 +16,7 @@ class AudioPlayer(Block):
           self._offset=0;
           self._stream=None;
           self._paused=False;
-          self._info  =None;
+          self._label  =None;
           self._buttons=None;
              
       def _createInterface(self):
@@ -58,9 +58,15 @@ class AudioPlayer(Block):
           self._buttons["stop"]=button;
           buttons.append(button);
 
-          label = widgets.Label(value="AudioPlayer:");
-          label.style.font_weight = 'bold';
-          box = widgets.VBox([label,widgets.HBox(buttons)]);
+          text="⏵ next";
+          button = create_button(text,'lightcoral',lambda _: self._next());
+          button.disabled=True;
+          self._buttons["next"]=button;
+          buttons.append(button);
+
+          self._label = widgets.Label(value="AudioPlayer:");
+          self._label.style.font_weight = 'bold';
+          box = widgets.VBox([self._label,widgets.HBox(buttons)]);
           box.layout.border = '2px solid black';
           box.layout.padding = '10px';
           box.layout.margin = '10px';
@@ -79,9 +85,12 @@ class AudioPlayer(Block):
                      self._offset+=1;
                      if self._offset >= cache.size:
                         self._cache.pop(0);
-                        if len(self._cache)==0: raise sd.CallbackStop();
-                        else:                   cache=self._cache[0];
-                        self._offset=0;
+                        self._label.value=f"AudioPlayer: {len(self._cache)} segmentos en memoria";
+                        if len(self._cache)==0: 
+                           raise sd.CallbackStop();
+                        else:                   
+                           cache=self._cache[0];
+                           self._offset=0;
 
               else:
                  raise sd.CallbackStop();
@@ -104,6 +113,7 @@ class AudioPlayer(Block):
              self._buttons["play" ].disabled=True;
              self._buttons["pause"].disabled=False;
              self._buttons["stop" ].disabled=False;
+             self._buttons["next" ].disabled=False;
              return self._stream.active if self._stream else False;
 
           else:
@@ -116,12 +126,14 @@ class AudioPlayer(Block):
                 self._buttons["play" ].disabled=True;
                 self._buttons["pause"].disabled=False;
                 self._buttons["stop" ].disabled=False;
+                self._buttons["next" ].disabled=False;
                 self._buttons["play" ].description="▶ start";
              else:
                 self._paused=True;
                 self._buttons["play" ].disabled=False;
                 self._buttons["pause"].disabled=True;
                 self._buttons["stop" ].disabled=False;
+                self._buttons["next" ].disabled=False;
                 self._buttons["play" ].description="▶ play";
              return self._paused;
 
@@ -132,17 +144,25 @@ class AudioPlayer(Block):
           self._buttons["play" ].disabled=True;
           self._buttons["pause"].disabled=True;
           self._buttons["stop" ].disabled=True;
+          self._buttons["next" ].disabled=True;
           self._offset=0;
           self._paused=False;
           self._cache=[];
           gc.collect();
           return True;
 
+      def _next(self):
+          if self._cache:
+             self._cache.pop(0);
+             self._offset=0;
+             self._label.value=f"AudioPlayer: {len(self._cache)} segmentos en memoria";
+
       @Block.slot("segment",{np.ndarray})
       def slot_segment(self, slot, data):
           if data is not None:
              self._cache.append(data);
              self._createInterface();
+             self._label.value=f"AudioPlayer: {len(self._cache)} segmentos en memoria";
              if self.params.autoplay or True:
                 self._start(data);
                 return True;
