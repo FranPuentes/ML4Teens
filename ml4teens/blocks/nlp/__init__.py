@@ -5,5 +5,4 @@ from .similarity  import Similarity;
 from .audioPlayer import AudioPlayer;
 from .audioSource import AudioSource;
 from .transcribe  import Transcribe;
-
-import .openai;
+from .openai      import Chat, TTS, STT;
