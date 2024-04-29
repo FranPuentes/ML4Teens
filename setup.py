@@ -33,17 +33,18 @@ setup(
                        "librosa",
                        #"webrtcvad",
                        "sounddevice",
-                       #"accelerate",
+                       "accelerate",
                        "ffmpeg",
                        "nsnet2-denoiser",
                        "pyaudio",
+                       "scipy==1.12.0", # <-------------- hay un error en la 1.13.0
                      ],
     include_package_data=True,
     
     # metadata para publicar en PyPI
     author='Francisco Puentes',
     author_email='fran@puentescalvo.com',
-    description='Machine Learning para Adolescentes',
+    description='Machine Learning para Adolescentes (Machine Learning for Teens)',
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
     url='https://github.com/FranPuentes/ML4Teens',
