@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 
 from .inputText   import InputText;
 from .tfidf       import TfIdf;

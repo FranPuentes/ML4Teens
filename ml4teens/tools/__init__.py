@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 
 from .embeddings import ImgEmbeddings;
 from .embeddings import TxtEmbeddings;

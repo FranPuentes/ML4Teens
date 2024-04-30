@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import gc;
 import gradio as gr
 import numpy as np

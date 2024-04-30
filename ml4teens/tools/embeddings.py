@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import os;
 import PIL;
 import numpy as np;

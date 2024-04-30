@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import PIL;
 import numpy as np;
 

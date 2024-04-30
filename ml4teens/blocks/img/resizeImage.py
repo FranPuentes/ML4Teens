@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from PIL.Image import Image;
 
 from ...core import Block;

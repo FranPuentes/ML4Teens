@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 
 from .dataLabelizer  import DataLabelizer;
 from .dataWarehouse  import DataWarehouse;

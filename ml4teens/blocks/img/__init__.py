@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 
 from .singleChannel     import SingleChannel
 from .splitChannels     import SplitChannels

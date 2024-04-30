@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import sys, os, io;
 import fnmatch;
 from PIL import Image;
