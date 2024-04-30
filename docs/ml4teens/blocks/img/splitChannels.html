@@ -386,7 +386,7 @@ class SplitChannels(Block):
 <h3>Methods</h3>
 <dl>
 <dt id="ml4teens.blocks.img.splitChannels.SplitChannels.signal_1bit"><code class="name flex">
-<span>def <span class="ident">signal_1bit</span></span>(<span>self, data='0c22c7fe3e2f7b0398c85f1ca2f9cb333b9e827f7b4e186491e8ebf5a93f6b2d')</span>
+<span>def <span class="ident">signal_1bit</span></span>(<span>self, data='0b7acfad8abb9f5b58a06cc2b0d81305a68c22bce2bd1bbe17f8578e91ee2dc6')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -401,11 +401,13 @@ class SplitChannels(Block):
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.splitChannels.SplitChannels.signal_F"><code class="name flex">
-<span>def <span class="ident">signal_F</span></span>(<span>self, data='b89a96acde95c048206a21416c10aa935de6e2e8caebbf4c89e7b7fa4fd4ca6d')</span>
+<span>def <span class="ident">signal_F</span></span>(<span>self, data='69535029f4dc050db68f8192353843e3fcce67cfa47efcd836050c74ab06cec9')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -420,11 +422,13 @@ class SplitChannels(Block):
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.splitChannels.SplitChannels.signal_I"><code class="name flex">
-<span>def <span class="ident">signal_I</span></span>(<span>self, data='38da9d64c154a6278838cd64c92493b0a7e7e88ea683df392ad6370c6536a403')</span>
+<span>def <span class="ident">signal_I</span></span>(<span>self, data='87b6a06ead7042c505a2f1700cad5d786187152423784b236f98f8a252b2c0d1')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -439,11 +443,13 @@ class SplitChannels(Block):
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.splitChannels.SplitChannels.signal_LAB_a"><code class="name flex">
-<span>def <span class="ident">signal_LAB_a</span></span>(<span>self, data='65262c86901309d65e20aa0710a3a409211ddcd89cd7f876feede9c6befc811c')</span>
+<span>def <span class="ident">signal_LAB_a</span></span>(<span>self, data='30969ed5d9bc0ab5c7589c6dfa10b79640ccadc023e9d9aab179eac2dc677006')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -458,11 +464,13 @@ class SplitChannels(Block):
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.splitChannels.SplitChannels.signal_LAB_b"><code class="name flex">
-<span>def <span class="ident">signal_LAB_b</span></span>(<span>self, data='aa9a894a3171ecf613184f6f98e1cf2812cee4282b23fc018ffc1f6648432f7c')</span>
+<span>def <span class="ident">signal_LAB_b</span></span>(<span>self, data='b92bb7bc6a767b48a3c913dc5b97d081150680cd8f3c446c9231f8e50d365d5f')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -477,11 +485,13 @@ class SplitChannels(Block):
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.splitChannels.SplitChannels.signal_LAB_l"><code class="name flex">
-<span>def <span class="ident">signal_LAB_l</span></span>(<span>self, data='67d0d41936f8960a3a62243b8eaa2ba244d67428d5dae844758f8448f7206b9d')</span>
+<span>def <span class="ident">signal_LAB_l</span></span>(<span>self, data='8c06ce52ea21b49eb075ea8903877ab6c750457d3756134d0b328148ae77aa4f')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -496,11 +506,13 @@ class SplitChannels(Block):
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.splitChannels.SplitChannels.signal_alpha"><code class="name flex">
-<span>def <span class="ident">signal_alpha</span></span>(<span>self, data='115eb8a7d3c72b0d943e859c1e7e2db96250b12cebff07f7f890a0ad97975aff')</span>
+<span>def <span class="ident">signal_alpha</span></span>(<span>self, data='1c2d6cd1eb5c00413b5051b833fab995390f472ab65e322f9cda29f3b97eaf5f')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -515,11 +527,13 @@ class SplitChannels(Block):
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.splitChannels.SplitChannels.signal_bdiff"><code class="name flex">
-<span>def <span class="ident">signal_bdiff</span></span>(<span>self, data='da6c00cb3f6b5768ac292416e076ca34e6b57fb8efd03ccbb64395ae955c4ece')</span>
+<span>def <span class="ident">signal_bdiff</span></span>(<span>self, data='4c9c25da2611446de183937c6b4c8c07022af3e65603d5ebbc792196255c1273')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -534,11 +548,13 @@ class SplitChannels(Block):
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.splitChannels.SplitChannels.signal_black"><code class="name flex">
-<span>def <span class="ident">signal_black</span></span>(<span>self, data='66307ea94e1e7c28d1e153e7b9a236229e59e7cca262d62fe5ce895460509b2c')</span>
+<span>def <span class="ident">signal_black</span></span>(<span>self, data='f2a94d37a5b1ce00e2081d3374a688855e99984abc7f445df09e6a12f84148be')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -553,11 +569,13 @@ class SplitChannels(Block):
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.splitChannels.SplitChannels.signal_blue"><code class="name flex">
-<span>def <span class="ident">signal_blue</span></span>(<span>self, data='12ed1c7dfd51e1b207ce998414cc2288fde92138ee9615dccbd7fae39f5786a3')</span>
+<span>def <span class="ident">signal_blue</span></span>(<span>self, data='4fcfa65004a5ec1ea26229ab2e43b2848156161440790999f635fa54b3850d56')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -572,11 +590,13 @@ class SplitChannels(Block):
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.splitChannels.SplitChannels.signal_cyan"><code class="name flex">
-<span>def <span class="ident">signal_cyan</span></span>(<span>self, data='fc277eb62f66db01fbf6b230b0cc96498e85714f221690a9ff4af88b4558f8e2')</span>
+<span>def <span class="ident">signal_cyan</span></span>(<span>self, data='39c87c68bce04f8da3da15676191cffc6ad10701521ae3a135e2610bb1ed948a')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -591,11 +611,13 @@ class SplitChannels(Block):
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.splitChannels.SplitChannels.signal_green"><code class="name flex">
-<span>def <span class="ident">signal_green</span></span>(<span>self, data='9d891ecb24ef18efa6d38501720c529a4653c65a8d1d5bfd7d2716019f84191a')</span>
+<span>def <span class="ident">signal_green</span></span>(<span>self, data='6e7dd96f62e4e46d3e2310e661028eac67cefec3ffda99434c813d4c93d331fb')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -610,11 +632,13 @@ class SplitChannels(Block):
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.splitChannels.SplitChannels.signal_grey"><code class="name flex">
-<span>def <span class="ident">signal_grey</span></span>(<span>self, data='0d8e2d315d3f87a971cafbd3623e4e4df0e9918fc850cec587f5d945708a8fc7')</span>
+<span>def <span class="ident">signal_grey</span></span>(<span>self, data='528b6e5aa1aae86efd033d9b6f13ca3866b8625010f3e0972ec201dfea8d9342')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -629,11 +653,13 @@ class SplitChannels(Block):
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.splitChannels.SplitChannels.signal_hue"><code class="name flex">
-<span>def <span class="ident">signal_hue</span></span>(<span>self, data='07579e6aabee9aabe8a8e726b38ea29f814ceaced9a5cb17e0f1b8b9b253c2ce')</span>
+<span>def <span class="ident">signal_hue</span></span>(<span>self, data='8fab1a756de28e0bc3e2f40599f3600074ced75a9ac1d13b4abffb6aaf1fb832')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -648,11 +674,13 @@ class SplitChannels(Block):
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.splitChannels.SplitChannels.signal_luminance"><code class="name flex">
-<span>def <span class="ident">signal_luminance</span></span>(<span>self, data='fc3968ca6a0394c8f3f617ffd03985509e43b99ec80ab9c105ace6a5896aaa8d')</span>
+<span>def <span class="ident">signal_luminance</span></span>(<span>self, data='4aa4f0a921601008ca712a946ffb6cae05e2f09f8e53239533ee94f0ed2984c6')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -667,11 +695,13 @@ class SplitChannels(Block):
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.splitChannels.SplitChannels.signal_magenta"><code class="name flex">
-<span>def <span class="ident">signal_magenta</span></span>(<span>self, data='3adbb66820741fa6c9d1e2ef9bb703ea3c532604f6e8d74a5bf64d47fb439772')</span>
+<span>def <span class="ident">signal_magenta</span></span>(<span>self, data='d92c0e4054d4ba99a861f76865f6742c7ecb9fd81e7f7ff1a2889b6b8cdb5320')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -686,11 +716,13 @@ class SplitChannels(Block):
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.splitChannels.SplitChannels.signal_palette"><code class="name flex">
-<span>def <span class="ident">signal_palette</span></span>(<span>self, data='1b8682422b69a07a7c921af1f0ecd464d092a9e1ab741d7496a9ad02677db480')</span>
+<span>def <span class="ident">signal_palette</span></span>(<span>self, data='a566ba26be6cbca70443835524b781688da3a6136188711305e7b122e58987c1')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -705,11 +737,13 @@ class SplitChannels(Block):
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.splitChannels.SplitChannels.signal_rdiff"><code class="name flex">
-<span>def <span class="ident">signal_rdiff</span></span>(<span>self, data='368bd21819672a8165bec3916f4e0acf86c0c54b678d959193005a9df123ae0a')</span>
+<span>def <span class="ident">signal_rdiff</span></span>(<span>self, data='7539700f2a71ff3b8da41fa87f23f99c6e1a3ceb8a1638f2d3fc81ddd255c721')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -724,11 +758,13 @@ class SplitChannels(Block):
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.splitChannels.SplitChannels.signal_red"><code class="name flex">
-<span>def <span class="ident">signal_red</span></span>(<span>self, data='d08f2fd719a898ad484f8aa0b12aadcf60af8c5ec0cf2a010d8e28d774d56a71')</span>
+<span>def <span class="ident">signal_red</span></span>(<span>self, data='461af4e72a3f05e93f16721e07d2ee755219f91af6dbaf42f2ee34f2b6f70a4e')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -743,11 +779,13 @@ class SplitChannels(Block):
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.splitChannels.SplitChannels.signal_saturation"><code class="name flex">
-<span>def <span class="ident">signal_saturation</span></span>(<span>self, data='d4b1e5b296452aab3ba75ae1d8c86e45d19411a305471988f8cf2a94d22f5011')</span>
+<span>def <span class="ident">signal_saturation</span></span>(<span>self, data='19ea06d1ebda3db0d08775900e3b7466e442c35977612debaa92c20f0ad41824')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -762,11 +800,13 @@ class SplitChannels(Block):
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.splitChannels.SplitChannels.signal_value"><code class="name flex">
-<span>def <span class="ident">signal_value</span></span>(<span>self, data='dbfad6d60f3bfd638c4f5858fe69a4cfd8a327e41dd673ce6354bba101f2ba1c')</span>
+<span>def <span class="ident">signal_value</span></span>(<span>self, data='fc8b4cac231453727f1956cf72374c9db11aa768b0623dfbb8c0981911772491')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -781,11 +821,13 @@ class SplitChannels(Block):
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.splitChannels.SplitChannels.signal_yellow"><code class="name flex">
-<span>def <span class="ident">signal_yellow</span></span>(<span>self, data='7d75485b667a55a35e79266daeaabef4f7e8f97a18c5aee0fee2be4f16b4dc2d')</span>
+<span>def <span class="ident">signal_yellow</span></span>(<span>self, data='1d808773ba9e476c5153bd0e81b5cae1463326afcdb92116cbe705b74d03e7d7')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -800,7 +842,9 @@ class SplitChannels(Block):
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.splitChannels.SplitChannels.slot_frame"><code class="name flex">

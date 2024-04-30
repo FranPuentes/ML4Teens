@@ -290,7 +290,7 @@ class TrimImage(Block):
 <h3>Methods</h3>
 <dl>
 <dt id="ml4teens.blocks.img.trimImage.TrimImage.signal_image"><code class="name flex">
-<span>def <span class="ident">signal_image</span></span>(<span>self, data='22e0267a61a3861da675e2cfdd0cc71de6ce91d854de56f34da3441eeced170c')</span>
+<span>def <span class="ident">signal_image</span></span>(<span>self, data='97dcb86511b1d6a2f68727cc4ad50e6900c246ff3840ab3b2e1c8ec27c872f1d')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -305,7 +305,9 @@ class TrimImage(Block):
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.trimImage.TrimImage.slot_boxes"><code class="name flex">

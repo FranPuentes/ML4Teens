@@ -253,7 +253,7 @@ class YoloTrain(Block):
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.yoloTrain.YoloTrain.signal_files"><code class="name flex">
-<span>def <span class="ident">signal_files</span></span>(<span>self, data='c3cc25fc7a36a88bd19c4709efd06a3f858af6b5292757fc4c724357cf392eb7')</span>
+<span>def <span class="ident">signal_files</span></span>(<span>self, data='d79e938f42625cf7ff2794931d503faf26b9242c0723cb1cc42669be3d6b0855')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -268,7 +268,9 @@ class YoloTrain(Block):
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.yoloTrain.YoloTrain.slot_close"><code class="name flex">

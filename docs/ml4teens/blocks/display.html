@@ -339,7 +339,7 @@ def get_textsize(cls, text, font):
 <h3>Methods</h3>
 <dl>
 <dt id="ml4teens.blocks.display.Display.signal_image"><code class="name flex">
-<span>def <span class="ident">signal_image</span></span>(<span>self, data='0994929ca891e28c7ea47ce1c4e32526a56c337640cca78f45b0803cf24dc709')</span>
+<span>def <span class="ident">signal_image</span></span>(<span>self, data='844bc9d45e3c472cd040af55eb4e38b9c74255764733bd636de4b17e5777c5c8')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -354,7 +354,9 @@ def get_textsize(cls, text, font):
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.display.Display.slot_image"><code class="name flex">

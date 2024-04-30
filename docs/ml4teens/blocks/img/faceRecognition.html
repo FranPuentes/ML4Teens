@@ -761,7 +761,7 @@ def similarity(emb1, emb2):
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.faceRecognition.FaceRecognition.signal_image"><code class="name flex">
-<span>def <span class="ident">signal_image</span></span>(<span>self, data='f36596fd10a77412706f7262b7a00856212dfb1549349593b5b0fb11bef61772')</span>
+<span>def <span class="ident">signal_image</span></span>(<span>self, data='16600c6e61056b47b2015f290e6c0bb5101c2821ff8b9f38b8437489ea624177')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -776,11 +776,13 @@ def similarity(emb1, emb2):
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.faceRecognition.FaceRecognition.signal_recognized"><code class="name flex">
-<span>def <span class="ident">signal_recognized</span></span>(<span>self, data='cd5fe7f6e5fec4e8a15c9661f89bb6fb3f81d382fbefb2b79b0227abd79f16a5')</span>
+<span>def <span class="ident">signal_recognized</span></span>(<span>self, data='55736f59963d8b75c7894f421532914f8176edb0d4ef10ce520c074d078976ab')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -795,11 +797,13 @@ def similarity(emb1, emb2):
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.faceRecognition.FaceRecognition.signal_reference"><code class="name flex">
-<span>def <span class="ident">signal_reference</span></span>(<span>self, data='47acc5c7a29ba63c8653b2b40407040cb1035fcd0a8fb01b56692634a3b693e2')</span>
+<span>def <span class="ident">signal_reference</span></span>(<span>self, data='160a9bed6e0322a44ae0d6201c5bcb8d2d3239d11fe9eaad3c8f5da86a889f26')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -814,7 +818,9 @@ def similarity(emb1, emb2):
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.faceRecognition.FaceRecognition.slot_image"><code class="name flex">

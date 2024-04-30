@@ -295,7 +295,7 @@ class ImageSource(Block):
 <h3>Methods</h3>
 <dl>
 <dt id="ml4teens.blocks.img.imageSource.ImageSource.signal_dims"><code class="name flex">
-<span>def <span class="ident">signal_dims</span></span>(<span>self, data='a54c9fd0e4ff4cf06fbc2fa0593a91d49167475aed3e01f7042ecb24256be91b')</span>
+<span>def <span class="ident">signal_dims</span></span>(<span>self, data='695bd48edec2cc099c7c4449df7eb5634562a041cd5a451296722e4be6564ead')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -310,11 +310,13 @@ class ImageSource(Block):
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.imageSource.ImageSource.signal_histogram"><code class="name flex">
-<span>def <span class="ident">signal_histogram</span></span>(<span>self, data='60a11f60d21fcfb443a40889d7b1a9ecf500e5a2f0ae0c49c20f7aaab72abe01')</span>
+<span>def <span class="ident">signal_histogram</span></span>(<span>self, data='4f730c9ce8a0f8c230ec010fec74277d6f63e1a3ca0c8ee93e7b320c2e833d13')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -329,11 +331,13 @@ class ImageSource(Block):
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.imageSource.ImageSource.signal_image"><code class="name flex">
-<span>def <span class="ident">signal_image</span></span>(<span>self, data='210268d540ed5a9350b0eb331403dea299d9c1c39a14f957e40b46702c37a184')</span>
+<span>def <span class="ident">signal_image</span></span>(<span>self, data='05078b4a73b675140f017ab95a4d8f947d4371bf9ecc6907ee70dc74344dca8a')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -348,11 +352,13 @@ class ImageSource(Block):
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.imageSource.ImageSource.signal_info"><code class="name flex">
-<span>def <span class="ident">signal_info</span></span>(<span>self, data='328729d0d06cf23b707447fd575b5370e86d290d151912e35e7cff82abe1cdd3')</span>
+<span>def <span class="ident">signal_info</span></span>(<span>self, data='77e61ef731bd4aeb27aa1f284abfbc9802ea372af9decc51b762f657a5a51826')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -367,7 +373,9 @@ class ImageSource(Block):
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.imageSource.ImageSource.slot_source"><code class="name flex">

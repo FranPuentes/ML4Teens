@@ -303,7 +303,7 @@ class FaceBoxing(Block):
 <h3>Methods</h3>
 <dl>
 <dt id="ml4teens.blocks.img.faceBoxing.FaceBoxing.signal_box"><code class="name flex">
-<span>def <span class="ident">signal_box</span></span>(<span>self, data='cbd93070d887f78f8daf00f4d65cef135adf5fbcb6c6b0acb6f51784636cd6b1')</span>
+<span>def <span class="ident">signal_box</span></span>(<span>self, data='8e4d6037de5557cff92e95bd700ccf3e1bb99ab2583183efc4da36565ff84639')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -318,11 +318,13 @@ class FaceBoxing(Block):
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.faceBoxing.FaceBoxing.signal_boxes"><code class="name flex">
-<span>def <span class="ident">signal_boxes</span></span>(<span>self, data='32b573aac30735ec5e94c8d1bb52854d3c6fff4f2a1253007c6963d526cc3556')</span>
+<span>def <span class="ident">signal_boxes</span></span>(<span>self, data='23b64c987770bb0aa2ac3b14191ca67524a60d7cd4cea8b570b65f104d546ea0')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -337,11 +339,13 @@ class FaceBoxing(Block):
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.faceBoxing.FaceBoxing.signal_end"><code class="name flex">
-<span>def <span class="ident">signal_end</span></span>(<span>self, data='3ebf4c3f494f11e2e3be92ffb62298cde565e47de7e8823c1b4f182d7658c611')</span>
+<span>def <span class="ident">signal_end</span></span>(<span>self, data='c3bfe9339ba52b808416f89844ed3afb5c14a1f7ca45fa4449bf3d66f0a6f5c3')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -356,11 +360,13 @@ class FaceBoxing(Block):
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.faceBoxing.FaceBoxing.signal_image"><code class="name flex">
-<span>def <span class="ident">signal_image</span></span>(<span>self, data='a16ed7bb830b24621586bab0a2493027c09a19c6e54d31b4747852b468c50bc3')</span>
+<span>def <span class="ident">signal_image</span></span>(<span>self, data='e601b65e1627eaa9f1ffaa913dd6f6e5e1426e924a2f41d319e61bfccd1dae3c')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -375,7 +381,9 @@ class FaceBoxing(Block):
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.faceBoxing.FaceBoxing.slot_image"><code class="name flex">

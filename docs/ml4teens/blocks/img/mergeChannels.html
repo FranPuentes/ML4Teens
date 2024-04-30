@@ -583,7 +583,7 @@ class MergeChannels(Block):
 <h3>Methods</h3>
 <dl>
 <dt id="ml4teens.blocks.img.mergeChannels.MergeChannels.signal_image"><code class="name flex">
-<span>def <span class="ident">signal_image</span></span>(<span>self, data='b2c056c96309fe30f556174d10e589402dfeaf458de72bc88b7181aead9cb0de')</span>
+<span>def <span class="ident">signal_image</span></span>(<span>self, data='cb1f17d352130db2f356da5e8c14f64eb835df370022cd6a93689cab01df5d8b')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -598,7 +598,9 @@ class MergeChannels(Block):
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.mergeChannels.MergeChannels.slot_1bit"><code class="name flex">

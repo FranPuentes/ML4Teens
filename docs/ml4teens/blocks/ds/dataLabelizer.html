@@ -164,7 +164,7 @@ class DataLabelizer(Block):
 </details>
 </dd>
 <dt id="ml4teens.blocks.ds.dataLabelizer.DataLabelizer.signal_data"><code class="name flex">
-<span>def <span class="ident">signal_data</span></span>(<span>self, data='d047a6e1aa44a859e25e77a7746b2f4e0d5649ee46e7f44c41753b967b66069d')</span>
+<span>def <span class="ident">signal_data</span></span>(<span>self, data='7784ac0fa3b15cb78a396c2a96bed1747db399c385becf6f1034c2af998a189a')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -179,11 +179,13 @@ class DataLabelizer(Block):
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.ds.dataLabelizer.DataLabelizer.signal_label"><code class="name flex">
-<span>def <span class="ident">signal_label</span></span>(<span>self, data='2b99538767ade19f9299d6e11e3032d5f54e22c72a23609ee94a86475753baa2')</span>
+<span>def <span class="ident">signal_label</span></span>(<span>self, data='256a2730d858927335a7d98cf944baf1983e3465c0e22e4dcaf2590370005b8b')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -198,7 +200,9 @@ class DataLabelizer(Block):
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.ds.dataLabelizer.DataLabelizer.slot_data"><code class="name flex">

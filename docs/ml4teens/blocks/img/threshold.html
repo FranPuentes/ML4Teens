@@ -164,7 +164,7 @@ class Threshold(Block):
 <h3>Methods</h3>
 <dl>
 <dt id="ml4teens.blocks.img.threshold.Threshold.signal_image"><code class="name flex">
-<span>def <span class="ident">signal_image</span></span>(<span>self, data='9309992a60d7588d54d5f32a7b63bbfffb0f1097a111f997e225b88969519d86')</span>
+<span>def <span class="ident">signal_image</span></span>(<span>self, data='eb5b8ded8b13cf43ed1177c1b4df4d8568c5dddef8de6923ae93ecddd723738c')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -179,7 +179,9 @@ class Threshold(Block):
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.threshold.Threshold.slot_image"><code class="name flex">

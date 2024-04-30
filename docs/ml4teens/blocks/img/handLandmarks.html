@@ -488,7 +488,7 @@ def names(cls, idx):
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.handLandmarks.HandLandmarks.signal_end"><code class="name flex">
-<span>def <span class="ident">signal_end</span></span>(<span>self, data='91a6a22bf30d261900a1654b614a8a3f897574a8adf2206dd80c7a40b3c987c9')</span>
+<span>def <span class="ident">signal_end</span></span>(<span>self, data='e6c10f31a9e540db14d71a454bb9a03083f8c42ae1b411c104730a425c2b803a')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -503,11 +503,13 @@ def names(cls, idx):
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.handLandmarks.HandLandmarks.signal_image"><code class="name flex">
-<span>def <span class="ident">signal_image</span></span>(<span>self, data='ec6001ddc14cd430727a195b3b59a09b2266b1260498b240434b833fa27b90ce')</span>
+<span>def <span class="ident">signal_image</span></span>(<span>self, data='3fb604f7d78f65d0a5bab5ac0e56d6bf80380f4bb186009a5f1a3f5e3d500723')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -522,11 +524,13 @@ def names(cls, idx):
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.handLandmarks.HandLandmarks.signal_landmark"><code class="name flex">
-<span>def <span class="ident">signal_landmark</span></span>(<span>self, data='39efcbf66a8b3ae82b185c13ebdce0c537e4c7a1ca6e1de78f2ef139dbd9f6e8')</span>
+<span>def <span class="ident">signal_landmark</span></span>(<span>self, data='63966414d729c1b128ae67c6a91665b7652897d7ef7dc25579e70d9abf45f2e0')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -541,11 +545,13 @@ def names(cls, idx):
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.handLandmarks.HandLandmarks.signal_landmarks"><code class="name flex">
-<span>def <span class="ident">signal_landmarks</span></span>(<span>self, data='f6282bfb13f2975021927155dc85e07cedac85f7480a095a5de0c3a51e0f946d')</span>
+<span>def <span class="ident">signal_landmarks</span></span>(<span>self, data='1c17756c7ca27c8747d5776cee53e56907dcb3d77ecb2f0f3105d685d2344358')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -560,7 +566,9 @@ def names(cls, idx):
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.handLandmarks.HandLandmarks.slot_image"><code class="name flex">

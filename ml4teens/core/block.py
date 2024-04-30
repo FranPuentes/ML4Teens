@@ -196,7 +196,7 @@ class Block(ABC):
                     assert func is not None;
                     assert callable(func);
                     
-                    done=func(self, _slot, data);
+                    done=func(self, _slot, data if data is not None else default);
                     
                     if self.params.done is not None:
                        if callable(self.params.done):
@@ -215,6 +215,10 @@ class Block(ABC):
                     pass;
                     
               Block._slots[cls][name]["stub"]=wrapper;
+              wrapper._is_slot=True;
+              wrapper._slot_name=name;
+              wrapper._types=typedecl;
+              wrapper._default=default;
               return wrapper;
           return decorador;
 
@@ -235,8 +239,13 @@ class Block(ABC):
                      if using:
                         data=func(self,data);
                         Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
-                        if sync:
-                           Context.instance.wait(forever=0, sync=sync);
+                        if bool(sync):
+                           Context.instance.wait(forever=0, sync=bool(sync));
+              wrapper._is_signal=True;
+              wrapper._signal_name=name;
+              wrapper._type=typedecl;
+              wrapper._is_sync=bool(sync);
+              wrapper._unique=_unique_;
               return wrapper;
           return decorador;
 

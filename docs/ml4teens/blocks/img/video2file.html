@@ -185,7 +185,7 @@ class Video2File(Block):
 <h3>Methods</h3>
 <dl>
 <dt id="ml4teens.blocks.img.video2file.Video2File.signal_filename"><code class="name flex">
-<span>def <span class="ident">signal_filename</span></span>(<span>self, data='41958565f9342d8df6ec2ba794f4e8e4e783b2e55f56f3e9bd332390163f0574')</span>
+<span>def <span class="ident">signal_filename</span></span>(<span>self, data='9b0539d4aa2f730ef521b8df0bd1bb0b333cee1f3c5013a26cac4ee56d7f9823')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -200,7 +200,9 @@ class Video2File(Block):
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.video2file.Video2File.slot_begin"><code class="name flex">

@@ -345,7 +345,7 @@ class Plot2D(Block):
 <h3>Methods</h3>
 <dl>
 <dt id="ml4teens.blocks.ds.plot2D.Plot2D.signal_image"><code class="name flex">
-<span>def <span class="ident">signal_image</span></span>(<span>self, data='b0407d6649c8c13cb9566c0ac7392dcbcb1d7f7f2cd59714013bf0555698bb2c')</span>
+<span>def <span class="ident">signal_image</span></span>(<span>self, data='90daab696401bb65c14ac0bc498dd59964c942c43877d32ddcee2fbf2419140f')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -360,7 +360,9 @@ class Plot2D(Block):
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.ds.plot2D.Plot2D.slot_dataframe"><code class="name flex">

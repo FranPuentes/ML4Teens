@@ -510,7 +510,7 @@ def names(cls, idx):
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.handGestures.HandGestures.signal_end"><code class="name flex">
-<span>def <span class="ident">signal_end</span></span>(<span>self, data='2377f05fade19f4f94703974b070b69c36069790b392f47d3c27e09b20f3c2e1')</span>
+<span>def <span class="ident">signal_end</span></span>(<span>self, data='78a1de384be32c5131375e635ff343e156550131a7a189ad8d388efde4ba3316')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -525,11 +525,13 @@ def names(cls, idx):
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.handGestures.HandGestures.signal_gesture"><code class="name flex">
-<span>def <span class="ident">signal_gesture</span></span>(<span>self, data='5d38efd829c068cb2260e0a5cba8fd2dfda82c80deb4c9aeac34264eecd085c1')</span>
+<span>def <span class="ident">signal_gesture</span></span>(<span>self, data='35388fbd1196bd967a85b889197536a5f2bd8f2a36cdd59aa30c11cc70d308d4')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -544,11 +546,13 @@ def names(cls, idx):
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.handGestures.HandGestures.signal_image"><code class="name flex">
-<span>def <span class="ident">signal_image</span></span>(<span>self, data='df6aedcc1504caa976e104a25d845d571d61442501b86fec6d943bc0e6e46651')</span>
+<span>def <span class="ident">signal_image</span></span>(<span>self, data='34c1c4a0fe581288d207e2dbded68ca16856634766eaa5c2a818378e6e668dc0')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -563,11 +567,13 @@ def names(cls, idx):
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.handGestures.HandGestures.signal_landmark"><code class="name flex">
-<span>def <span class="ident">signal_landmark</span></span>(<span>self, data='7cafef7574cce7995de097d2178e918138f6b1dc460636fcd623a66b3e8c0380')</span>
+<span>def <span class="ident">signal_landmark</span></span>(<span>self, data='6cc1bb7a6b7966a8bdf253b2a13f0c784dd85f875621bdb351e9d8ece0d238aa')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -582,11 +588,13 @@ def names(cls, idx):
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.handGestures.HandGestures.signal_landmarks"><code class="name flex">
-<span>def <span class="ident">signal_landmarks</span></span>(<span>self, data='bebccdf603ce601792e9537ddd33e6c1ec81d5c7a3e36be28c07d1f73071a836')</span>
+<span>def <span class="ident">signal_landmarks</span></span>(<span>self, data='045668a828a2eec2b253f14ce7da66786adff3e3d1b3c7b79a9a8f119362a39c')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -601,7 +609,9 @@ def names(cls, idx):
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.handGestures.HandGestures.slot_image"><code class="name flex">

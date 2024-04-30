@@ -215,7 +215,7 @@ def download(source:str):
 <h3>Methods</h3>
 <dl>
 <dt id="ml4teens.blocks.img.embedding.Embedding.signal_embedding"><code class="name flex">
-<span>def <span class="ident">signal_embedding</span></span>(<span>self, data='8e38a74089a49e2d63cfdf9c7cdfc0446b438d60ec5edd0b6174430708851503')</span>
+<span>def <span class="ident">signal_embedding</span></span>(<span>self, data='1cf57b390ab31655fff92f2c3de8fb99392fa1c4346dc5385f91bbf7c0180410')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -230,7 +230,9 @@ def download(source:str):
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.embedding.Embedding.slot_image"><code class="name flex">

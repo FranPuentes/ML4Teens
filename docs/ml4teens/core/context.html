@@ -33,6 +33,7 @@ import queue;
 import time;
 import json;
 import torch;
+import numpy as np;
 
 from IPython.display import display;
 from IPython.display import HTML, Javascript;
@@ -54,6 +55,13 @@ Un MetaBlock identifica (bloque,slot) de entrada y (bloque,signal) de salida.
 ¿Cómo hacerlo sin repetir código?
 
 &#34;&#34;&#34;
+class ReadOnlyNamespace:
+
+    def __init__(self, **kwargs):
+        self.__dict__.update(kwargs);
+    
+    def __setattr__(self, name, value):
+        raise AttributeError(&#34;No se permite modificar el valor de los datos globales&#34;);
 
 #-------------------------------------------------------------------------------
 # Es un singleton (ver TODO).
@@ -87,15 +95,25 @@ class Context:
         if not cls._instance:
            cls._instance = super(Context, cls).__new__(cls);
            cls._instance.listeners={};
-           cls._allowGPU = torch.cuda.is_available();
            #cls.__html__();
-           cls._queue=queue.PriorityQueue();
+           cls._queue   = queue.PriorityQueue();
            
            cwd   = os.path.dirname(__file__);
-           mwd   = os.path.join(cwd, &#39;../models&#39;);
-           cache = os.path.join(mwd,&#34;cache&#34;);
-           os.makedirs(cache, exist_ok=True);
-           os.environ[&#39;TRANSFORMERS_CACHE&#39;] = cache;
+           rwd   = os.path.join(cwd, &#39;..&#39;);
+           mwd   = os.path.join(rwd, &#39;models&#39;);
+           
+           gdata = { &#34;AudioSampleRate&#34;:48000,
+                     &#34;VadChunkTime&#34;:10,
+                     &#34;GPU&#34;:torch.cuda.is_available(),
+                     &#34;RootDirectory&#34;:rwd,
+                     &#34;ModelsDirectory&#34;:mwd,
+                   };
+                          
+           cls._default=ReadOnlyNamespace(**gdata);
+           
+           #cache = os.path.join(mwd,&#34;cache&#34;);
+           #os.makedirs(cache, exist_ok=True);
+           #os.environ[&#39;TRANSFORMERS_CACHE&#39;] = cache;
         return cls._instance;
 
     #-----------------------------------------------------------------------------------------
@@ -114,23 +132,24 @@ class Context:
         
     #-----------------------------------------------------------------------------------------
     @property
-    def allowGPU(self):
-        return self._allowGPU;
-        
-    #-----------------------------------------------------------------------------------------
-    @allowGPU.setter
-    def allowGPU(self, value):
-        self._allowGPU = bool(value);
+    def default(self):
+        return self._default;
         
     #-----------------------------------------------------------------------------------------
     @property
     def gpu(self):
-        return self._allowGPU and torch.cuda.is_available();
+        return torch.cuda.is_available();
         
     #-----------------------------------------------------------------------------------------
     @property
     def gpus(self):
-        return torch.cuda.device_count() if (self._allowGPU and torch.cuda.is_available()) else 0;
+        return torch.cuda.device_count() if torch.cuda.is_available() else 0;
+        
+    #-----------------------------------------------------------------------------------------
+    @property
+    def device(self):
+        if torch.cuda.is_available(): return &#34;cuda&#34;;
+        else:                         return &#34;cpu&#34;;
         
     #-----------------------------------------------------------------------------------------
     @property
@@ -422,43 +441,55 @@ class Context:
               raise RuntimeError(f&#34;No existe la señal &#39;{sname}&#39; en {source._fullClassName}&#34;);
                
     #-----------------------------------------------------------------------------------------
-    def wait(self, timeout=1):
+    def wait(self, forever=1, sync=False): 
         &#34;&#34;&#34;
         Inicia el loop asíncrono y procesa los mensajes enviados por medio de la cola del contexto uno a uno.
         Se supone que el usuario ha colocado en la cola, previamente, mensajes para inicial la red.
         Si no hay mensajes en la cola, finaliza.
         Puede volver a invocarse, con nuevos mensajes encolados.
-        &#34;&#34;&#34;
-        
+        &#34;&#34;&#34;       
+        signals=0;
         try:
           timestamp=time.time();        
-          debug.print(&#34;Entrando en el bucle de eventos.&#34;, flush=True);
+          if sync is False: debug.print(f&#34;Entrando en el bucle de eventos (forever:{forever}).&#34;, flush=True);
           while True:
                 try:
                 
-                   with ui_events() as poll:
-                        poll(10);
+                   with ui_events() as poll: poll(10);
                 
                    try:
-                     debug.print(&#34;Esperando por un nuevo evento ...&#34;);
-                     event=self._queue.get(True,0.5);
+                     #if sync is False: debug.print(&#34;Esperando por un nuevo evento ...&#34;, flush=True);
+                     event=self._queue.get(True,0.5 if sync is False else 0);
                    
                    except queue.Empty:
                    
-                     diff=(time.time()-timestamp);
-                     if diff&gt;timeout: break;
-                     else:            continue;
-                     
+                     if type(forever) is int:
+                        timeout=max(0,forever);
+                        diff=(time.time()-timestamp);
+                        if diff&gt;timeout: break;
+                        else:            continue;
+                        
+                     else:
+                        if bool(forever) is True: continue;
+                        else:                     break;
+                   
+                   signals+=1;  
+                   timestamp=time.time();
                    tm, target, sname, data, mods = event;
                    target.run(sname, data, mods);
                                     
                 except KeyboardInterrupt as e:
                    debug.print(&#34;Interrumpido por el/la usuario/a.&#34;);
+                   signals=signals*(-1);
+                   break;
                    
                 except Exception as e:
                    debug.print(f&#34;Excepción ejecutando un slot: {e}&#34;);
+                   signals=signals*(-1);
+                   break;
           
-          return self;
+          if sync is False: debug.print(&#34;Saliendo del bucle de eventos.&#34;, flush=True);
+          return signals;
           
         finally:
           while not self._queue.empty(): self._queue.get();
@@ -558,15 +589,25 @@ La inicialización del <strong>único</strong> objeto de esta clase se hace en <
         if not cls._instance:
            cls._instance = super(Context, cls).__new__(cls);
            cls._instance.listeners={};
-           cls._allowGPU = torch.cuda.is_available();
            #cls.__html__();
-           cls._queue=queue.PriorityQueue();
+           cls._queue   = queue.PriorityQueue();
            
            cwd   = os.path.dirname(__file__);
-           mwd   = os.path.join(cwd, &#39;../models&#39;);
-           cache = os.path.join(mwd,&#34;cache&#34;);
-           os.makedirs(cache, exist_ok=True);
-           os.environ[&#39;TRANSFORMERS_CACHE&#39;] = cache;
+           rwd   = os.path.join(cwd, &#39;..&#39;);
+           mwd   = os.path.join(rwd, &#39;models&#39;);
+           
+           gdata = { &#34;AudioSampleRate&#34;:48000,
+                     &#34;VadChunkTime&#34;:10,
+                     &#34;GPU&#34;:torch.cuda.is_available(),
+                     &#34;RootDirectory&#34;:rwd,
+                     &#34;ModelsDirectory&#34;:mwd,
+                   };
+                          
+           cls._default=ReadOnlyNamespace(**gdata);
+           
+           #cache = os.path.join(mwd,&#34;cache&#34;);
+           #os.makedirs(cache, exist_ok=True);
+           #os.environ[&#39;TRANSFORMERS_CACHE&#39;] = cache;
         return cls._instance;
 
     #-----------------------------------------------------------------------------------------
@@ -585,23 +626,24 @@ La inicialización del <strong>único</strong> objeto de esta clase se hace en <
         
     #-----------------------------------------------------------------------------------------
     @property
-    def allowGPU(self):
-        return self._allowGPU;
-        
-    #-----------------------------------------------------------------------------------------
-    @allowGPU.setter
-    def allowGPU(self, value):
-        self._allowGPU = bool(value);
+    def default(self):
+        return self._default;
         
     #-----------------------------------------------------------------------------------------
     @property
     def gpu(self):
-        return self._allowGPU and torch.cuda.is_available();
+        return torch.cuda.is_available();
         
     #-----------------------------------------------------------------------------------------
     @property
     def gpus(self):
-        return torch.cuda.device_count() if (self._allowGPU and torch.cuda.is_available()) else 0;
+        return torch.cuda.device_count() if torch.cuda.is_available() else 0;
+        
+    #-----------------------------------------------------------------------------------------
+    @property
+    def device(self):
+        if torch.cuda.is_available(): return &#34;cuda&#34;;
+        else:                         return &#34;cpu&#34;;
         
     #-----------------------------------------------------------------------------------------
     @property
@@ -893,43 +935,55 @@ La inicialización del <strong>único</strong> objeto de esta clase se hace en <
               raise RuntimeError(f&#34;No existe la señal &#39;{sname}&#39; en {source._fullClassName}&#34;);
                
     #-----------------------------------------------------------------------------------------
-    def wait(self, timeout=1):
+    def wait(self, forever=1, sync=False): 
         &#34;&#34;&#34;
         Inicia el loop asíncrono y procesa los mensajes enviados por medio de la cola del contexto uno a uno.
         Se supone que el usuario ha colocado en la cola, previamente, mensajes para inicial la red.
         Si no hay mensajes en la cola, finaliza.
         Puede volver a invocarse, con nuevos mensajes encolados.
-        &#34;&#34;&#34;
-        
+        &#34;&#34;&#34;       
+        signals=0;
         try:
           timestamp=time.time();        
-          debug.print(&#34;Entrando en el bucle de eventos.&#34;, flush=True);
+          if sync is False: debug.print(f&#34;Entrando en el bucle de eventos (forever:{forever}).&#34;, flush=True);
           while True:
                 try:
                 
-                   with ui_events() as poll:
-                        poll(10);
+                   with ui_events() as poll: poll(10);
                 
                    try:
-                     debug.print(&#34;Esperando por un nuevo evento ...&#34;);
-                     event=self._queue.get(True,0.5);
+                     #if sync is False: debug.print(&#34;Esperando por un nuevo evento ...&#34;, flush=True);
+                     event=self._queue.get(True,0.5 if sync is False else 0);
                    
                    except queue.Empty:
                    
-                     diff=(time.time()-timestamp);
-                     if diff&gt;timeout: break;
-                     else:            continue;
-                     
+                     if type(forever) is int:
+                        timeout=max(0,forever);
+                        diff=(time.time()-timestamp);
+                        if diff&gt;timeout: break;
+                        else:            continue;
+                        
+                     else:
+                        if bool(forever) is True: continue;
+                        else:                     break;
+                   
+                   signals+=1;  
+                   timestamp=time.time();
                    tm, target, sname, data, mods = event;
                    target.run(sname, data, mods);
                                     
                 except KeyboardInterrupt as e:
                    debug.print(&#34;Interrumpido por el/la usuario/a.&#34;);
+                   signals=signals*(-1);
+                   break;
                    
                 except Exception as e:
                    debug.print(f&#34;Excepción ejecutando un slot: {e}&#34;);
+                   signals=signals*(-1);
+                   break;
           
-          return self;
+          if sync is False: debug.print(&#34;Saliendo del bucle de eventos.&#34;, flush=True);
+          return signals;
           
         finally:
           while not self._queue.empty(): self._queue.get();
@@ -992,7 +1046,7 @@ La inicialización del <strong>único</strong> objeto de esta clase se hace en <
 </dl>
 <h3>Instance variables</h3>
 <dl>
-<dt id="ml4teens.core.context.Context.allowGPU"><code class="name">var <span class="ident">allowGPU</span></code></dt>
+<dt id="ml4teens.core.context.Context.default"><code class="name">var <span class="ident">default</span></code></dt>
 <dd>
 <div class="desc"></div>
 <details class="source">
@@ -1000,8 +1054,21 @@ La inicialización del <strong>único</strong> objeto de esta clase se hace en <
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">@property
-def allowGPU(self):
-    return self._allowGPU;</code></pre>
+def default(self):
+    return self._default;</code></pre>
+</details>
+</dd>
+<dt id="ml4teens.core.context.Context.device"><code class="name">var <span class="ident">device</span></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def device(self):
+    if torch.cuda.is_available(): return &#34;cuda&#34;;
+    else:                         return &#34;cpu&#34;;</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.core.context.Context.fwd"><code class="name">var <span class="ident">fwd</span></code></dt>
@@ -1026,7 +1093,7 @@ def fwd(self):
 </summary>
 <pre><code class="python">@property
 def gpu(self):
-    return self._allowGPU and torch.cuda.is_available();</code></pre>
+    return torch.cuda.is_available();</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.core.context.Context.gpus"><code class="name">var <span class="ident">gpus</span></code></dt>
@@ -1038,7 +1105,7 @@ def gpu(self):
 </summary>
 <pre><code class="python">@property
 def gpus(self):
-    return torch.cuda.device_count() if (self._allowGPU and torch.cuda.is_available()) else 0;</code></pre>
+    return torch.cuda.device_count() if torch.cuda.is_available() else 0;</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.core.context.Context.mwd"><code class="name">var <span class="ident">mwd</span></code></dt>
@@ -1435,7 +1502,7 @@ tupla (<em>block</em>, <em>slot name</em>)</p></div>
 </details>
 </dd>
 <dt id="ml4teens.core.context.Context.wait"><code class="name flex">
-<span>def <span class="ident">wait</span></span>(<span>self, timeout=1)</span>
+<span>def <span class="ident">wait</span></span>(<span>self, forever=1, sync=False)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Inicia el loop asíncrono y procesa los mensajes enviados por medio de la cola del contexto uno a uno.
@@ -1446,49 +1513,80 @@ Puede volver a invocarse, con nuevos mensajes encolados.</p></div>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def wait(self, timeout=1):
+<pre><code class="python">def wait(self, forever=1, sync=False): 
     &#34;&#34;&#34;
     Inicia el loop asíncrono y procesa los mensajes enviados por medio de la cola del contexto uno a uno.
     Se supone que el usuario ha colocado en la cola, previamente, mensajes para inicial la red.
     Si no hay mensajes en la cola, finaliza.
     Puede volver a invocarse, con nuevos mensajes encolados.
-    &#34;&#34;&#34;
-    
+    &#34;&#34;&#34;       
+    signals=0;
     try:
       timestamp=time.time();        
-      debug.print(&#34;Entrando en el bucle de eventos.&#34;, flush=True);
+      if sync is False: debug.print(f&#34;Entrando en el bucle de eventos (forever:{forever}).&#34;, flush=True);
       while True:
             try:
             
-               with ui_events() as poll:
-                    poll(10);
+               with ui_events() as poll: poll(10);
             
                try:
-                 debug.print(&#34;Esperando por un nuevo evento ...&#34;);
-                 event=self._queue.get(True,0.5);
+                 #if sync is False: debug.print(&#34;Esperando por un nuevo evento ...&#34;, flush=True);
+                 event=self._queue.get(True,0.5 if sync is False else 0);
                
                except queue.Empty:
                
-                 diff=(time.time()-timestamp);
-                 if diff&gt;timeout: break;
-                 else:            continue;
-                 
+                 if type(forever) is int:
+                    timeout=max(0,forever);
+                    diff=(time.time()-timestamp);
+                    if diff&gt;timeout: break;
+                    else:            continue;
+                    
+                 else:
+                    if bool(forever) is True: continue;
+                    else:                     break;
+               
+               signals+=1;  
+               timestamp=time.time();
                tm, target, sname, data, mods = event;
                target.run(sname, data, mods);
                                 
             except KeyboardInterrupt as e:
                debug.print(&#34;Interrumpido por el/la usuario/a.&#34;);
+               signals=signals*(-1);
+               break;
                
             except Exception as e:
                debug.print(f&#34;Excepción ejecutando un slot: {e}&#34;);
+               signals=signals*(-1);
+               break;
       
-      return self;
+      if sync is False: debug.print(&#34;Saliendo del bucle de eventos.&#34;, flush=True);
+      return signals;
       
     finally:
       while not self._queue.empty(): self._queue.get();</code></pre>
 </details>
 </dd>
 </dl>
+</dd>
+<dt id="ml4teens.core.context.ReadOnlyNamespace"><code class="flex name class">
+<span>class <span class="ident">ReadOnlyNamespace</span></span>
+<span>(</span><span>**kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class ReadOnlyNamespace:
+
+    def __init__(self, **kwargs):
+        self.__dict__.update(kwargs);
+    
+    def __setattr__(self, name, value):
+        raise AttributeError(&#34;No se permite modificar el valor de los datos globales&#34;);</code></pre>
+</details>
 </dd>
 </dl>
 </section>
@@ -1510,9 +1608,10 @@ Puede volver a invocarse, con nuevos mensajes encolados.</p></div>
 <h4><code><a title="ml4teens.core.context.Context" href="#ml4teens.core.context.Context">Context</a></code></h4>
 <ul class="two-column">
 <li><code><a title="ml4teens.core.context.Context.Linker" href="#ml4teens.core.context.Context.Linker">Linker</a></code></li>
-<li><code><a title="ml4teens.core.context.Context.allowGPU" href="#ml4teens.core.context.Context.allowGPU">allowGPU</a></code></li>
 <li><code><a title="ml4teens.core.context.Context.blocks" href="#ml4teens.core.context.Context.blocks">blocks</a></code></li>
 <li><code><a title="ml4teens.core.context.Context.checkSubscription" href="#ml4teens.core.context.Context.checkSubscription">checkSubscription</a></code></li>
+<li><code><a title="ml4teens.core.context.Context.default" href="#ml4teens.core.context.Context.default">default</a></code></li>
+<li><code><a title="ml4teens.core.context.Context.device" href="#ml4teens.core.context.Context.device">device</a></code></li>
 <li><code><a title="ml4teens.core.context.Context.emit" href="#ml4teens.core.context.Context.emit">emit</a></code></li>
 <li><code><a title="ml4teens.core.context.Context.fwd" href="#ml4teens.core.context.Context.fwd">fwd</a></code></li>
 <li><code><a title="ml4teens.core.context.Context.gpu" href="#ml4teens.core.context.Context.gpu">gpu</a></code></li>
@@ -1525,6 +1624,9 @@ Puede volver a invocarse, con nuevos mensajes encolados.</p></div>
 <li><code><a title="ml4teens.core.context.Context.unsubscribe" href="#ml4teens.core.context.Context.unsubscribe">unsubscribe</a></code></li>
 <li><code><a title="ml4teens.core.context.Context.wait" href="#ml4teens.core.context.Context.wait">wait</a></code></li>
 </ul>
+</li>
+<li>
+<h4><code><a title="ml4teens.core.context.ReadOnlyNamespace" href="#ml4teens.core.context.ReadOnlyNamespace">ReadOnlyNamespace</a></code></h4>
 </li>
 </ul>
 </li>

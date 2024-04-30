@@ -109,7 +109,7 @@ def data(self):
 <h3>Methods</h3>
 <dl>
 <dt id="ml4teens.blocks.value.Value.signal_data"><code class="name flex">
-<span>def <span class="ident">signal_data</span></span>(<span>self, data='d5195c7170219f413a752aa639b846a04c37e3327d9f9efddf479979de7252fb')</span>
+<span>def <span class="ident">signal_data</span></span>(<span>self, data='fa3ef58c59e7111f9a9a99f5d5bd97a9dabc90e17b1448e4b451fa7026027d3d')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -124,7 +124,9 @@ def data(self):
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.value.Value.slot_data"><code class="name flex">

@@ -109,7 +109,7 @@ class SingleChannel(Block):
 <h3>Methods</h3>
 <dl>
 <dt id="ml4teens.blocks.img.singleChannel.SingleChannel.signal_image"><code class="name flex">
-<span>def <span class="ident">signal_image</span></span>(<span>self, data='7b65234cd22ebb38537c71fa224e1dc914f058c0611cb7cf09dce1fca81a0195')</span>
+<span>def <span class="ident">signal_image</span></span>(<span>self, data='0b70bdb236ca43a58ac1cacb4497b279ebd8e33387d29618c37b8d2311b20e8a')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -124,7 +124,9 @@ class SingleChannel(Block):
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.singleChannel.SingleChannel.slot_image"><code class="name flex">

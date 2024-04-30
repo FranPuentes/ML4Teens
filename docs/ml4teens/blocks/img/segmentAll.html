@@ -180,7 +180,7 @@ class SegmentAll(Block):
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.segmentAll.SegmentAll.signal_image"><code class="name flex">
-<span>def <span class="ident">signal_image</span></span>(<span>self, data='e833b1005ecec4e85fa6e38df687e23f089ea02cbd83c0449ac588c64176764c')</span>
+<span>def <span class="ident">signal_image</span></span>(<span>self, data='01f26b27d99d48d5b47aa0a3c3bd93f937809c8c0283c508e2e91d31b43d7f86')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -195,11 +195,13 @@ class SegmentAll(Block):
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.segmentAll.SegmentAll.signal_mask"><code class="name flex">
-<span>def <span class="ident">signal_mask</span></span>(<span>self, data='da9ed093c903a0513a0e12e07bc1266dec9285c36f9f6731f1233e160fb398bb')</span>
+<span>def <span class="ident">signal_mask</span></span>(<span>self, data='6162aaaa38f6504e27a64ea96ec5d734cdf83f5f4c9cb8ba1c52f2ddb607c4c2')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -214,7 +216,9 @@ class SegmentAll(Block):
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.segmentAll.SegmentAll.slot_not"><code class="name flex">

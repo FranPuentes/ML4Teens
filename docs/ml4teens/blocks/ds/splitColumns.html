@@ -205,7 +205,7 @@ class SplitColumns(Block):
 </details>
 </dd>
 <dt id="ml4teens.blocks.ds.splitColumns.SplitColumns.signal_main"><code class="name flex">
-<span>def <span class="ident">signal_main</span></span>(<span>self, data='49f225cfe41de6a080604ed6e802f00f7a578da7eb54724733a0fc28a5a66248')</span>
+<span>def <span class="ident">signal_main</span></span>(<span>self, data='fbeeb11c48f1b9ea76afd59e7fb17e10d4960faf7145c6018dd0609dcf3f4533')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -220,11 +220,13 @@ class SplitColumns(Block):
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.ds.splitColumns.SplitColumns.signal_partition"><code class="name flex">
-<span>def <span class="ident">signal_partition</span></span>(<span>self, data='4316beafeb4d6025752396ca8b956b4f384583a04e4d5fca8b6ba7ba35d8170f')</span>
+<span>def <span class="ident">signal_partition</span></span>(<span>self, data='3dbceef21ec3cdd5f8be7d233cabb682d785402608cb7cc4a0c18c55cfde7297')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -239,7 +241,9 @@ class SplitColumns(Block):
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.ds.splitColumns.SplitColumns.slot_label"><code class="name flex">

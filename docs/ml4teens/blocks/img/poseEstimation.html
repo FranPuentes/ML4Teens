@@ -186,7 +186,7 @@ class PoseEstimation(Block):
 <h3>Methods</h3>
 <dl>
 <dt id="ml4teens.blocks.img.poseEstimation.PoseEstimation.signal_boxes"><code class="name flex">
-<span>def <span class="ident">signal_boxes</span></span>(<span>self, data='d354facd756477db2163d13b451a3df2ee91a82e1f952fbc2ba910a1b0806b09')</span>
+<span>def <span class="ident">signal_boxes</span></span>(<span>self, data='a774402cb165c0759a6c9c7f75ce53bd07fefc9416efe94f59f8f010d33af55d')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -201,11 +201,13 @@ class PoseEstimation(Block):
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.poseEstimation.PoseEstimation.signal_image"><code class="name flex">
-<span>def <span class="ident">signal_image</span></span>(<span>self, data='293de11e29364723b3ccf5b33d31a2d1f6bbbb69ba9bde071b80a7201328cf08')</span>
+<span>def <span class="ident">signal_image</span></span>(<span>self, data='888d8a9a8fc202cfcf6c6e272eb4f654a6276acb47820e3f02df36d8412c094b')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -220,7 +222,9 @@ class PoseEstimation(Block):
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.poseEstimation.PoseEstimation.slot_image"><code class="name flex">

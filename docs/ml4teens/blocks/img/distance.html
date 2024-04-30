@@ -180,7 +180,7 @@ class Distance(Block):
 <h3>Methods</h3>
 <dl>
 <dt id="ml4teens.blocks.img.distance.Distance.signal_distance"><code class="name flex">
-<span>def <span class="ident">signal_distance</span></span>(<span>self, data='df8101fca5a50d6349996b7270f8dad7bed9eae970f6c06b89a31b1f79d60e1a')</span>
+<span>def <span class="ident">signal_distance</span></span>(<span>self, data='22bf8b56574c1dae831de46edfa56f2fff433dabfe72b45f03624ed9d9cbb309')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -195,7 +195,9 @@ class Distance(Block):
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.distance.Distance.slot_embedding"><code class="name flex">

@@ -185,7 +185,7 @@ SIGNALS: "event" y "end"</p></div>
 <h3>Methods</h3>
 <dl>
 <dt id="ml4teens.blocks.timer.Timer.signal_end"><code class="name flex">
-<span>def <span class="ident">signal_end</span></span>(<span>self, data='0b90826d751b1dcf0ce81fbef3442a903c1147ddf21c6e029a989cbbffa3f34b')</span>
+<span>def <span class="ident">signal_end</span></span>(<span>self, data='407d95fbfad3658a41eea30210131e2fe6ba25b86754e3198f4b89a27b69a17f')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -200,11 +200,13 @@ SIGNALS: "event" y "end"</p></div>
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.timer.Timer.signal_event"><code class="name flex">
-<span>def <span class="ident">signal_event</span></span>(<span>self, data='32a5fad436d30ac5f91b4b21ab4e127e61c4f0947b0e6d3834e6b6f2c7ae33a8')</span>
+<span>def <span class="ident">signal_event</span></span>(<span>self, data='512d2e4d6085d72ea0c5f64c2d4221eb8e94bda1119d887ab102e1379936e154')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -219,7 +221,9 @@ SIGNALS: "event" y "end"</p></div>
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.timer.Timer.slot_interval"><code class="name flex">

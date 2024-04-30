@@ -67,10 +67,10 @@ class Terminal(Block):
              message=escape(str(message));
              for p in message.split(&#39;\n&#39;):
                  if p.strip(): 
-                    display( HTML(f&#34;&lt;p style=&#39;{style}&#39;&gt;{p.strip()}&lt;/p&gt;&#34;) );
+                    display( HTML(f&#34;&lt;p style=&#39;{style}&#39;&gt;{p.strip()}&lt;/p&gt;&#34;), display_id=self._id if not self.params.feed else None);
           else:
              message=escape(str(message));
-             display( HTML(f&#34;&lt;p style=&#39;{style}&#39;&gt;{message}&lt;/p&gt;&#34;) );
+             display( HTML(f&#34;&lt;p style=&#39;{style}&#39;&gt;{message}&lt;/p&gt;&#34;), display_id=self._id if not self.params.feed else None );
 
       #-------------------------------------------------------------------------
       @Block.slot(&#34;stdout&#34;, {str,list,set,tuple,dict,object})
@@ -166,10 +166,10 @@ class Terminal(Block):
              message=escape(str(message));
              for p in message.split(&#39;\n&#39;):
                  if p.strip(): 
-                    display( HTML(f&#34;&lt;p style=&#39;{style}&#39;&gt;{p.strip()}&lt;/p&gt;&#34;) );
+                    display( HTML(f&#34;&lt;p style=&#39;{style}&#39;&gt;{p.strip()}&lt;/p&gt;&#34;), display_id=self._id if not self.params.feed else None);
           else:
              message=escape(str(message));
-             display( HTML(f&#34;&lt;p style=&#39;{style}&#39;&gt;{message}&lt;/p&gt;&#34;) );
+             display( HTML(f&#34;&lt;p style=&#39;{style}&#39;&gt;{message}&lt;/p&gt;&#34;), display_id=self._id if not self.params.feed else None );
 
       #-------------------------------------------------------------------------
       @Block.slot(&#34;stdout&#34;, {str,list,set,tuple,dict,object})

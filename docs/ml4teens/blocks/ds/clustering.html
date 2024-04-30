@@ -486,7 +486,7 @@ Esta clase NO detecta el número de clusters 'óptimo', debe indicarse.</p>
 <h3>Methods</h3>
 <dl>
 <dt id="ml4teens.blocks.ds.clustering.Clustering.signal_image"><code class="name flex">
-<span>def <span class="ident">signal_image</span></span>(<span>self, data='51f1e30be00c80a777eea565af70aeb7d44fb9afaca6cd4fc6380318cbc4f019')</span>
+<span>def <span class="ident">signal_image</span></span>(<span>self, data='868cd24d3688a774aeba922f1266e1788a9a838b0ca2d5a9e9630a0f969a143f')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -501,7 +501,9 @@ Esta clase NO detecta el número de clusters 'óptimo', debe indicarse.</p>
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.ds.clustering.Clustering.slot_dataframe"><code class="name flex">

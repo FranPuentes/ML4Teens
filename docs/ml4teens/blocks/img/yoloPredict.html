@@ -149,7 +149,7 @@ class YoloPredict(Block):
 <h3>Methods</h3>
 <dl>
 <dt id="ml4teens.blocks.img.yoloPredict.YoloPredict.signal_image"><code class="name flex">
-<span>def <span class="ident">signal_image</span></span>(<span>self, data='6fd09132dbb901ee8d513ff1f611b451f762e4a7a13b5581da5f4b35559d7e06')</span>
+<span>def <span class="ident">signal_image</span></span>(<span>self, data='33504b2100b718b0ff4c66c4baabde86a2c7e34729271b83b59cce39f2f42f63')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -164,7 +164,9 @@ class YoloPredict(Block):
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.yoloPredict.YoloPredict.slot_files"><code class="name flex">

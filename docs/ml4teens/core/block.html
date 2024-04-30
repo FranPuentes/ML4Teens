@@ -160,9 +160,11 @@ class Block(ABC):
 
       #-------------------------------------------------------------------------
       def __init__(self, **kwargs):
+          self._context      =Context();
           self._fullClassName=Block._classNameFrom(self.__init__);
           self._signal_mods  ={};
           self._params       =StackedDicts(**kwargs);
+          
           self._id=&#34;ID&#34;+&#39;&#39;.join(random.choice(string.ascii_letters + string.digits) for _ in range(16));
 
           cls=self._fullClassName;
@@ -190,6 +192,11 @@ class Block(ABC):
       def params(self):
           return self._params;
 
+      #-------------------------------------------------------------------------
+      @property
+      def context(self):
+          return self._context;
+          
       #-------------------------------------------------------------------------
       @property
       def signals(self):
@@ -241,7 +248,7 @@ class Block(ABC):
 
       #-------------------------------------------------------------------------
       @staticmethod
-      def signal(name, typedecl):
+      def signal(name, typedecl, sync=False):
           def decorador(func):
               cls=Block._classNameFrom(func);
               if cls not in Block._slots:   Block._slots  [cls]=Slots  ();
@@ -256,6 +263,8 @@ class Block(ABC):
                      if using:
                         data=func(self,data);
                         Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+                        if sync:
+                           Context.instance.wait(forever=0, sync=sync);
               return wrapper;
           return decorador;
 
@@ -436,9 +445,11 @@ class Block(ABC):
 
       #-------------------------------------------------------------------------
       def __init__(self, **kwargs):
+          self._context      =Context();
           self._fullClassName=Block._classNameFrom(self.__init__);
           self._signal_mods  ={};
           self._params       =StackedDicts(**kwargs);
+          
           self._id=&#34;ID&#34;+&#39;&#39;.join(random.choice(string.ascii_letters + string.digits) for _ in range(16));
 
           cls=self._fullClassName;
@@ -466,6 +477,11 @@ class Block(ABC):
       def params(self):
           return self._params;
 
+      #-------------------------------------------------------------------------
+      @property
+      def context(self):
+          return self._context;
+          
       #-------------------------------------------------------------------------
       @property
       def signals(self):
@@ -517,7 +533,7 @@ class Block(ABC):
 
       #-------------------------------------------------------------------------
       @staticmethod
-      def signal(name, typedecl):
+      def signal(name, typedecl, sync=False):
           def decorador(func):
               cls=Block._classNameFrom(func);
               if cls not in Block._slots:   Block._slots  [cls]=Slots  ();
@@ -532,6 +548,8 @@ class Block(ABC):
                      if using:
                         data=func(self,data);
                         Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+                        if sync:
+                           Context.instance.wait(forever=0, sync=sync);
               return wrapper;
           return decorador;
 
@@ -718,17 +736,24 @@ class Block(ABC):
 <li><a title="ml4teens.blocks.img.videoSource.VideoSource" href="../blocks/img/videoSource.html#ml4teens.blocks.img.videoSource.VideoSource">VideoSource</a></li>
 <li><a title="ml4teens.blocks.img.yoloPredict.YoloPredict" href="../blocks/img/yoloPredict.html#ml4teens.blocks.img.yoloPredict.YoloPredict">YoloPredict</a></li>
 <li><a title="ml4teens.blocks.img.yoloTrain.YoloTrain" href="../blocks/img/yoloTrain.html#ml4teens.blocks.img.yoloTrain.YoloTrain">YoloTrain</a></li>
+<li><a title="ml4teens.blocks.nlp.audioPlayer.AudioPlayer" href="../blocks/nlp/audioPlayer.html#ml4teens.blocks.nlp.audioPlayer.AudioPlayer">AudioPlayer</a></li>
+<li><a title="ml4teens.blocks.nlp.audioSource.AudioSource" href="../blocks/nlp/audioSource.html#ml4teens.blocks.nlp.audioSource.AudioSource">AudioSource</a></li>
+<li><a title="ml4teens.blocks.nlp.inputText.InputText" href="../blocks/nlp/inputText.html#ml4teens.blocks.nlp.inputText.InputText">InputText</a></li>
+<li><a title="ml4teens.blocks.nlp.openai.Chat" href="../blocks/nlp/openai.html#ml4teens.blocks.nlp.openai.Chat">Chat</a></li>
+<li><a title="ml4teens.blocks.nlp.openai.STT" href="../blocks/nlp/openai.html#ml4teens.blocks.nlp.openai.STT">STT</a></li>
+<li><a title="ml4teens.blocks.nlp.openai.TTS" href="../blocks/nlp/openai.html#ml4teens.blocks.nlp.openai.TTS">TTS</a></li>
+<li><a title="ml4teens.blocks.nlp.similarity.Similarity" href="../blocks/nlp/similarity.html#ml4teens.blocks.nlp.similarity.Similarity">Similarity</a></li>
+<li><a title="ml4teens.blocks.nlp.tfidf.TfIdf" href="../blocks/nlp/tfidf.html#ml4teens.blocks.nlp.tfidf.TfIdf">TfIdf</a></li>
+<li><a title="ml4teens.blocks.nlp.transcribe.Transcribe" href="../blocks/nlp/transcribe.html#ml4teens.blocks.nlp.transcribe.Transcribe">Transcribe</a></li>
 <li><a title="ml4teens.blocks.terminal.Terminal" href="../blocks/terminal.html#ml4teens.blocks.terminal.Terminal">Terminal</a></li>
 <li><a title="ml4teens.blocks.timer.Timer" href="../blocks/timer.html#ml4teens.blocks.timer.Timer">Timer</a></li>
-<li><a title="ml4teens.blocks.txt.inputText.InputText" href="../blocks/txt/inputText.html#ml4teens.blocks.txt.inputText.InputText">InputText</a></li>
-<li><a title="ml4teens.blocks.txt.oaiChat.OAIChat" href="../blocks/txt/oaiChat.html#ml4teens.blocks.txt.oaiChat.OAIChat">OAIChat</a></li>
 <li><a title="ml4teens.blocks.value.Value" href="../blocks/value.html#ml4teens.blocks.value.Value">Value</a></li>
 <li><a title="ml4teens.blocks.values.Values" href="../blocks/values.html#ml4teens.blocks.values.Values">Values</a></li>
 </ul>
 <h3>Static methods</h3>
 <dl>
 <dt id="ml4teens.core.block.Block.signal"><code class="name flex">
-<span>def <span class="ident">signal</span></span>(<span>name, typedecl)</span>
+<span>def <span class="ident">signal</span></span>(<span>name, typedecl, sync=False)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -737,7 +762,7 @@ class Block(ABC):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">@staticmethod
-def signal(name, typedecl):
+def signal(name, typedecl, sync=False):
     def decorador(func):
         cls=Block._classNameFrom(func);
         if cls not in Block._slots:   Block._slots  [cls]=Slots  ();
@@ -752,6 +777,8 @@ def signal(name, typedecl):
                if using:
                   data=func(self,data);
                   Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+                  if sync:
+                     Context.instance.wait(forever=0, sync=sync);
         return wrapper;
     return decorador;</code></pre>
 </details>
@@ -825,6 +852,18 @@ def waitUntil(finish):
 </dl>
 <h3>Instance variables</h3>
 <dl>
+<dt id="ml4teens.core.block.Block.context"><code class="name">var <span class="ident">context</span></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def context(self):
+    return self._context;</code></pre>
+</details>
+</dd>
 <dt id="ml4teens.core.block.Block.params"><code class="name">var <span class="ident">params</span></code></dt>
 <dd>
 <div class="desc"></div>
@@ -1197,6 +1236,7 @@ bool</p></div>
 <h4><code><a title="ml4teens.core.block.Block" href="#ml4teens.core.block.Block">Block</a></code></h4>
 <ul class="two-column">
 <li><code><a title="ml4teens.core.block.Block.checkSignalUsage" href="#ml4teens.core.block.Block.checkSignalUsage">checkSignalUsage</a></code></li>
+<li><code><a title="ml4teens.core.block.Block.context" href="#ml4teens.core.block.Block.context">context</a></code></li>
 <li><code><a title="ml4teens.core.block.Block.params" href="#ml4teens.core.block.Block.params">params</a></code></li>
 <li><code><a title="ml4teens.core.block.Block.run" href="#ml4teens.core.block.Block.run">run</a></code></li>
 <li><code><a title="ml4teens.core.block.Block.signal" href="#ml4teens.core.block.Block.signal">signal</a></code></li>

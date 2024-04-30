@@ -273,7 +273,7 @@ boxes -&gt; object</p>
 <h3>Methods</h3>
 <dl>
 <dt id="ml4teens.blocks.img.objectCLS.ObjectCLS.signal_class"><code class="name flex">
-<span>def <span class="ident">signal_class</span></span>(<span>self, data='ea2c8efb6133d3b837524279ee29c506058057bedaeb398576c0e2656188aac6')</span>
+<span>def <span class="ident">signal_class</span></span>(<span>self, data='03451204998ff1d22ca0670509defdd379353ef6bd094347e5b7f7902f4b0b2a')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -288,11 +288,13 @@ boxes -&gt; object</p>
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.objectCLS.ObjectCLS.signal_classes"><code class="name flex">
-<span>def <span class="ident">signal_classes</span></span>(<span>self, data='7e365ef489f5b1e46bb40682db217969ad090782cd0b88d0f63d6ac825f55333')</span>
+<span>def <span class="ident">signal_classes</span></span>(<span>self, data='f1ee52cf497f0862a10cd8a3527a74d8434e820194aa73b3dfdf548627298b07')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -307,11 +309,13 @@ boxes -&gt; object</p>
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.objectCLS.ObjectCLS.signal_end"><code class="name flex">
-<span>def <span class="ident">signal_end</span></span>(<span>self, data='a97db6d42200c944fdc36b09c563dfafc4f6234f3b87633e738601c2d40c2d30')</span>
+<span>def <span class="ident">signal_end</span></span>(<span>self, data='117dd97ce18d3ec6dc823ab91b377e283fb294954ddc67ed48e82655e9b51ad6')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -326,11 +330,13 @@ boxes -&gt; object</p>
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.objectCLS.ObjectCLS.signal_image"><code class="name flex">
-<span>def <span class="ident">signal_image</span></span>(<span>self, data='d1ffac6f8481f4661be3f14971b36ad6533a08ad5275466930ee1f6388701127')</span>
+<span>def <span class="ident">signal_image</span></span>(<span>self, data='d0111dedc28ae740acaa7bb38b6c8dde4a5c8b512c7ca505eb956702c6d50026')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -345,7 +351,9 @@ boxes -&gt; object</p>
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.objectCLS.ObjectCLS.slot_image"><code class="name flex">

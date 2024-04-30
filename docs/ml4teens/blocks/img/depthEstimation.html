@@ -169,7 +169,7 @@ class DepthEstimation(Block):
 <h3>Methods</h3>
 <dl>
 <dt id="ml4teens.blocks.img.depthEstimation.DepthEstimation.signal_image"><code class="name flex">
-<span>def <span class="ident">signal_image</span></span>(<span>self, data='3f062e22ffdf047b5e1c94ee5516de02f298f1bbd7b86fedff108d6d0cb443cb')</span>
+<span>def <span class="ident">signal_image</span></span>(<span>self, data='cd8d3736a463a0fa9420f3875227eb3a19581cbbd4e45879914512bfcfb8f57a')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -184,7 +184,9 @@ class DepthEstimation(Block):
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.depthEstimation.DepthEstimation.slot_image"><code class="name flex">

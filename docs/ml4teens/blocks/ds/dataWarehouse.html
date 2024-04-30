@@ -321,7 +321,7 @@ def dataframe(self):
 </details>
 </dd>
 <dt id="ml4teens.blocks.ds.dataWarehouse.DataWarehouse.signal_dataframe"><code class="name flex">
-<span>def <span class="ident">signal_dataframe</span></span>(<span>self, data='c8b609f704d7b5998664938f2d9038bce231aec9e89ade3869a88fcdbbc4f34c')</span>
+<span>def <span class="ident">signal_dataframe</span></span>(<span>self, data='bb2b7e33da98d095e68f23cc3abba898ad3e762a0693181d17ed147638cf6eec')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -336,7 +336,9 @@ def dataframe(self):
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.ds.dataWarehouse.DataWarehouse.slot_features"><code class="name flex">

@@ -213,7 +213,7 @@ class ConvertImage(Block):
 <h3>Methods</h3>
 <dl>
 <dt id="ml4teens.blocks.img.convertImage.ConvertImage.signal_image"><code class="name flex">
-<span>def <span class="ident">signal_image</span></span>(<span>self, data='c36c089858caba4d8b39e2cc2dfd61786f8fa72307936409c823ba00b1fc4c06')</span>
+<span>def <span class="ident">signal_image</span></span>(<span>self, data='468fddf5b60f3a89c866ce236c075f4d1a10fb1172f0d72c59de9c7c0609594c')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -228,7 +228,9 @@ class ConvertImage(Block):
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.convertImage.ConvertImage.slot_1bit"><code class="name flex">

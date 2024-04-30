@@ -18,7 +18,7 @@ class ForEach(Block):
       #-------------------------------------------------------------------------
       # SLOTS
       #-------------------------------------------------------------------------
-      @Block.slot("list",{list,tuple})
+      @Block.slot("list",{list, tuple})
       def slot_list(self, slot, data):
           if data:
              for item in data:

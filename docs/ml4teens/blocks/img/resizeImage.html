@@ -190,7 +190,7 @@ class ResizeImage(Block):
 <h3>Methods</h3>
 <dl>
 <dt id="ml4teens.blocks.img.resizeImage.ResizeImage.signal_image"><code class="name flex">
-<span>def <span class="ident">signal_image</span></span>(<span>self, data='9c6463490696f15304bdac3d2aec5dae2fe10e5fc5d6e11a875b11576e28ac08')</span>
+<span>def <span class="ident">signal_image</span></span>(<span>self, data='6a90a074f397f496b3c19916e381b5d2ab37ed38782b32f714cb6484b30d7810')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -205,11 +205,13 @@ class ResizeImage(Block):
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.resizeImage.ResizeImage.signal_shape"><code class="name flex">
-<span>def <span class="ident">signal_shape</span></span>(<span>self, data='5098451bf46ec1ba2cfa050cc91ebc0c1dfba673c0f34591ecf6a2c5007fb1d5')</span>
+<span>def <span class="ident">signal_shape</span></span>(<span>self, data='9c1213e77cdf951078891c594fd38fbd42f414235084c094caece21dbee1ce5e')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -224,7 +226,9 @@ class ResizeImage(Block):
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.resizeImage.ResizeImage.slot_image"><code class="name flex">

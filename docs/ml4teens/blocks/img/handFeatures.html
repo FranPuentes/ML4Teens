@@ -459,7 +459,7 @@ def normalize_names(cls, *args):
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.handFeatures.HandFeatures.signal_features"><code class="name flex">
-<span>def <span class="ident">signal_features</span></span>(<span>self, data='ea9bfa192c4a67bece157294d4caa6f1b9e47486da9c5d59c3fbfc94cba01d5e')</span>
+<span>def <span class="ident">signal_features</span></span>(<span>self, data='10cb5b55f1362d1b97febbc6c74799d0fef16bfb4ac4b2748f0c7774fb67719d')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -474,11 +474,13 @@ def normalize_names(cls, *args):
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.handFeatures.HandFeatures.signal_image"><code class="name flex">
-<span>def <span class="ident">signal_image</span></span>(<span>self, data='0228c3dcc1f6e06e3475689a9641c92681abe64e34eb061322667f3c0841fb43')</span>
+<span>def <span class="ident">signal_image</span></span>(<span>self, data='e95352207d0f64d3f51c51352fc7c011d059026dd9cb6e8ea4ee7f613a571bf5')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -493,7 +495,9 @@ def normalize_names(cls, *args):
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.handFeatures.HandFeatures.slot_image"><code class="name flex">

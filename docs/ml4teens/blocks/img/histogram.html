@@ -184,7 +184,7 @@ class Histogram(Block):
 <h3>Methods</h3>
 <dl>
 <dt id="ml4teens.blocks.img.histogram.Histogram.signal_histogram"><code class="name flex">
-<span>def <span class="ident">signal_histogram</span></span>(<span>self, data='7020fd0cdcb6a777f7ca5cda8424d7ce9f06171f266e5d53646b1bddfb327404')</span>
+<span>def <span class="ident">signal_histogram</span></span>(<span>self, data='8a552b2b0f7c4b56bf41f1f4ffc4e3261dd265f2fa89b2b22767cdd44898260f')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -199,7 +199,9 @@ class Histogram(Block):
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.histogram.Histogram.slot_image"><code class="name flex">

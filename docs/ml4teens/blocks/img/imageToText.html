@@ -40,10 +40,10 @@ class ImageToText(Block):
           super().__init__();
 
           self.model_name=&#34;Salesforce/blip-image-captioning-base&#34;;
-          if &#34;model_name&#34; in kwargs:
-             if kwargs[&#34;model_name&#34;].lower() in [&#34;small&#34;, &#34;s&#34; ]: self.model_name=&#34;Salesforce/blip-image-captioning-base&#34;;
-             if kwargs[&#34;model_name&#34;].lower() in [&#34;base&#34;,  &#34;b&#34; ]: self.model_name=&#34;Salesforce/blip-image-captioning-base&#34;;
-             if kwargs[&#34;model_name&#34;].lower() in [&#34;large&#34;, &#34;l&#34; ]: self.model_name=&#34;Salesforce/blip-image-captioning-large&#34;;
+          if &#34;model&#34; in kwargs:
+             if kwargs[&#34;model&#34;].lower() in [&#34;small&#34;, &#34;s&#34; ]: self.model_name=&#34;Salesforce/blip-image-captioning-base&#34;;
+             if kwargs[&#34;model&#34;].lower() in [&#34;base&#34;,  &#34;b&#34; ]: self.model_name=&#34;Salesforce/blip-image-captioning-base&#34;;
+             if kwargs[&#34;model&#34;].lower() in [&#34;large&#34;, &#34;l&#34; ]: self.model_name=&#34;Salesforce/blip-image-captioning-large&#34;;
 
           for key in [&#34;caption&#34;]:
               if key in kwargs:
@@ -61,7 +61,7 @@ class ImageToText(Block):
       @Block.slot(&#34;image&#34;, {Image})
       def slot_image(self, slot, data):
           
-          caption=self.params.caption or self.token[&#34;caption&#34;].data;
+          caption=self.params.caption # or self.token[&#34;caption&#34;].data;
 
           if caption:
              inputs = self.processor(data, caption, return_tensors=&#34;pt&#34;);
@@ -103,10 +103,10 @@ class ImageToText(Block):
           super().__init__();
 
           self.model_name=&#34;Salesforce/blip-image-captioning-base&#34;;
-          if &#34;model_name&#34; in kwargs:
-             if kwargs[&#34;model_name&#34;].lower() in [&#34;small&#34;, &#34;s&#34; ]: self.model_name=&#34;Salesforce/blip-image-captioning-base&#34;;
-             if kwargs[&#34;model_name&#34;].lower() in [&#34;base&#34;,  &#34;b&#34; ]: self.model_name=&#34;Salesforce/blip-image-captioning-base&#34;;
-             if kwargs[&#34;model_name&#34;].lower() in [&#34;large&#34;, &#34;l&#34; ]: self.model_name=&#34;Salesforce/blip-image-captioning-large&#34;;
+          if &#34;model&#34; in kwargs:
+             if kwargs[&#34;model&#34;].lower() in [&#34;small&#34;, &#34;s&#34; ]: self.model_name=&#34;Salesforce/blip-image-captioning-base&#34;;
+             if kwargs[&#34;model&#34;].lower() in [&#34;base&#34;,  &#34;b&#34; ]: self.model_name=&#34;Salesforce/blip-image-captioning-base&#34;;
+             if kwargs[&#34;model&#34;].lower() in [&#34;large&#34;, &#34;l&#34; ]: self.model_name=&#34;Salesforce/blip-image-captioning-large&#34;;
 
           for key in [&#34;caption&#34;]:
               if key in kwargs:
@@ -124,7 +124,7 @@ class ImageToText(Block):
       @Block.slot(&#34;image&#34;, {Image})
       def slot_image(self, slot, data):
           
-          caption=self.params.caption or self.token[&#34;caption&#34;].data;
+          caption=self.params.caption # or self.token[&#34;caption&#34;].data;
 
           if caption:
              inputs = self.processor(data, caption, return_tensors=&#34;pt&#34;);
@@ -148,7 +148,7 @@ class ImageToText(Block):
 <h3>Methods</h3>
 <dl>
 <dt id="ml4teens.blocks.img.imageToText.ImageToText.signal_text"><code class="name flex">
-<span>def <span class="ident">signal_text</span></span>(<span>self, data='4a8f92b113a29158b792f48376362a969ed3e2db6e39ff83c840714de5cfc4b5')</span>
+<span>def <span class="ident">signal_text</span></span>(<span>self, data='0bf27bca95442ea442bb4b78a760e6c05b35429f49c02067487b8bc9948974a4')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -163,7 +163,9 @@ class ImageToText(Block):
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.img.imageToText.ImageToText.slot_caption"><code class="name flex">

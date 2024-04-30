@@ -168,7 +168,7 @@ La expresión también puede ser un texto, con un avariable local lamada 'data'.
 <h3>Methods</h3>
 <dl>
 <dt id="ml4teens.blocks.ifElse.IfElse.signal_bool"><code class="name flex">
-<span>def <span class="ident">signal_bool</span></span>(<span>self, data='7d51e461177837d38c9cd60ad263b845bfae99cda6ab0c4fb8e1669f05de9de1')</span>
+<span>def <span class="ident">signal_bool</span></span>(<span>self, data='d46f9e4a4b7f9fe62c8c43c36e684364fb47040b86ca9014160493b6bb175b85')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -183,11 +183,13 @@ La expresión también puede ser un texto, con un avariable local lamada 'data'.
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.ifElse.IfElse.signal_false"><code class="name flex">
-<span>def <span class="ident">signal_false</span></span>(<span>self, data='c38b3361c40aa342886ef1356efa2ab38c8b35fd915923b540f99e20ba1dbbfc')</span>
+<span>def <span class="ident">signal_false</span></span>(<span>self, data='52a898730adf56a0f6dea5881dd00feadf1c19fc567d009dcdc7bb6f3b70a63a')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -202,11 +204,13 @@ La expresión también puede ser un texto, con un avariable local lamada 'data'.
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.ifElse.IfElse.signal_true"><code class="name flex">
-<span>def <span class="ident">signal_true</span></span>(<span>self, data='aae2c3551234a2c0746026484c07e3b63ce03f834d89af29fdfc98d2a8c50070')</span>
+<span>def <span class="ident">signal_true</span></span>(<span>self, data='2373457930d38aafd19e3804f0be43d2320e1c4712f721e088e05a7fbb75b651')</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -221,7 +225,9 @@ La expresión también puede ser un texto, con un avariable local lamada 'data'.
     else:
        if using:
           data=func(self,data);
-          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);</code></pre>
+          Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
+          if sync:
+             Context.instance.wait(forever=0, sync=sync);</code></pre>
 </details>
 </dd>
 <dt id="ml4teens.blocks.ifElse.IfElse.slot_event"><code class="name flex">
