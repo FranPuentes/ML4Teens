@@ -16,33 +16,33 @@ from ...core import Block;
 #===============================================================================
 class Clustering(Block):
       """
-      Lleva a cabo un clustering dado un DataFrame de Pandas.
-      Esta clase NO detecta el número de clusters 'óptimo', debe indicarse.
+      Lleva a cabo un agrupamiento (clustering) 2D dado un DataFrame de Pandas y, opcionalmente, una columna objetivo (target).
       
-      SLOTS
-      + dataframe: Pandas DataFrame.
-      
-      SIGNALS
-      + image: imagen 2D del clustering.
-      
-      PARÁMETROS
-      + clean: hacer una limpieza de los datos (booleano, por defecto True)
-      + normalize: hacer una normalización de los datos (booleano, por defecto True)
-      + clusters: el número de clusters buscados, por defecto 2
-      + method: nombre del algoritmo de reducción de dimensionalidad, por defecto "tsne"
-      + algorithm: nombre del algoritmo de clustering, por defecto "kmeans"
-      + args: diccionario de parámetros para el algoritmo de clusterización
-      + threshold: (en tanto por uno) elimina columnas si tiene n% elementos a NaN, por defecto 0.5 (50%)
-      + figsize: por defecto (8, 6)
-      + cmap: por defecto 'viridis'
-      + marker: por defecto 'o'
-      + edgecolor: por defecto 'k'
-      + s | size: por defecto 50
-      + alpha: por defecto 0.7
-      + title: por defecto "Clusterización"
-      + xlabel: por defecto "Componente Principal 1"
-      + ylabel: por defecto "Componente Principal 2"
+      Opcionalmente los datos de entrada se normalizarán y limpiarán antes de su procesamiento.
+      Seguidamente se llevará a cabo un método de reducción de dimensionaldad, siempre a 2 componentes.
+      Finalmente se realiza el agrupamiento y se genera el gráfico.
+      Esta clase no detecta el número de clusters 'óptimo', se debe indicar.
       """
+      
+      #TODO emitir un dataframe con las agrupaciones realizadas.
+      
+      parameters=[{ "name":"clean",     "type":"bool",   "default":"True",                   "doc":"lleva a cabo la limpieza de datos" },
+                  { "name":"normalize", "type":"bool",   "default":"True",                   "doc":"lleva a cabo la normalización de los datos" },
+                  { "name":"clusters",  "type":"int",    "default":"2",                      "doc":"número de clusters a considerar" },
+                  { "name":"method",    "type":"string", "default":"tsne",                   "doc":"algoritmo de reducción de dimensionalidad a usar" },
+                  { "name":"algorithm", "type":"string", "default":"kmeans",                 "doc":"algoritmo de clustering a usar" },
+                  { "name":"args",      "type":"dict",   "default":"{}",                     "doc":"parámetros para el algoritmo de clustering" },
+                  { "name":"threshold", "type":"float",  "default":"0.5",                    "doc":"(en tanto por uno) elimina columnas si tienen dicho porcentaje de elementos a NaN" },
+                  { "name":"figsize",   "type":"tupla",  "default":"(8,6)",                  "doc":"tamaño de la figura" },
+                  { "name":"cmap",      "type":"string", "default":"viridis",                "doc":"mapa de color" },
+                  { "name":"marker",    "type":"string", "default":"o",                      "doc":"marcador para los puntos" },
+                  { "name":"edgecolor", "type":"string", "default":"k",                      "doc":"color del borde" },
+                  { "name":"s",         "type":"string", "default":"50",                     "doc":"tamaño de los puntos" },
+                  { "name":"alpha",     "type":"float",  "default":"0.7",                    "doc":"nivel de transparencia de los puntos" },
+                  { "name":"title",     "type":"string", "default":"Clusterización",         "doc":"Título del gráfico" },
+                  { "name":"xlabel",    "type":"string", "default":"Componente principal 1", "doc":"Etiqueta de las x" },
+                  { "name":"ylabel",    "type":"string", "default":"Componente principal 2", "doc":"Etiqueta de las y" },
+                 ];
       
       #-------------------------------------------------------------------------
       def __init__(self, **kwargs):
@@ -52,11 +52,17 @@ class Clustering(Block):
       #-------------------------------------------------------------------------
       @Block.slot("target", {pd.DataFrame}) 
       def slot_target(self, slot, data):
+          """
+          Recibe un Dataframe de Pandas, cuya primera columna será usada para la validación del 'clustering'.
+          """
           self._target=data;
           
       #-------------------------------------------------------------------------
       @Block.slot("dataframe", {pd.DataFrame})
       def slot_dataframe(self, slot, data):
+          """
+          Recibe un Dataframe Pandas, aplica el agrupamiento y genera la señal "image".
+          """
           if data is not None:
              df=data.copy();
 
@@ -210,5 +216,8 @@ class Clustering(Block):
       #-------------------------------------------------------------------------
       @Block.signal("image", Image)
       def signal_image(self, data):
+          """
+          Emite una imagen representando una vista 2D de los clusters detectados en el Dataframe de Pandas recibido.
+          """
           return data;
 

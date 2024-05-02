@@ -242,12 +242,11 @@ class Block(ABC):
                         data=func(self,data);
                         Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
                         if bool(sync):
-                           Context.instance.wait(forever=0, sync=bool(sync));
+                           Context.instance.wait(forever=0, sync=True);
               wrapper._is_signal=True;
               wrapper._signal_name=name;
               wrapper._type=typedecl;
               wrapper._is_sync=bool(sync);
-              wrapper._unique=_unique_;
               return wrapper;
           return decorador;
 
