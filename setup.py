@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='ml4teens',
-    version='0.1.34',
+    version='0.1.37',
     packages=find_packages(),
     install_requires=[ "ipython",
                        "opencv-python>=4.9",
@@ -48,4 +48,4 @@ setup(
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
     url='https://github.com/FranPuentes/ML4Teens',
-)
+   )
