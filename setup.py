@@ -1,8 +1,16 @@
 from setuptools import setup, find_packages
 
+PACKAGE="ml4teens";
+
+def read_version():
+    with open(f"{PACKAGE}/version.py", "rt") as fd:
+         locals = {};
+         exec(fd.read(), None, locals);
+         return locals["__version__"];
+
 setup(
-    name='ml4teens',
-    version='0.1.37',
+    name=PACKAGE,
+    version=read_version(),
     packages=find_packages(),
     install_requires=[ "ipython",
                        "opencv-python>=4.9",

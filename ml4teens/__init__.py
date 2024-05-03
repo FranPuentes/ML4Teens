@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from .version import __version__;
+
 import torch;
 Tensor=torch.Tensor;
 
