@@ -70,7 +70,7 @@ class Context:
            cls._instance = super(Context, cls).__new__(cls);
            cls._instance.listeners={};
            #cls.__html__();
-           cls._queue   = queue.Queue(); #queue.PriorityQueue();
+           cls._queue   = queue.Queue();
            
            cwd   = os.path.dirname(__file__);
            rwd   = os.path.join(cwd, '..');
@@ -179,7 +179,7 @@ class Context:
                if "close" in block.slots:
                   block.run("close",True,[{},{}]); 
 
-        self._queue=queue.Queue(); #queue.PriorityQueue();
+        self._queue=queue.Queue();
         if all:
            self._instance.listeners={};
         return self;
@@ -353,7 +353,7 @@ class Context:
            if sname in target.slots:
               slot=target.slots[sname];
               debug.print(f"Encolando: Una señal a {target._fullClassName} en el slot '{sname}' con data={type(data)}");
-              self._queue.put( (time.monotonic_ns(), target, sname, data, (mods,{})) );
+              self._queue.put( (target, sname, data, (mods,{})) );
            else:
               raise RuntimeError(f"No existe el slot '{sname}' en {target._fullClassName}");
            
@@ -372,7 +372,7 @@ class Context:
               signal_mods, slot_mods = mods;
               if "@sync" not in slot_mods or bool(slot_mods["@sync"]) is False:
                  debug.print(f"Encolando una señal dirigida a {target._fullClassName}::{sname} con type(data)={type(data)}");
-                 self._queue.put_nowait( (time.monotonic_ns(), target, sname, data, (signal_mods,slot_mods)) );
+                 self._queue.put_nowait( (target, sname, data, (signal_mods,slot_mods)) );
               else:
                  debug.print(f"Ejecutando síncronamente una señal dirigida a {target._fullClassName}::{sname} con type(data)={type(data)}");
                  target.run(sname,data,(signal_mods,slot_mods));                 
@@ -449,7 +449,7 @@ class Context:
                    
                    signals+=1;  
                    timestamp=time.time();
-                   tm, target, sname, data, mods = event;
+                   target, sname, data, mods = event;
                    target.run(sname, data, mods);
                                     
                 except KeyboardInterrupt as e:
@@ -466,7 +466,8 @@ class Context:
           return signals;
           
         finally:
-          while not self._queue.empty(): self._queue.get();
+          while not self._queue.empty():
+                self._queue.get();
                         
     #-----------------------------------------------------------------------------------------
     #-----------------------------------------------------------------------------------------
