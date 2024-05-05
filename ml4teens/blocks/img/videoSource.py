@@ -474,7 +474,10 @@ class VideoSource(Block):
                      frame = self._resize(frame, self.params.width, self.params.height);
                      self.signal_frame(frame);
                      
-                     ok, frame = self._fd.read();
+                     try:
+                       ok, frame = self._fd.read();
+                     except Exception:
+                       break;  
                    
                self.signal_end(True);
             

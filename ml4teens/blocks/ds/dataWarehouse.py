@@ -45,7 +45,8 @@ class DataWarehouse(Block):
       
       #-------------------------------------------------------------------------
       def save(self, filename=None):
-          self._df.to_csv(filename if bool(filename) else self.params.filename, index=False);
+          if self._df is not None:
+             self._df.to_csv(filename if bool(filename) else self.params.filename, index=False);
       
       #-------------------------------------------------------------------------
       def append(self, data):
