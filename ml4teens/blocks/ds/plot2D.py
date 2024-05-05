@@ -18,28 +18,25 @@ class Plot2D(Block):
       """
       Recibe un DataFrame de Pandas y lo representa, posiblemente con reducción de dimensionalidad.
       
-      SLOTS
-      + dataframe: Pandas DataFrame.
-      
-      SIGNALS
-      + image: imagen 2D.
-      
-      PARÁMETROS
-      + clean: hacer una limpieza de los datos (booleano, por defecto True)
-      + normalize: hacer una normalización de los datos (booleano, por defecto True)
-      + method: nombre del algoritmo de reducción de dimensionalidad, por defecto "pca"
-      + threshold: (en tanto por uno) elimina columnas si tiene n% elementos a NaN, por defecto 0.5 (50%)
-      + figsize: por defecto (8, 6)
-      + cmap: por defecto 'viridis'
-      + marker: por defecto 'o'
-      + edgecolor: por defecto 'k'
-      + s | size: por defecto 50
-      + alpha: por defecto 0.7
-      + title: por defecto "Plot"
-      + xlabel: por defecto "Componente Principal 1"
-      + ylabel: por defecto "Componente Principal 2"
-      + inplace: muestra la imagen, además de mandarla como señal.
+      La reducción se hace en 2D con el objetivo de representarla
+      El slot 'labels' puede recibir otro DataFrame, en cuyo caso usa su primera columna para diferenciar los puntos.
       """
+      
+      parameters=[{ "name":"clean",     "type":"bool",   "default":"True",                   "doc":"lleva a cabo la limpieza de datos" },
+                  { "name":"normalize", "type":"bool",   "default":"True",                   "doc":"lleva a cabo la normalización de los datos" },
+                  { "name":"method",    "type":"string", "default":"tsne",                   "doc":"algoritmo de reducción de dimensionalidad" },
+                  { "name":"threshold", "type":"float",  "default":"0.5",                    "doc":"(en tanto por uno) elimina columnas nulas" },
+                  { "name":"figsize",   "type":"tupla",  "default":"(8,6)",                  "doc":"tamaño de la figura" },
+                  { "name":"cmap",      "type":"string", "default":"viridis",                "doc":"mapa de color" },
+                  { "name":"marker",    "type":"string", "default":"o",                      "doc":"marcador para los puntos" },
+                  { "name":"edgecolor", "type":"string", "default":"k",                      "doc":"color del borde" },
+                  { "name":"s",         "type":"string", "default":"50",                     "doc":"tamaño de los puntos" },
+                  { "name":"alpha",     "type":"float",  "default":"0.7",                    "doc":"nivel de transparencia de los puntos" },
+                  { "name":"title",     "type":"string", "default":"Clusterización",         "doc":"Título del gráfico" },
+                  { "name":"xlabel",    "type":"string", "default":"Componente principal 1", "doc":"Etiqueta de las x" },
+                  { "name":"ylabel",    "type":"string", "default":"Componente principal 2", "doc":"Etiqueta de las y" },
+                  { "name":"inplace",   "type":"bool",   "default":"False",                  "doc":"Muestra la imagen, además de mandarla como señal" },
+                 ];
       
       #-------------------------------------------------------------------------
       def __init__(self, **kwargs):

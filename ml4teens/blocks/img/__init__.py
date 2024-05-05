@@ -10,6 +10,7 @@ from .segmentation      import Segmentation
 from .segmentAll        import SegmentAll
 from .imageOp           import ImageOp
 from .videoSource       import VideoSource
+from .videoSource       import VideoSourceNoSync
 from .imageSource       import ImageSource
 from .objectID          import ObjectID
 from .objectCLS         import ObjectCLS

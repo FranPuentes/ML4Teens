@@ -46,6 +46,7 @@ setup(
                        "nsnet2-denoiser",
                        "pyaudio",
                        "scipy==1.12.0", # <-------------- hay un error en la 1.13.0
+                       "imageio",
                      ],
     include_package_data=True,
     

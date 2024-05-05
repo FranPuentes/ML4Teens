@@ -50,7 +50,7 @@ def image_from_url(url:str, mode:str=None, width:int=None, height:int=None):
             else:
                new_dimensions = (width, height);
                
-            img = img.resize(new_dimensions, Image.ANTIALIAS);
+            img = img.resize(new_dimensions, Image.Resampling.LANCZOS);
          
          if mode is not None: return img.convert(mode);
          else:                return img;
