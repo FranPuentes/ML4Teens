@@ -6,6 +6,8 @@ import PIL;
 
 from PIL.Image import Image;
 
+from sklearn.base import BaseEstimator;
+
 import numpy as np;
 from sklearn.preprocessing import StandardScaler;
 import matplotlib.pyplot as plt;
@@ -126,10 +128,13 @@ class Clustering(Block):
              else:
                   raise RuntimeError(f"Algoritmo de clusterig desconocido: f{self.params.algorithm}");
 
-             # Mostrar la clusterización en una gráfica y enviarla
+             self.signal_model(cmodel);
              
              if self._target is None:
                 
+                pass;
+                
+                """
                 if df.shape[1]>2:
                    from sklearn.manifold import TSNE;
                    tsne = TSNE(n_components=2);
@@ -146,20 +151,28 @@ class Clustering(Block):
                             edgecolor=self.params.edgecolor or 'k',
                             s=self.params.size or self.params.s or 50,
                             alpha=self.params.alpha or 0.7);
+                 """           
              else:
                 target_values = self._target.iloc[:, 0];
                 
                 from sklearn.preprocessing import LabelEncoder;
                 encoder = LabelEncoder();
                 target_values_array = encoder.fit_transform(target_values);
+
+                from sklearn.metrics import confusion_matrix;
+
+                # Calcula la matriz de confusión
+                mat_confusion = confusion_matrix(target_values_array, clusters);
                 
+                self.signal_classes(encoder.classes_);
+                self.signal_matrix (mat_confusion);
+                
+                """
                 from sklearn.metrics import confusion_matrix;
                 import seaborn as sns;
 
                 # Calcula la matriz de confusión
                 mat_confusion = confusion_matrix(target_values_array, clusters);
-                
-                self.signal_matrix(mat_confusion);
 
                 # Visualización de la matriz de confusión con Seaborn
                 plt.figure(figsize=(10, 7));
@@ -173,7 +186,8 @@ class Clustering(Block):
                 plt.title("Matriz de Confusión");
                 plt.ylabel("Verdad");
                 plt.xlabel("Inferido");
-
+                """
+                """
                 if df.shape[1]>2:
                    from sklearn.manifold import TSNE;
                    tsne = TSNE(n_components=2);
@@ -195,7 +209,8 @@ class Clustering(Block):
                                 s=self.params.size or self.params.s or 50,
                                 alpha=self.params.alpha or 0.7);
                 plt.legend(title="Clusters");
-                                
+                """
+             """                   
              plt.title (self.params.title  or 'Clusterización');
              plt.xlabel(self.params.xlabel or 'Componente 1');
              plt.ylabel(self.params.ylabel or 'Componente 2');
@@ -212,15 +227,21 @@ class Clustering(Block):
                plt.close();
              
              return True;
+             """
              
-          return False;
+          #return False;
+
+      #-------------------------------------------------------------------------
+      @Block.signal("classes", np.ndarray)
+      def signal_classes(self, data):
+          return data;
 
       #-------------------------------------------------------------------------
       @Block.signal("matrix", np.ndarray)
       def signal_matrix(self, data):
           return data;
-
+          
       #-------------------------------------------------------------------------
-      @Block.signal("image", Image)
-      def signal_image(self, data):
+      @Block.signal("model", BaseEstimator)
+      def signal_model(self, data):
           return data;

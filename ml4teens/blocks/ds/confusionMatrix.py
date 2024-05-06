@@ -59,7 +59,7 @@ class ConfusionMatrix(Block):
              self._matrix =None;
 
       #-------------------------------------------------------------------------
-      @Block.slot("classes", {list}) 
+      @Block.slot("classes", {np.ndarray}) 
       def slot_classes(self, slot, data):
           if data is not None:
              self._classes=data;
