@@ -31,8 +31,8 @@ class Clustering(Block):
       parameters=[{ "name":"clean",     "type":"bool",   "default":"True",                   "doc":"lleva a cabo la limpieza de datos" },
                   { "name":"normalize", "type":"bool",   "default":"True",                   "doc":"lleva a cabo la normalización de los datos" },
                   { "name":"clusters",  "type":"int",    "default":"2",                      "doc":"número de clusters a considerar" },
-                  { "name":"method",    "type":"string", "default":"tsne",                   "doc":"algoritmo de reducción de dimensionalidad a usar" },
-                  { "name":"algorithm", "type":"string", "default":"kmeans",                 "doc":"algoritmo de clustering a usar" },
+                  { "name":"method",    "type":"bool",   "default":"False",                  "doc":"Usar un algoritmo de reducción de dimensionalidad" },
+                  { "name":"algorithm", "type":"string", "default":"agglomerative",          "doc":"algoritmo de clustering a usar" },
                   { "name":"args",      "type":"dict",   "default":"{}",                     "doc":"parámetros para el algoritmo de clustering" },
                   { "name":"threshold", "type":"float",  "default":"0.5",                    "doc":"(en tanto por uno) elimina columnas si tienen dicho porcentaje de elementos a NaN" },
                   { "name":"figsize",   "type":"tupla",  "default":"(8,6)",                  "doc":"tamaño de la figura" },
@@ -81,26 +81,30 @@ class Clustering(Block):
                 scaler = StandardScaler();
                 df = scaler.fit_transform(df);
                 
-             """
              if bool(self.params.method) is True:
-                # Reducir la dimensionalidad
-                if self._target is None:
-                   from sklearn.decomposition import PCA;
-                   pca = PCA(n_components=0.99);
-                   df = pca.fit_transform(df);
-                else:   
-                   from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA;
-                   labels = self._target.iloc[:, 0];
-                   max_components = min(labels.nunique() - 1, df.shape[1]);
-                   lda = LDA(n_components=max_components);
-                   df = lda.fit_transform(df, labels);
-             """
+                if df.shape[1]>2:
+                   # Reducir la dimensionalidad
+                   if self._target is None:
+                      from sklearn.decomposition import PCA;
+                      pca = PCA(n_components=self.params.components or 0.99);
+                      df = pca.fit_transform(df);
+                   else:
+                      from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA;
+                      labels = self._target.iloc[:, 0];
+                      max_components = min(labels.nunique() - 1, df.shape[1]);
+                      lda = LDA(n_components=self.params.components or max_components);
+                      df = lda.fit_transform(df, labels);
+                   
              args     = self.params.args or {};
              clusters = (self._target.iloc[:,0].nunique() if self._target is not None else (self.params.clusters or 2));
              cmodel   = None;
              
              # Realizar clustering
-             if   self.params.algorithm is None or self.params.algorithm.lower()=="kmeans":
+             if   self.params.algorithm is None or self.params.algorithm.lower()=="agglomerative":
+                  from sklearn.cluster import AgglomerativeClustering;
+                  cmodel = AgglomerativeClustering(n_clusters=clusters, **args);
+                  clusters =cmodel.fit_predict(df);
+             elif self.params.algorithm.lower()=="kmeans":
                   from sklearn.cluster import KMeans;
                   cmodel = KMeans(n_clusters=clusters, **args);
                   clusters = cmodel.fit_predict(df);
@@ -109,10 +113,6 @@ class Clustering(Block):
                   from sklearn.cluster import DBSCAN;
                   cmodel = DBSCAN(**args);
                   clusters = cmodel.fit_predict(df);
-             elif self.params.algorithm.lower()=="agglomerative":
-                  from sklearn.cluster import AgglomerativeClustering;
-                  cmodel = AgglomerativeClustering(n_clusters=clusters, **args);
-                  clusters =cmodelfit_predict(df);
              elif self.params.algorithm.lower()=="spectral":
                   from sklearn.cluster import SpectralClustering;
                   cmodel = SpectralClustering(n_clusters=clusters, **args);
@@ -129,9 +129,13 @@ class Clustering(Block):
              # Mostrar la clusterización en una gráfica y enviarla
              
              if self._target is None:
-                from sklearn.manifold import TSNE;
-                tsne = TSNE(n_components=2);
-                df2 = tsne.fit_transform(df);
+                
+                if df.shape[1]>2:
+                   from sklearn.manifold import TSNE;
+                   tsne = TSNE(n_components=2);
+                   df2  = tsne.fit_transform(df);
+                else:
+                   df2=df;   
 
                 plt.figure(figsize=self.params.figsize or (8, 6));
                 plt.scatter(df2[:, 0],
@@ -149,17 +153,16 @@ class Clustering(Block):
                 encoder = LabelEncoder();
                 target_values_array = encoder.fit_transform(target_values);
                 
-                from sklearn.metrics import confusion_matrix
-                import seaborn as sns
-
-                # Suponiendo que target_values y clusters están correctamente alineados
-                # y que ambos son arrays de Numpy del mismo tamaño.
+                from sklearn.metrics import confusion_matrix;
+                import seaborn as sns;
 
                 # Calcula la matriz de confusión
-                mat_confusion = confusion_matrix(target_values_array, clusters)
+                mat_confusion = confusion_matrix(target_values_array, clusters);
+                
+                self.signal_matrix(mat_confusion);
 
                 # Visualización de la matriz de confusión con Seaborn
-                plt.figure(figsize=(10, 7))
+                plt.figure(figsize=(10, 7));
                 sns.heatmap(mat_confusion, 
                             annot=True, 
                             fmt="d", 
@@ -171,9 +174,12 @@ class Clustering(Block):
                 plt.ylabel("Verdad");
                 plt.xlabel("Inferido");
 
-                from sklearn.manifold import TSNE;
-                tsne = TSNE(n_components=2);
-                df2 = tsne.fit_transform(df);
+                if df.shape[1]>2:
+                   from sklearn.manifold import TSNE;
+                   tsne = TSNE(n_components=2);
+                   df2  = tsne.fit_transform(df);
+                else:
+                   df2=df;   
                 
                 plt.figure(figsize=self.params.figsize or (8, 6));
                 target_values = self._target.iloc[:, 0];
@@ -190,9 +196,9 @@ class Clustering(Block):
                                 alpha=self.params.alpha or 0.7);
                 plt.legend(title="Clusters");
                                 
-             #plt.title (self.params.title  or 'Clusterización');
-             #plt.xlabel(self.params.xlabel or 'Componente Principal 1');
-             #plt.ylabel(self.params.ylabel or 'Componente Principal 2');
+             plt.title (self.params.title  or 'Clusterización');
+             plt.xlabel(self.params.xlabel or 'Componente 1');
+             plt.ylabel(self.params.ylabel or 'Componente 2');
              
              buf = BytesIO();
              try:
@@ -210,7 +216,11 @@ class Clustering(Block):
           return False;
 
       #-------------------------------------------------------------------------
+      @Block.signal("matrix", np.ndarray)
+      def signal_matrix(self, data):
+          return data;
+
+      #-------------------------------------------------------------------------
       @Block.signal("image", Image)
       def signal_image(self, data):
           return data;
-
