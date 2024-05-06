@@ -51,7 +51,22 @@ class Clustering(Block):
       #-------------------------------------------------------------------------
       def __init__(self, **kwargs):
           super().__init__(**kwargs);
+          self._model =None;
           self._target=None;
+          
+      #-------------------------------------------------------------------------
+      @Block.slot("model", {BaseEstimator})
+      def slot_model(self, slot, data):
+          if data is not None:
+             self._model=data;
+          
+      #-------------------------------------------------------------------------
+      @Block.slot("inference", {pd.DataFrame})
+      def slot_inference(self, slot, data):
+          if data is not None:
+             if self._model is not None:
+                result = self._model.predict(data);
+                print(result);
           
       #-------------------------------------------------------------------------
       @Block.slot("target", {pd.DataFrame}) 
@@ -128,10 +143,25 @@ class Clustering(Block):
              else:
                   raise RuntimeError(f"Algoritmo de clusterig desconocido: f{self.params.algorithm}");
 
+             if self._target is not None:
+                target_values = self._target.iloc[:, 0];
+                
+                from sklearn.preprocessing import LabelEncoder;
+                encoder = LabelEncoder();
+                target_values_array = encoder.fit_transform(target_values);
+
+                from sklearn.metrics import confusion_matrix;
+
+                mat_confusion = confusion_matrix(target_values_array, clusters);
+                
+                self.signal_classes(encoder.classes_);
+                self.signal_matrix (mat_confusion);
+                
+                cmodel._encoder=encoder;
+             
              self.signal_model(cmodel);
              
              if self._target is None:
-                
                 pass;
                 
                 """
@@ -153,6 +183,9 @@ class Clustering(Block):
                             alpha=self.params.alpha or 0.7);
                  """           
              else:
+                pass;
+                
+                """
                 target_values = self._target.iloc[:, 0];
                 
                 from sklearn.preprocessing import LabelEncoder;
@@ -167,7 +200,6 @@ class Clustering(Block):
                 self.signal_classes(encoder.classes_);
                 self.signal_matrix (mat_confusion);
                 
-                """
                 from sklearn.metrics import confusion_matrix;
                 import seaborn as sns;
 

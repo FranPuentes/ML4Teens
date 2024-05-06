@@ -57,7 +57,7 @@ class ConfusionMatrix(Block):
           
              self._classes=None;
              self._matrix =None;
-
+      
       #-------------------------------------------------------------------------
       @Block.slot("classes", {np.ndarray}) 
       def slot_classes(self, slot, data):
