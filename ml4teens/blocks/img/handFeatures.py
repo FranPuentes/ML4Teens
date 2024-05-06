@@ -77,8 +77,7 @@ class HandFeatures(Block):
 
           return annotated_image
           
-      @classmethod    
-      def normalize_names(cls, *args):
+      def normalize_names(self, *args):
           rt="";
           for arg in args:
               rt += "".join([s.capitalize() for s in arg.split()]);
@@ -135,7 +134,7 @@ class HandFeatures(Block):
                  
                  wrist = None;
                  for idx, lm in enumerate(landmarks):
-                     name=HandFeatures.normalize_names(prefix,self.names(idx));
+                     name=self.normalize_names(prefix if bool(self.params.agnostic) is False else "",self.names(idx));
                      if wrist is None:
                         wrist=[lm.x, lm.y, lm.z];
                         rt.append({"index":idx, "score":0.0, "name":name});

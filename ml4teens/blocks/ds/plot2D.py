@@ -84,9 +84,11 @@ class Plot2D(Block):
                   df = tsne.fit_transform(df);
              elif self.params.method.lower()=="lda":
                   assert self._labels is not None, "LDA necesita las etiquetas";
-                  from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA;
-                  lda = LDA(n_components=2);
-                  df = lda.fit_transform(df, self._labels.iloc[:,0]);
+                  from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA;                  
+                  labels = self._labels.iloc[:, 0];
+                  max_components = min(labels.nunique()-1, df.shape[1]);
+                  lda = LDA(n_components=max_components);
+                  df = lda.fit_transform(df, labels);
              elif self.params.method.lower()=="isomap":
                   from sklearn.manifold import Isomap;
                   isomap = Isomap(n_components=2);

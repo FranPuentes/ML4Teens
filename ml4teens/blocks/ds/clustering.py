@@ -80,19 +80,21 @@ class Clustering(Block):
              if self.params.normalize or True:
                 scaler = StandardScaler();
                 df = scaler.fit_transform(df);
-
-             # Reducir la dimensionalidad
-             if self._target is None:
-                from sklearn.decomposition import PCA;
-                pca = PCA(n_components=0.99);
-                df = pca.fit_transform(df);
-             else:   
-                from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA;
-                labels = self._target.iloc[:, 0];
-                max_components = min(labels.nunique() - 1, df.shape[1]);
-                lda = LDA(n_components=max_components);
-                df = lda.fit_transform(df, labels);
-
+                
+             """
+             if bool(self.params.method) is True:
+                # Reducir la dimensionalidad
+                if self._target is None:
+                   from sklearn.decomposition import PCA;
+                   pca = PCA(n_components=0.99);
+                   df = pca.fit_transform(df);
+                else:   
+                   from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA;
+                   labels = self._target.iloc[:, 0];
+                   max_components = min(labels.nunique() - 1, df.shape[1]);
+                   lda = LDA(n_components=max_components);
+                   df = lda.fit_transform(df, labels);
+             """
              args     = self.params.args or {};
              clusters = (self._target.iloc[:,0].nunique() if self._target is not None else (self.params.clusters or 2));
              cmodel   = None;
@@ -127,9 +129,13 @@ class Clustering(Block):
              # Mostrar la clusterización en una gráfica y enviarla
              
              if self._target is None:
+                from sklearn.manifold import TSNE;
+                tsne = TSNE(n_components=2);
+                df2 = tsne.fit_transform(df);
+
                 plt.figure(figsize=self.params.figsize or (8, 6));
-                plt.scatter(df[:, 0],
-                            df[:, 1],
+                plt.scatter(df2[:, 0],
+                            df2[:, 1],
                             c=clusters,
                             cmap=self.params.cmap or 'viridis',
                             marker=self.params.marker or 'o', 
@@ -141,13 +147,12 @@ class Clustering(Block):
                 
                 from sklearn.preprocessing import LabelEncoder;
                 encoder = LabelEncoder();
-                target_values_encoded = encoder.fit_transform(target_values);
-                target_values_array = target_values_encoded;
+                target_values_array = encoder.fit_transform(target_values);
                 
                 from sklearn.metrics import confusion_matrix
                 import seaborn as sns
 
-                # Suponiendo que target_values_array y clusters están correctamente alineados
+                # Suponiendo que target_values y clusters están correctamente alineados
                 # y que ambos son arrays de Numpy del mismo tamaño.
 
                 # Calcula la matriz de confusión
@@ -162,23 +167,27 @@ class Clustering(Block):
                             xticklabels=encoder.classes_, 
                             yticklabels=encoder.classes_)  # Ajusta las etiquetas según sea necesario
 
-                plt.title("Matriz de Confusión")
-                plt.ylabel("Etiquetas Verdaderas")
-                plt.xlabel("Etiquetas de Clustering")
+                plt.title("Matriz de Confusión");
+                plt.ylabel("Verdad");
+                plt.xlabel("Inferido");
 
+                from sklearn.manifold import TSNE;
+                tsne = TSNE(n_components=2);
+                df2 = tsne.fit_transform(df);
+                
                 plt.figure(figsize=self.params.figsize or (8, 6));
                 target_values = self._target.iloc[:, 0];
                 valores_unicos = target_values.unique();
                 for i, target_label in enumerate(valores_unicos):
-                    plt.scatter(df[target_values == target_label, 0], 
-                                df[target_values == target_label, 1],
+                    plt.scatter(df2[target_values == target_label, 0],
+                                df2[target_values == target_label, 1],
                                 label=target_label,
                                 #c=clusters,
                                 #cmap=self.params.cmap or 'viridis',
                                 marker=self.params.marker or 'o',
                                 edgecolor=self.params.edgecolor or 'k',
                                 s=self.params.size or self.params.s or 50,
-                                alpha=self.params.alpha or 0.7);                                                                
+                                alpha=self.params.alpha or 0.7);
                 plt.legend(title="Clusters");
                                 
              #plt.title (self.params.title  or 'Clusterización');

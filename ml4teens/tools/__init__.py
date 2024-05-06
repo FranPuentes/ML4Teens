@@ -3,11 +3,11 @@
 from .embeddings import ImgEmbeddings;
 from .embeddings import TxtEmbeddings;
 
-from .tools      import image_from_url; 
 from .tools      import imageFromUrl;
-from .tools      import runnigInGoogleColab;
-from .tools      import runnigInJupyterLike;
-from .tools      import runningInNotebook;
+from .tools      import runningOnColab;
+from .tools      import runningOnJupyter;
+from .tools      import runningOnNotebook;
+from .tools      import runningOnLocal;
 from .tools      import uploadFiles;
 from .tools      import UrlDownload;
 from .tools      import searchFilename;

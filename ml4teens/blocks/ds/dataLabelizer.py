@@ -34,8 +34,8 @@ class DataLabelizer(Block):
           
       #-------------------------------------------------------------------------
       def click_label(self, label):
-          self.signal_label(str(label));
-          self.signal_data(self._data);
+          self.signal_label(  str(label)              );
+          self.signal_data ( (str(label), self._data) );
           
       #-------------------------------------------------------------------------
       @Block.slot("data", {object})
@@ -43,7 +43,7 @@ class DataLabelizer(Block):
           self._data=data;
           
       #-------------------------------------------------------------------------
-      @Block.signal("data", object)
+      @Block.signal("data", tuple)
       def signal_data(self, data):
           return data;
           

@@ -1,20 +1,23 @@
 # -*- coding: utf-8 -*-
 import sys, os, io;
 import fnmatch;
+import numpy as np;
 from PIL import Image;
 import requests;
 from io import BytesIO;
 import tempfile;
-
+import time;
+import socket;
 import glob;
 import json;
 import shutil;
 import zipfile;
+import imageio;
 
 from itertools import accumulate;
 
 #===============================================================================
-def image_from_url(url:str, mode:str=None, width:int=None, height:int=None):
+def imageFromUrl(url:str, mode:str=None, width:int=None, height:int=None):
     """
     Esta función recibe como parámetro una url:str y si es posible devuelve una imagen:Image.
     
@@ -25,6 +28,32 @@ def image_from_url(url:str, mode:str=None, width:int=None, height:int=None):
     Si no puede devolver la imagen dispara una excepción.
     """
     try:
+      """
+      img = imageio.v3.imread(url);
+
+      if width is not None or height is not None:
+      
+         original_width, original_height = img.size;
+      
+         if width is not None and height is None:
+            ratio = width / original_width;
+            new_height = int(original_height * ratio);
+            new_dimensions = (width, new_height);
+        
+         elif height is not None and width is None:
+            ratio = height / original_height;
+            new_width = int(original_width * ratio);
+            new_dimensions = (new_width, height);
+        
+         else:
+            new_dimensions = (width, height);
+            
+         img = img.resize(new_dimensions, Image.Resampling.LANCZOS);
+      
+      if mode is not None: return img.convert(mode);
+      else:                return img;
+      """
+      
       headers = { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'};
 
       response = requests.get(url, headers=headers);      
@@ -57,14 +86,12 @@ def image_from_url(url:str, mode:str=None, width:int=None, height:int=None):
          
       else:
          raise RuntimeError(f"Error al descargar la imagen: Estado HTTP {response.status_code}");
-        
+         
     except Exception as e:
-        raise RuntimeError(f"No he podido cargar la siguiente imagen: {url}");
-
-imageFromUrl = image_from_url;
+      raise RuntimeError(f"No he podido cargar la siguiente imagen: {url}");
 
 #===============================================================================
-def runnigInGoogleColab():
+def runningOnColab():
     """
     Averigua si estamos en un ambiente Google Colab.
     """
@@ -72,7 +99,7 @@ def runnigInGoogleColab():
     else:                             return False;
 
 #-------------------------------------------------------------------------------
-def runnigInJupyterLike():
+def runningOnJupyter():
     """
     Averigua si estamos en un ambiente Jupyter Notebook.
     """
@@ -84,7 +111,7 @@ def runnigInJupyterLike():
     return False;
     
 #-------------------------------------------------------------------------------
-def runningInNotebook():
+def runningOnNotebook():
     """
     Averigua si estamos en un ambiente Notebook genérico.
     """
@@ -94,9 +121,27 @@ def runningInNotebook():
     except ImportError:
         return False    
     return False
-    
+
+#-------------------------------------------------------------------------------
+def runningOnLocal():
+
+    try:
+      import netifaces;
+      for interface in netifaces.interfaces():
+          addresses = netifaces.ifaddresses(interface);
+          ipv4 = addresses.get(netifaces.AF_INET, []);
+          for address in ipv4:
+              ip = address.get('addr');
+              if ip == host_ip or ip.startswith("127."):
+                 return True
+                 
+    except ImportError:
+      pass;
+              
+    return False;
+
 #===============================================================================
-def uploadFiles():
+def uploadFiles(accept=None):
     """
     Invita al usuario a subir ficheros (local -> Colab/Jupyter).
     
@@ -105,18 +150,32 @@ def uploadFiles():
     Permite subir varios ficheros de cualquier tipo.
     """
     _files=[];
-    if runnigInGoogleColab():
+    
+    if runningOnColab():
        from google.colab import files;
        uploaded = files.upload();
        for filename in uploaded.keys():
            _files.append(filename);
-    else:
+    else:    
+       from jupyter_ui_poll import ui_events;
        import ipywidgets as widgets;
-       uploader = widgets.FileUpload(accept='*/*', multiple=True);
+       uploader = widgets.FileUpload(accept=accept or '*/*', multiple=True);
+       
+       _finish=False;
+       
+       def on_change(change):
+           nonlocal _files, _finish;
+           _files=list(uploader["new"].keys());
+           _finish=True;
+       
        display(uploader);
-       for item in uploader.value:
-           _files.append(item["name"]);
-
+       
+       uploader.observe(on_change, names=['value']);   
+       with ui_events() as poll:
+            while not _finish:
+                  poll(50);
+                  time.sleep(0.2);
+       
     return tuple(_files);
 
 #===============================================================================

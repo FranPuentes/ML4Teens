@@ -51,10 +51,20 @@ class DataWarehouse(Block):
       #-------------------------------------------------------------------------
       def append(self, data):
       
+          if isinstance(data,tuple) and len(data)==2:
+             # tupla de label, data.
+             label=data[0];
+             self._label=label;
+             if self._label is not None and self.params.labelName is None:
+                self.params.labelName="__TARGET__";
+             data =data[1];
+             self.append(data);
+             return;
+             
           if isinstance(data,list) and all(isinstance(d,list) for d in data):
              # lista de listas.
              for item in data: self.append(item);
-             return;    
+             return;
              
           if isinstance(data,list) and all(isinstance(d,dict) and all(key in d for key in ["name","score"]) for d in data):
              # lista de diccionarios con claves 'name' y 'score'.
@@ -82,12 +92,13 @@ class DataWarehouse(Block):
              self.params.labelName="__TARGET__";             
           
       #-------------------------------------------------------------------------
-      @Block.slot("instance", {list,dict})
+      @Block.slot("instance", {tuple,list,dict})
       def slot_features(self, slot, data):
           if data is not None:
              if self.params.fit is not None: data=self.params.fit(data);
-             if data is not None: self.append(data);
-          self.signal_dataframe(self._df);
+             if data is not None:
+                self.append(data);
+                self.signal_dataframe(self._df);
 
       #-------------------------------------------------------------------------
       @Block.signal("dataframe", pd.DataFrame)
