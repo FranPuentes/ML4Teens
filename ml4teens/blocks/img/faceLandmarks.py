@@ -13,8 +13,6 @@ from mediapipe import solutions
 from mediapipe.framework.formats import landmark_pb2
 
 import mediapipe as mp
-from mediapipe.tasks import python
-from mediapipe.tasks.python import vision
 
 from ...core import Block;
 
@@ -31,14 +29,24 @@ class FaceLandmarks(Block):
           mwd = os.path.join(cwd, '../../models');
           fwd = os.path.join(cwd, '../../fonts');
           
-          num_faces=self.params.faces or 1;
+          from mediapipe.tasks        import python;
+          from mediapipe.tasks.python import vision;
+
+          VisionRunningMode = vision.RunningMode;
+
+          self.running_mode = VisionRunningMode.IMAGE;
+          self.running_mode = VisionRunningMode.IMAGE if self.params.image else self.running_mode;
+          self.running_mode = VisionRunningMode.VIDEO if (self.params.frame or self.params.video) else self.running_mode;
+
+          options={ "num_faces": self.params.faces or 1,
+                    "running_mode": self.running_mode,
+                    "output_face_blendshapes":True,
+                    "output_facial_transformation_matrixes":True,
+                  };
 
           base_options = python.BaseOptions(model_asset_path=os.path.join(mwd,'face_landmarker.task'));
-          options = vision.FaceLandmarkerOptions(base_options=base_options,
-                                                 output_face_blendshapes=True,
-                                                 output_facial_transformation_matrixes=True,
-                                                 num_faces=num_faces);
-          self._model = vision.FaceLandmarker.create_from_options(options);
+          self._model  = vision.FaceLandmarker.create_from_options(vision.FaceLandmarkerOptions(base_options=base_options,**options));
+          self._ms=0;
 
       #-------------------------------------------------------------------------
       @classmethod
@@ -229,10 +237,22 @@ class FaceLandmarks(Block):
       @Block.slot("image", {Image})
       def slot_image(self, slot, data):
 
+          from mediapipe.tasks        import python;
+          from mediapipe.tasks.python import vision;
+
+          VisionRunningMode = vision.RunningMode;
+          
           if data:
+             ms=self.params.ms or 33;
              image = data.convert('RGB');  
              image = mp.Image(image_format=mp.ImageFormat.SRGB, data=np.asarray(image));
-             results = self._model.detect(image);
+             if self.running_mode==VisionRunningMode.IMAGE: results = self._model.detect(image);
+             if self.running_mode==VisionRunningMode.VIDEO: results = self._model.detect_for_video(image,self._ms);
+             self._ms+=ms;
+                    
+             #image = data.convert('RGB');  
+             #image = mp.Image(image_format=mp.ImageFormat.SRGB, data=np.asarray(image));
+             #results = self._model.detect(image);
 
              if self.signal_image():
                 image = image.numpy_view();

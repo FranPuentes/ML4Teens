@@ -33,7 +33,7 @@ class HandGestures(Block):
           self.num_hands    = self.params.hands or 2;
           self.running_mode = VisionRunningMode.IMAGE;
           self.running_mode = VisionRunningMode.IMAGE if self.params.image else self.running_mode;
-          self.running_mode = VisionRunningMode.VIDEO if self.params.video else self.running_mode;
+          self.running_mode = VisionRunningMode.VIDEO if (self.params.video or self.params.frame) else self.running_mode;
           
           options={ "num_hands": self.num_hands,
                     "running_mode": self.running_mode,
