@@ -22,7 +22,7 @@ setup(
                        "ipyevents",
                        "ipywidgets==7.7.1",
                        "pandas>=1.3.4",
-                       "netifaces",
+                       #"netifaces", Da problemas en windows (necesita c++ para ser compilado)
                        #"transformers>=4.37",
                        "transformers",
                        "torch==2.2.2",   # <------------ si algo falla pasa a 2.2.1
