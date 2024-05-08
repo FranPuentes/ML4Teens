@@ -388,9 +388,10 @@ def prettyPrintException(e, render=True):
     </script>
     </head>
     <body>
-    <table style="border-collapse: separate; border-spacing: 0; border-radius: 5px; background-color: #DC143C; color: white; width: 100%;
+    <table style="border-collapse: separate; border-spacing: 0; border-radius: 5px; background-color: #DC143C; color: white; width: 100%; border-collapse: collapse;">
+    
       <tr>
-        <td style="width: 1px; white-space: nowrap; transform: rotate(-90deg); transform-origin: left botton; pading:10px 0; height: 100%
+        <td style="width: 1px; white-space: nowrap; transform: rotate(-90deg); transform-origin: left botton; pading:10px 0; height: 100%; vertical-align: middle">        
           <b>Excepción</b>
         </td>
         <td>
@@ -398,7 +399,7 @@ def prettyPrintException(e, render=True):
             <tr>         
               <td>
                  <p style="text-shadow: 2px 2px 2px black;"><b>Ha ocurrido una excepción:</b></p>
-                 <p style="text-decoration: underline;">{{message}}</p>
+                 <p style="">{{message}}</p>
               </td>
             </tr>
             <tr>

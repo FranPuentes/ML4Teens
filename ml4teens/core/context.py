@@ -460,9 +460,8 @@ class Context:
                    break;
                    
                 except Exception as e:
-                   debug.print(f"Excepción ejecutando un slot: {e}");
                    signals=signals*(-1);
-                   break;
+                   raise;
           
           if sync is False: debug.print("Saliendo del bucle de eventos.", flush=True);
           return signals;

@@ -210,9 +210,6 @@ class Block(ABC):
                        if done is not None:
                           self.signal_done(done);
                        
-                  except Exception as e:
-                    debug.print(f"{cls}:: Excepción: '{e}'", exception=e);
-                    
                   finally:
                     pass;
                     

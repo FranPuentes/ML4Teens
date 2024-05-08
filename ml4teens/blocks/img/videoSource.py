@@ -423,6 +423,7 @@ class VideoSource(Block):
           
           try:
             if self._fd is None or not self._fd.isOpened():
+               self.signal_end(False);
                raise RuntimeError(f"Error al abrir el vídeo '{source}'");
                
             else:
@@ -481,10 +482,6 @@ class VideoSource(Block):
                    
                self.signal_end(True);
             
-          except Exception as e:
-            self.signal_end(False);
-            raise e;
-            
-          finally:  
+          finally:
             self.reset();
             
