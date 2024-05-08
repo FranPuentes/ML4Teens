@@ -9,16 +9,17 @@ from PIL.Image import Image;
 import numpy as np;
 from sklearn.preprocessing import StandardScaler;
 import matplotlib.pyplot as plt;
+from mpl_toolkits.mplot3d import Axes3D;
 from io import BytesIO;
 
 from ...core import Block;
 
 #===============================================================================
-class Plot2D(Block):
+class Plot3D(Block):
       """
       Recibe un DataFrame de Pandas y lo representa, posiblemente con reducción de dimensionalidad.
       
-      La reducción se hace en 2D con el objetivo de representarla
+      La reducción se hace en 3D interactiva con el objetivo de representarla
       El slot 'labels' puede recibir otro DataFrame, en cuyo caso usa su primera columna para diferenciar los puntos.
       """
       
@@ -84,27 +85,76 @@ class Plot2D(Block):
              # Reducir la dimensionalidad
              if   self.params.method is None or self.params.method.lower()=="pca":
                   from sklearn.decomposition import PCA;
-                  pca = PCA(n_components=2);
+                  pca = PCA(n_components=3);
                   df = pca.fit_transform(df);
              elif self.params.method.lower()=="t-sne" or self.params.method.lower()=="tsne":
                   from sklearn.manifold import TSNE;
-                  tsne = TSNE(n_components=2);
+                  tsne = TSNE(n_components=3);
                   df = tsne.fit_transform(df);
              elif self.params.method.lower()=="lda":
                   assert self._labels is not None, "LDA necesita las etiquetas";
                   from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA;                  
                   labels = self._labels.iloc[:, 0];
-                  max_components = min(labels.nunique()-1, df.shape[1]);
-                  lda = LDA(n_components=max_components);
+                  lda = LDA(n_components=3);
                   df = lda.fit_transform(df, labels);
              elif self.params.method.lower()=="isomap":
                   from sklearn.manifold import Isomap;
-                  isomap = Isomap(n_components=2, n_neighbors=self.params.neighbors or max(5, int(np.log10(df.shape[0]))));
+                  isomap = Isomap(n_components=3, n_neighbors=self.params.neighbors or max(5, int(np.log10(df.shape[0]))));
                   df = isomap.fit_transform(df);
              else:
                   raise RuntimeError(f"Método de reducción de dimensionalidad desconocido: f{self.params.method}");
                   
-             plt.figure(figsize=self.params.figsize or (8, 6));
+             xs = df[:, 0];
+             ys = df[:, 1];
+             zs = df[:, 2];
+                  
+             if self._labels is None:
+                plt.figure(figsize=self.params.figsize or (10, 6));
+                ax = Axes3D(fig);
+                plot_geeks = ax.scatter(xs, ys, zs, color='green') ;
+                ax.set_title("3D plot") 
+                ax.set_xlabel('x-axis') 
+                ax.set_ylabel('y-axis') 
+                ax.set_zlabel('z-axis') 
+                plt.show();
+                
+             else:
+                import plotly.graph_objects as go;
+                #from plotly.offline import iplot;
+                #import plotly.io as pio;
+                
+                # Crear el gráfico
+                fig = go.Figure(data=[go.Scatter3d(
+                    x=xs,
+                    y=ys,
+                    z=zs,
+                    mode='markers',
+                    marker=dict(
+                        size=6,
+                        color=self._labels, 
+                        colorscale='Viridis', 
+                        opacity=0.8,
+                        showscale=True 
+                    )
+                )])
+
+                # Actualizar los layout del gráfico
+                fig.update_layout(
+                    title='Interactive 3D Scatter Plot by Labels',
+                    scene=dict(
+                        xaxis_title='X Axis',
+                        yaxis_title='Y Axis',
+                        zaxis_title='Z Axis'
+                    ),
+                    margin=dict(l=0, r=0, b=0, t=30)  # Ajustar márgenes
+                )
+
+                # Mostrar el gráfico
+                fig.show();
+                #iplot(fig);
+                #pio.show(fig);
+
+             """
              if self._labels is None:
                 plt.scatter(df[:, 0],
                             df[:, 1],
@@ -130,24 +180,5 @@ class Plot2D(Block):
              plt.xlabel(self.params.xlabel or 'Componente Principal 1');
              plt.ylabel(self.params.ylabel or 'Componente Principal 2');
              
-             buf = BytesIO();
-             try:
-               plt.savefig(buf, format='png');
-               buf.seek(0);
-               imagen=PIL.Image.open(buf);
-               imagen.load();
-               self.signal_image(imagen);
-               if self.params.inplace: plt.show();
-             finally:  
-               buf.close();
-               plt.close();
-             
-             return True;
-             
-          return False;
-
-      #-------------------------------------------------------------------------
-      @Block.signal("image", Image)
-      def signal_image(self, data):
-          return data;
-
+             # TODO mostrar el gráfico!
+             """

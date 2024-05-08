@@ -2,6 +2,7 @@
 
 import copy;
 import pandas as pd;
+import numpy  as np;
 
 from ...core import Block;
 
@@ -82,17 +83,27 @@ class DataWarehouse(Block):
              if self._df is None: self._df = pd.DataFrame([inst]);
              else:                self._df = pd.concat( [ self._df, pd.DataFrame([inst]) ], ignore_index=True);
       
+          if isinstance(data,np.ndarray):
+             # array de numpy
+             if   len(data.shape)==1:
+                  data=data.reshape(1, -1);
+                  if self._df is None: self._df = pd.DataFrame(data);
+                  else:                self._df = pd.concat( [ self._df, pd.DataFrame(data) ], ignore_index=True);
+             elif len(data.shape)==2:
+                  for d in dat.Ta:
+                      self.append(d);
+             else:
+                  raise RuntimeError(f"Array numpy de dimensiones erróneas: {data.shape}");
+             
       #-------------------------------------------------------------------------
       @Block.slot("label", {int, float, str})
       def slot_label(self, slot, data):
-
           self._label=data;
-
           if self._label is not None and self.params.labelName is None:
              self.params.labelName="__TARGET__";             
           
       #-------------------------------------------------------------------------
-      @Block.slot("instance", {tuple,list,dict})
+      @Block.slot("instance", {tuple,list,dict, np.ndarray})
       def slot_features(self, slot, data):
           if data is not None:
              if self.params.fit is not None: data=self.params.fit(data);

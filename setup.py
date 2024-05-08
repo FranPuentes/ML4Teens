@@ -48,6 +48,7 @@ setup(
                        "pyaudio",
                        "scipy==1.12.0", # <-------------- hay un error en la 1.13.0
                        "imageio",
+                       "plotly",
                      ],
     include_package_data=True,
     
