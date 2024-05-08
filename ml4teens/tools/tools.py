@@ -370,6 +370,10 @@ def prettyPrintException(e, render=True):
         padding: 5px;
         text-align: left;
       }
+      
+      .coding-font {
+        font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+      }
     </style>
     <script>
       function toggleDropdown() { 
@@ -404,9 +408,9 @@ def prettyPrintException(e, render=True):
                   <p style="color:LightGreen; text-shadow: 2px 2px 2px black;"><b>Trazado de la pila:</b></p>
                   {%for point in trace%}
                         <hr/>
-                        <p style="background-color:#AC649C; padding: 5px">
-                          <b style="color:LightGreen;">Fichero:</b> <b>{{point.filename|e}}</b> [en la línea {{point.line|e}}]<br/>
-                          <b style="color:LightGreen;">Texto:</b> {{point.text|e}}<br/>
+                        <p style="background-color:#FAEBD7; color:black; padding: 5px">
+                          <b style="">Fichero:</b> <b>{{point.filename|e}}</b> [en la línea <b>{{point.line|e}}</b>]<br/>
+                          <b style="">Texto:</b> <span class="coding-font">{{point.text|e}}</span><br/>
                         </p>                    
                   {%endfor%}
                 </div>
