@@ -9,7 +9,7 @@ Cada bloque hace algo concreto, en modo *caja negra*; cada uno de ellos genera *
 Un objeto (*singleton*) se encarga de emparejar los signals con slots (con control de tipos) y lanzar la red.
 
 >[!NOTE]
->Versión actual: 0.1.37 en pip.
+>Versión actual: 0.1.40 en pip.
 
 >[!NOTE]
 >El submódulo *blocks*/*img* **está en estado estable**.
