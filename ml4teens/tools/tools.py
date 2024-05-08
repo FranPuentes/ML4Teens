@@ -123,6 +123,7 @@ def runningOnNotebook():
     return False
 
 #-------------------------------------------------------------------------------
+"""
 def runningOnLocal():
 
     try:
@@ -139,7 +140,7 @@ def runningOnLocal():
       pass;
               
     return False;
-
+"""
 #===============================================================================
 def uploadFiles(accept=None):
     """
@@ -352,6 +353,89 @@ def splitDict(criteria, **kwargs):
         else:               rt[1][key]=kwargs[key];
     return rt;    
     
-    
+#===============================================================================
+def prettyPrintException(e, render=True):
+    from IPython.display import display, HTML;
+    from jinja2 import Template;
+
+    exception_template="""
+    <!DOCTYPE html>
+    <html lang="es">
+    <head>
+    <meta charset="UTF-8">
+    <title>Tabla Desplegable</title>
+    <style>
+      .xdropdown-content {
+        display: none;
+        padding: 5px;
+        text-align: left;
+      }
+    </style>
+    <script>
+      function toggleDropdown() { 
+                var content = document.getElementById("dropdownContent");
+                if (content.style.display === "block") { 
+                    content.style.display = "none"; 
+                   }
+                else {
+                    content.style.display = "block"; 
+                   } 
+               }
+    </script>
+    </head>
+    <body>
+    <table style="border-collapse: separate; border-spacing: 0; border-radius: 5px; background-color: #DC143C; color: white; width: 100%;
+      <tr>
+        <td style="width: 1px; white-space: nowrap; transform: rotate(-90deg); transform-origin: left botton; pading:10px 0; height: 100%
+          <b>Excepción</b>
+        </td>
+        <td>
+          <table style="width: 100%;">
+            <tr>         
+              <td>
+                 <p style="text-shadow: 2px 2px 2px black;"><b>Ha ocurrido una excepción:</b></p>
+                 <p style="text-decoration: underline;">{{message}}</p>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <a onclick="toggleDropdown(); return false;" style="cursor:pointer; text-decoration: none; color:black">&#x25BC;</a>
+                <div id="dropdownContent" class="dropdown-content" style="display: none; padding: 5px; text-align: left;">
+                  <p style="color:LightGreen; text-shadow: 2px 2px 2px black;"><b>Trazado de la pila:</b></p>
+                  {%for point in trace%}
+                        <hr/>
+                        <p style="background-color:#AC649C; padding: 5px">
+                          <b style="color:LightGreen;">Fichero:</b> <b>{{point.filename|e}}</b> [en la línea {{point.line|e}}]<br/>
+                          <b style="color:LightGreen;">Texto:</b> {{point.text|e}}<br/>
+                        </p>                    
+                  {%endfor%}
+                </div>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+    </body>
+    </html>
+    """
+
+    import sys, traceback, linecache;
+    exc_type, exc_value, exc_traceback = sys.exc_info();
+    trace_list = traceback.extract_tb(exc_traceback);
+    detailed_trace = [];
+    for frame in trace_list:
+        filename = frame.filename
+        lineno = frame.lineno
+        line_text = linecache.getline(filename, lineno).strip()
+        detailed_trace.append({"filename":filename, "line":lineno, "text":line_text});
+
+    gvars={ "message":str(e),
+            "trace":detailed_trace,
+          };
+    template = Template(exception_template);
+    html = template.render(**gvars);
+    if render: display(HTML(html));
+    return html;
     
     

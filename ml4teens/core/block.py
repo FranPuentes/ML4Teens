@@ -241,12 +241,12 @@ class Block(ABC):
                      if using:
                         data=func(self,data);
                         Context.instance.emit(source=self, sname=name, data=data, mods=self._signal_mods);
-                        if bool(sync):
+                        if bool(sync) or self._signal_mods.get("@sync") is True:
                            Context.instance.wait(forever=0, sync=True);
               wrapper._is_signal=True;
               wrapper._signal_name=name;
               wrapper._type=typedecl;
-              wrapper._is_sync=bool(sync);
+              wrapper._is_sync=bool(sync); # por defecto, puede cambiarse en el 'mods' de la señal.
               return wrapper;
           return decorador;
 

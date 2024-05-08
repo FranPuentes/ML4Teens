@@ -18,7 +18,7 @@ from .signals    import Signals;
 from .slotType   import SlotType;
 from .slots      import Slots;
 
-from ..tools     import debug;
+from ..tools     import debug, prettyPrintException;
 
 # TODO
 """
@@ -338,7 +338,7 @@ class Context:
         #-----------------------------------------------------------------------
         
         assert (("source" in kwargs) and ("target" not in kwargs)) or (("source" not in kwargs) and ("target" in kwargs))  or (("source" in kwargs) and ("target" in kwargs));               
-        assert ("sname" in kwargs) or ("signal_name" in kwargs) or ("slot_name" in kwargs);        
+        assert ("signal" in kwargs) or ("slot" in kwargs) or ("sname" in kwargs) or ("signal_name" in kwargs) or ("slot_name" in kwargs);
         assert ("data"  in kwargs);
         
         if ("target" in kwargs) and ("source" not in kwargs):
@@ -383,7 +383,7 @@ class Context:
            # señal generada en un bloque (source)
            # ha de enviarse a todos sus subscriptores
            source=kwargs["source"];
-           sname =kwargs.get("sname") or kwargs.get("signal_name");
+           sname =kwargs.get("sname") or kwargs.get("signal_name") or kwargs.get("signal");
            data  =kwargs.get("data" );
            mods  =kwargs.get("mods" ) or {}; # signal mods
            assert type(mods) is dict;
@@ -415,13 +415,15 @@ class Context:
               raise RuntimeError(f"No existe la señal '{sname}' en {source._fullClassName}");
                
     #-----------------------------------------------------------------------------------------
-    def wait(self, forever=1, sync=False): 
+    def wait(self, forever=1, sync=False, deep=[0]):
         """
         Inicia el loop asíncrono y procesa los mensajes enviados por medio de la cola del contexto uno a uno.
         Se supone que el usuario ha colocado en la cola, previamente, mensajes para inicial la red.
         Si no hay mensajes en la cola, finaliza.
         Puede volver a invocarse, con nuevos mensajes encolados.
-        """       
+        """
+        deep[0] += 1;
+        
         signals=0;
         try:
           timestamp=time.time();        
@@ -464,8 +466,17 @@ class Context:
           
           if sync is False: debug.print("Saliendo del bucle de eventos.", flush=True);
           return signals;
+        
+        except Exception as e:
+        
+          if deep[0]==1:
+             prettyPrintException(e, render=True);
+
+          else:
+            raise e;  
           
         finally:
+          deep[0] -= 1;
           while not self._queue.empty():
                 self._queue.get();
                         
