@@ -1,10 +1,14 @@
 # -*- coding: utf-8 -*-
 
 import os;
+import math;
+import torch;
 
 import PIL;
 
 from PIL.Image import Image;
+
+import numpy as np;
 
 from ultralytics import YOLO;
 
@@ -14,7 +18,7 @@ from ...core  import Block;
 class PoseEstimation(Block):
 
       def __init__(self, **kwargs):
-          params, self._rest = tools.splitDict(["model","n","bodies"], **kwargs);
+          params, self._rest = tools.splitDict(["model","n","bodies","verge"], **kwargs);
           super().__init__(**params);
           
           cwd = os.path.dirname(__file__);
@@ -57,10 +61,28 @@ class PoseEstimation(Block):
                     self.signal_boxes(boxes);
                     
                  if self.signal_features():
-                    pass;
+                    
+                    for conf,xyn in zip(result.keypoints.conf.cpu(), result.keypoints.xyn.cpu()):
+                        cv=[];
+                        mc = torch.mean(xyn, dim=0);
+                        for i, point in enumerate(xyn):
+                            if conf[i] >= (self.params.verge or 0.5):
+                               d=math.sqrt((point[0]-mc[0])**2 + (point[1]-mc[1])**2);
+                               cv.append(d);
+                            else:
+                               cv.append(None);                               
+                        
+                        cv = np.array(cv, dtype=float);
+                        mean_value = np.nanmean(cv);
+                        mask=np.isnan(cv);
+                        cv[mask] = mean_value;
+                        cv = cv /  np.linalg.norm(cv);
+                        cv[mask] = np.nan;
+                        
+                        self.signal_features(cv); 
                     
                  if self.signal_image():
-                    image = r.plot(conf=False, labels=False, boxes=False, masks=False, probs=False);
+                    image = result.plot(conf=False, labels=False, boxes=False, masks=False, probs=False);
                     image = PIL.Image.fromarray(image[..., ::-1]);
                     self.signal_image(image);
 
@@ -70,7 +92,7 @@ class PoseEstimation(Block):
           return data;
           
       #-------------------------------------------------------------------------
-      @Block.signal("features", list)
+      @Block.signal("features", np.ndarray)
       def signal_features(self, data):
           return data;
 

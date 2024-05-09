@@ -57,6 +57,11 @@ class Clustering(Block):
           self._target=None;
           
       #-------------------------------------------------------------------------
+      def load(self, filename):
+          df=pd.read_csv(filename);
+          self.context.emit(target=self, slot="dataframe", data=df);
+
+      #-------------------------------------------------------------------------
       @Block.slot("model", {BaseEstimator})
       def slot_model(self, slot, data):
           if data is not None:
@@ -65,7 +70,8 @@ class Clustering(Block):
       #-------------------------------------------------------------------------
       def _cleanDataframe(self, df):
           # Limpiar filas
-          # TODO eliminar filas con todo a NaN
+          # Eliminar filas con todo a NaN
+          df.dropna(axis=0, how="all", inplace=True);
              
           # Limpiar columnas
           # TODO columnas categóricas
@@ -167,39 +173,21 @@ class Clustering(Block):
                    else:
                       from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA;
                       labels = self._target.iloc[:, 0];
-                      max_components = min(labels.nunique() - 1, df.shape[1]);
-                      dimr = LDA(n_components=self.params.components or max_components);
+                      max_components = self.params.components or min(labels.nunique() - 1, df.shape[1]);
+                      dimr = LDA(n_components=max_components);
                       df = dimr.fit_transform(df, labels);
                    
              args     = self.params.args or {};
              clusters = (self._target.iloc[:,0].nunique() if self._target is not None else (self.params.clusters or 2));
              cmodel   = None;
              
-             """          
-             elif self.params.algorithm.lower()=="agglomerative":
-                  from sklearn.cluster import AgglomerativeClustering;
-                  cmodel = AgglomerativeClustering(n_clusters=clusters, **args);
-                  clusters =cmodel.fit_predict(df);
-             elif self.params.algorithm.lower()=="dbscan":
-                  from sklearn.cluster import DBSCAN;
-                  cmodel = DBSCAN(**args);
-                  clusters = cmodel.fit_predict(df);
-             elif self.params.algorithm.lower()=="spectral":
-                  from sklearn.cluster import SpectralClustering;
-                  cmodel = SpectralClustering(n_clusters=clusters, **args);
-                  clusters = cmodel.fit_predict(df);
-             elif self.params.algorithm.lower()=="gaussian" or self.params.algorithm.lower()=="gmm":
-                  from sklearn.mixture import GaussianMixture;
-                  cmodel = GaussianMixture(**args);
-                  cmodel.fit(df);
-                  clusters = cmodel.predict(df);
-             """     
-             
              # Realizar clustering
              if   self.params.algorithm is None or self.params.algorithm.lower()=="kmeans": # por defecto
                   from sklearn.cluster import KMeans;
                   cmodel = KMeans(n_clusters=clusters, **args);
                   clusters = cmodel.fit_predict(df);
+                  labels = pd.DataFrame(clusters, columns=['__TARGET__']);
+                  self.signal_labels(labels);
                   cmodel._scaler = scaler;
                   cmodel._dimr   = dimr;
                   if self._target is not None:
@@ -208,8 +196,69 @@ class Clustering(Block):
                          _map[l]=clusters[i];
                      cmodel._map=_map;
                   else:
-                     cmodel._map=None;
-                     
+                     cmodel._map=None;                     
+             elif self.params.algorithm.lower()=="agglomerative":
+                  from sklearn.cluster import AgglomerativeClustering;
+                  cmodel = AgglomerativeClustering(n_clusters=clusters, **args);
+                  clusters =cmodel.fit_predict(df);
+                  labels = pd.DataFrame(clusters, columns=['__TARGET__']);
+                  self.signal_labels(labels);
+                  cmodel._scaler = scaler;
+                  cmodel._dimr   = dimr;
+                  if self._target is not None:
+                     _map={}; 
+                     for i, l in enumerate(self._target.iloc[:,0]):
+                         _map[l]=clusters[i];
+                     cmodel._map=_map;
+                  else:
+                     cmodel._map=None;                     
+             elif self.params.algorithm.lower()=="dbscan":
+                  from sklearn.cluster import DBSCAN;
+                  cmodel = DBSCAN(**args);
+                  clusters = cmodel.fit_predict(df);
+                  labels = pd.DataFrame(clusters, columns=['__TARGET__']);
+                  self.signal_labels(labels);
+                  cmodel._scaler = scaler;
+                  cmodel._dimr   = dimr;
+                  if self._target is not None:
+                     _map={}; 
+                     for i, l in enumerate(self._target.iloc[:,0]):
+                         _map[l]=clusters[i];
+                     cmodel._map=_map;
+                  else:
+                     cmodel._map=None;                     
+             elif self.params.algorithm.lower()=="spectral":
+                  from sklearn.cluster import SpectralClustering;
+                  cmodel = SpectralClustering(n_clusters=clusters, **args);
+                  clusters = cmodel.fit_predict(df);
+                  clusters =cmodel.fit_predict(df);
+                  labels = pd.DataFrame(clusters, columns=['__TARGET__']);
+                  self.signal_labels(labels);
+                  cmodel._scaler = scaler;
+                  cmodel._dimr   = dimr;
+                  if self._target is not None:
+                     _map={}; 
+                     for i, l in enumerate(self._target.iloc[:,0]):
+                         _map[l]=clusters[i];
+                     cmodel._map=_map;
+                  else:
+                     cmodel._map=None;                     
+             elif self.params.algorithm.lower()=="gaussian" or self.params.algorithm.lower()=="gss":
+                  from sklearn.mixture import GaussianMixture;
+                  cmodel = GaussianMixture(n_components=clusters, **args);
+                  cmodel.fit(df);
+                  clusters = cmodel.predict(df);
+                  labels = pd.DataFrame(clusters, columns=['__TARGET__']);
+                  self.signal_labels(labels);
+                  cmodel._scaler = scaler;
+                  cmodel._dimr   = dimr;
+                  if self._target is not None:
+                     _map={}; 
+                     for i, l in enumerate(self._target.iloc[:,0]):
+                         _map[l]=clusters[i];
+                     cmodel._map=_map;
+                  else:
+                     cmodel._map=None;                     
              else:
                   raise RuntimeError(f"Algoritmo de clusterig desconocido: f{self.params.algorithm}");
              
@@ -227,6 +276,11 @@ class Clustering(Block):
                 
                 self.signal_matrix(df_confusion);
              
+      #-------------------------------------------------------------------------
+      @Block.signal("labels", pd.DataFrame)
+      def signal_labels(self, data):
+          return data;
+          
       #-------------------------------------------------------------------------
       @Block.signal("matrix", pd.DataFrame)
       def signal_matrix(self, data):
