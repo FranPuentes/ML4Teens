@@ -120,8 +120,6 @@ class Plot3D(Block):
                 
              else:
                 import plotly.graph_objects as go;
-                #from plotly.offline import iplot;
-                #import plotly.io as pio;
                 
                 # Crear el gráfico
                 fig = go.Figure(data=[go.Scatter3d(
@@ -151,8 +149,6 @@ class Plot3D(Block):
 
                 # Mostrar el gráfico
                 fig.show();
-                #iplot(fig);
-                #pio.show(fig);
 
              """
              if self._labels is None:
