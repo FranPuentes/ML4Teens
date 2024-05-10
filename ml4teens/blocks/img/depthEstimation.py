@@ -5,6 +5,8 @@ import torch;
 
 from PIL.Image import Image;
 
+import matplotlib.pyplot as plt;
+from matplotlib.colors import Normalize;
 
 import numpy as np;
 
@@ -19,26 +21,22 @@ class DepthEstimation(Block):
           super().__init__(**kwargs);
           
           from transformers import AutoImageProcessor, AutoModelForDepthEstimation;
-          #from transformers import DPTImageProcessor, DPTForDepthEstimation;
-          #from transformers import pipeline;
           
-          #self.processor = DPTImageProcessor.from_pretrained("Intel/dpt-large")
-          #self.model     = DPTForDepthEstimation.from_pretrained("Intel/dpt-large")
-          #self._pipeline = pipeline("depth-estimation",model="vinvino02/glpn-nyu");
+          #checkpoint = self.params.model or ""Intel/dpt-large";
+          #checkpoint = self.params.model or "vinvino02/glpn-nyu";
+          checkpoint = self.params.model or "LiheYoung/depth-anything-base-hf";
           
           if DepthEstimation.processor is None or DepthEstimation.model is None:
-             DepthEstimation.processor = AutoImageProcessor.from_pretrained("LiheYoung/depth-anything-base-hf");
-             DepthEstimation.model     = AutoModelForDepthEstimation.from_pretrained("LiheYoung/depth-anything-base-hf");
+             DepthEstimation.processor = AutoImageProcessor.from_pretrained         (checkpoint, device=self.context.device);
+             DepthEstimation.model     = AutoModelForDepthEstimation.from_pretrained(checkpoint).to(self.context.device);
 
       #-------------------------------------------------------------------------
       @Block.slot("image", {Image})
       def slot_image(self, slot, data):
 
           if data:
-             #predictions=self._pipeline(data);
-             #imagen=predictions["depth"];
 
-             inputs = DepthEstimation.processor(images=data, return_tensors="pt");
+             inputs = DepthEstimation.processor(images=data, return_tensors="pt").to(self.context.device);
              
              with torch.no_grad():
                   outputs = DepthEstimation.model(**inputs);
@@ -47,8 +45,14 @@ class DepthEstimation(Block):
              prediction = torch.nn.functional.interpolate(predicted_depth.unsqueeze(1), size=data.size[::-1], mode="bicubic", align_corners=False);
              
              output = prediction.squeeze().cpu().numpy();
-             formatted = (output * 255 / np.max(output)).astype("uint8");
-             imagen = PIL.Image.fromarray(formatted);
+             if self.params.colormap:
+                normalized = Normalize(vmin=np.min(output), vmax=np.max(output))(output);
+                colored    = plt.get_cmap(self.params.colormap)(normalized);
+                rgb        = (colored[..., :3] * 255).astype(np.uint8);
+                imagen     = PIL.Image.fromarray(rgb);
+             else:   
+                formatted  = ( 255 * (output-np.min(output)) / (np.max(output)-np.min(output)) ).astype(np.uint8);
+                imagen     = PIL.Image.fromarray(formatted);
 
              self.signal_image(imagen);
 
