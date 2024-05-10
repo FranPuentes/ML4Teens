@@ -18,6 +18,7 @@ from .signals    import Signals
 from .slots      import Slots
 
 from ..tools     import debug;
+from ..tools     import autodoc;
 
 #===============================================================================      
 class StackedDicts:
@@ -131,6 +132,11 @@ class Block(ABC):
       def _classNameFrom(func):
           assert hasattr(func, '__module__') and  hasattr(func, '__qualname__') and ('.' in func.__qualname__);
           return f"{func.__module__}:{func.__qualname__.split('.', maxsplit=1)[0]}";
+
+      #-------------------------------------------------------------------------
+      @classmethod
+      def autodoc(cls):
+          return autodoc.class_html(f"{cls.__module__}.{cls.__qualname__}");
 
       #-------------------------------------------------------------------------
       def __init__(self, **kwargs):
