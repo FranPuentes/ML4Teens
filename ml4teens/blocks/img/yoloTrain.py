@@ -20,6 +20,23 @@ from ...tools import searchFilename, searchPattern;
 from ...core import Block;
 
 class YoloTrain(Block):
+      """
+      Este bloque recibe en el slot 'dataset' el path de un directorio y lleva a cabo el entrenamiento del modelo YOLOv8 indicado en los parámetros.
+      Al finalizar el entrenamiento envía la señal 'files' con un diccionario que indica donde están los ficheros resultado.
+      
+      Este bloque es muy expresivo, va a generar gran cantidad de información técnica.
+      Dependiendo del tamaño del dataset y del tamaño del modelo a entrenar, es muy probable que sea necesaria una GPU.
+      """
+      
+      parameters=["name":"model",     "type":"string",      "default":"yolov8n.pt", "doc":"Modelo yolo preentrenado a usar.",
+                  "name":"epochs",    "type":"int",         "default":"10",         "doc":"Número de epochs a emplear en el entrenamiento.",
+                  "name":"imgsz",     "type":"int",         "default":"640",        "doc":"Tamaño de la imagen al entrar en el modelo.",
+                  "name":"batch",     "type":"int",         "default":"-1",         "doc":"Tamaño del lote (-1 significa que lo elija el modelo).",
+                  "name":"patience",  "type":"int",         "default":"100",        "doc":"Condición para un early stop.",
+                  "name":"device",    "type":"string|none", "default":"none",       "doc":"¿Qué dispositvo usar? cuda, cpu.",
+                  "name":"optimizer", "type":"string",      "default":"auto",       "doc":"¿Qué optimizador usar?",
+                  "name":"seed",      "type":"int",         "default":"0",          "doc":"Semilla, para que el entrenamieto sea reproducible",
+                 ];
 
       #--------------------------------------------------------------------------
       def __init__(self, **kwargs):
@@ -69,7 +86,7 @@ class YoloTrain(Block):
       
           if source:
              
-             assert os.path.exists(source), f"'{source}' no existe!";
+             assert os.path.exists(source), f"El dataset '{source}' no existe!";
 
              source=os.path.abspath(source);
 
