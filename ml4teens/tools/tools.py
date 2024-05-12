@@ -183,18 +183,24 @@ def uploadFiles(accept=None):
 class UrlDownload:
 
       def __init__(self, url:str, filename=None, autoremove=True):
-          self._autoremove=autoremove;
-          response = requests.get(url);
-          response.raise_for_status();
-          if filename is None:
-             with tempfile.NamedTemporaryFile(delete=False, delete_on_close=False) as temp:
-                  temp.write(response.content);
-                  self._filename=temp.name;
+          
+          if url.startswith("http"):
+             self._autoremove=autoremove;
+             response = requests.get(url);
+             response.raise_for_status();
+             if filename is None:
+                with tempfile.NamedTemporaryFile(delete=False, delete_on_close=False) as temp:
+                     temp.write(response.content);
+                     self._filename=temp.name;
+             else:
+                with open(filename,"wb") as fd:
+                     fd.write(response.content);
+                     self._filename=filename;
           else:
-             with open(filename,"wb") as fd:
-                  fd.write(response.content);
-                  self._filename=filename;
-
+             assert filename is None, "Si 'url' es un fichero, no debe indicarse el parámetro 'filename'";
+             self._autoremove=False;
+             self._filename=url;
+          
       def __del__(self):
           try:
             if self._autoremove:
