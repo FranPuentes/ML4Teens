@@ -12,6 +12,10 @@ https://github.com/ultralytics/ultralytics
 
 **Modelo: ssd_mobilenet_v2.tflite**
 
+**mobilenet_v3_small.tflite**
+
+**mobilenet_v3_large.tflite**
+
 Copyright 2023 The MediaPipe Authors.
 Licensed under the Apache License, Version 2.0 (the "License");
 
