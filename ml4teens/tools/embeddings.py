@@ -3,16 +3,18 @@ import os;
 import PIL;
 import numpy as np;
 
-from PIL.Image import Image;
+#from PIL.Image import Image;
 
 import torch;
+
+from keras.applications.vgg16 import VGG16;
 
 #===============================================================================
 class ImgEmbeddings():
 
       #-------------------------------------------------------------------
       def __init__(self, model_size=None, quantize=True):
-
+          """
           from ..core import Context;
           
           if Context().gpu:
@@ -22,9 +24,12 @@ class ImgEmbeddings():
              transformers.utils.logging.set_verbosity=transformers.logging.ERROR;
              
              from transformers import AutoImageProcessor, ViTModel;
-
-             self._processor = AutoImageProcessor.from_pretrained("google/vit-base-patch16-224-in21k");
-             self._model     = ViTModel.from_pretrained("google/vit-base-patch16-224-in21k");
+             
+             checkpoint="nateraw/vit-base-beans";
+             #checkpoint="google/vit-base-patch16-224-in21k";
+ 
+             self._processor = AutoImageProcessor.from_pretrained(checkpoint);
+             self._model     = ViTModel.from_pretrained(checkpoint);
 
           else:
              import mediapipe as mp;
@@ -50,18 +55,23 @@ class ImgEmbeddings():
                           
              self._processor = None;
              self._model = ImageEmbedder.create_from_options(options);
+          """
+          self._model = VGG16(weights='imagenet', include_top=False, pooling='max', input_shape=(224, 224, 3));
+
+          for layer in self._model.layers:
+              layer.trainable = False;
 
       #-------------------------------------------------------------------
       def embedding(self, imagen):
-          
-          from ..core import Context;
+          """
           
           if Context().gpu:
              inputs = self._processor(imagen, return_tensors="pt");
              with torch.no_grad():
-                  outputs = self._model(**inputs);
-                  embedding=outputs.last_hidden_state[0];
-                  return embedding;
+                  outputs   = self._model(**inputs);
+                  embedding = outputs.last_hidden_state[0];
+                  embedding = torch.flatten(embedding);
+             return embedding;
 
           else:
              import mediapipe as mp;
@@ -78,7 +88,20 @@ class ImgEmbeddings():
              result = self._model.embed(image);
              embedding = result.embeddings[0].embedding;          
              return torch.from_numpy(embedding);
+          """
+          def resize_image(imagen, size=(224, 224)):
+              if isinstance(imagen, np.ndarray):
+                 imagen = Image.fromarray(imagen);
+              imagen = imagen.resize(size, PIL.Image.LANCZOS);
+              imagen_array = np.array(imagen);
+              return imagen_array;
+              
+          image = resize_image(imagen);
+          image_array = np.expand_dims(image, axis = 0);
+          image_embedding = self._model.predict(image_array);
+          return torch.from_numpy(image_embedding);
 
+         
 #===============================================================================
 class TxtEmbeddings():
 
