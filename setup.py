@@ -52,6 +52,7 @@ setup(
                        #"tensorflow",
                        "keras",
                        #"face_recognition",
+                       "scikit-image",
                      ],
     include_package_data=True,
     

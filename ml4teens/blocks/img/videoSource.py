@@ -7,6 +7,8 @@ import numpy as np;
 import PIL;
 import requests;
 
+from skimage.metrics import structural_similarity as ssim;
+
 from PIL.Image import Image;
 
 from tempfile import NamedTemporaryFile;
@@ -271,7 +273,40 @@ class VideoSourceNoSync(Block):
       def slot_close(self, slot, _):
           self.reset();
 
-################################################################################          
+################################################################################
+def frame_similarity(frame1, frame2, method='ssim'):
+
+    if isinstance(frame1, PIL.Image.Image):
+       frame1 = np.array(frame1);
+       
+    if isinstance(frame2, PIL.Image.Image):
+       frame2 = np.array(frame2);
+    
+    if method == 'ssim':
+        # Convierte los fotogramas a escala de grises
+        gray_frame1 = cv.cvtColor(frame1, cv.COLOR_BGR2GRAY);
+        gray_frame2 = cv.cvtColor(frame2, cv.COLOR_BGR2GRAY);
+        # Calcula el SSIM entre los dos fotogramas
+        score, _ = ssim(gray_frame1, gray_frame2, full=True);
+        return score;
+        
+    elif method == 'histogram':
+        # Convierte los fotogramas a escala de grises
+        gray_frame1 = cv.cvtColor(frame1, cv.COLOR_BGR2GRAY);
+        gray_frame2 = cv.cvtColor(frame2, cv.COLOR_BGR2GRAY);
+        # Calcula el histograma para cada fotograma
+        hist_frame1 = cv.calcHist([gray_frame1], [0], None, [8], [0, 256]);
+        hist_frame2 = cv.calcHist([gray_frame2], [0], None, [8], [0, 256]);
+        # Normaliza los histogramas
+        hist_frame1 = cv.normalize(hist_frame1, hist_frame1).flatten();
+        hist_frame2 = cv.normalize(hist_frame2, hist_frame2).flatten();
+        # Calcula la distancia euclidiana entre los histogramas
+        score = cv.compareHist(hist_frame1, hist_frame2, cv.HISTCMP_CORREL);
+        return score;
+        
+    else:
+        raise ValueError("Método desconocido: usa 'ssim' o 'histogram'");
+
 class VideoSource(Block):
 
       #-------------------------------------------------------------------------
@@ -447,19 +482,28 @@ class VideoSource(Block):
                                  "delay":int(self._delay*1000) });
 
                ok, frame = self._fd.read();              
+               if not ok: return;
+               
+               assert len(frame.shape)==2 or (len(frame.shape)==3 and frame.shape[2] in [3, 4]), "Formato de vídeo no soportado";
+             
+               if len(frame.shape)==3: shape=(alto,ancho,frame.shape[2]);
+               else:                   shape=(alto,ancho,1);
+               self.signal_dims(shape);
                
                self.signal_begin(frames);
                
+               last_frame=None;
+               
                while ok: 
-                      
-                     assert len(frame.shape)==2 or (len(frame.shape)==3 and frame.shape[2] in [3, 4]), "Formato de vídeo no soportado";
-
-                   
-                     if len(frame.shape)==3: shape=(alto,ancho,frame.shape[2]);
-                     else:                   shape=(alto,ancho,1);
-                     self.signal_dims(shape);
-                      
-                     self._tm = time.time();
+               
+                     if self.params.method and last_frame is not None:
+                        similarity = frame_similarity(last_frame, frame, method=self.params.method);
+                        if similarity > (self.params.tolerance or 0.90):
+                           last_frame=frame;
+                           ok, frame = self._fd.read();
+                           continue;
+                                            
+                     #self._tm = time.time();
 
                      # TODO, quedarnos sólo con unos pocos modos: L, RGB, RGBA, ...
                       
@@ -471,11 +515,12 @@ class VideoSource(Block):
                         else:
                            frame=cv.cvtColor(frame, cv.COLOR_BGRA2RGBA);
                                 
-                     frame = PIL.Image.fromarray(frame);
-                     frame = self._resize(frame, self.params.width, self.params.height);
-                     self.signal_frame(frame);
+                     pil_frame = PIL.Image.fromarray(frame);
+                     pil_frame = self._resize(pil_frame, self.params.width, self.params.height);
+                     self.signal_frame(pil_frame);
                      
                      try:
+                       last_frame=frame;
                        ok, frame = self._fd.read();
                      except Exception:
                        break;  
