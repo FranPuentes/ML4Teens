@@ -7,14 +7,13 @@ import numpy as np;
 
 import torch;
 
-from keras.applications.vgg16 import VGG16;
+#from keras.applications.vgg16 import VGG16;
 
 #===============================================================================
 class ImgEmbeddings():
 
       #-------------------------------------------------------------------
       def __init__(self, model_size=None, quantize=True):
-          """
           from ..core import Context;
           
           if Context().gpu:
@@ -60,10 +59,11 @@ class ImgEmbeddings():
 
           for layer in self._model.layers:
               layer.trainable = False;
+          """    
 
       #-------------------------------------------------------------------
       def embedding(self, imagen):
-          """
+          from ..core import Context;
           
           if Context().gpu:
              inputs = self._processor(imagen, return_tensors="pt");
@@ -100,7 +100,7 @@ class ImgEmbeddings():
           image_array = np.expand_dims(image, axis = 0);
           image_embedding = self._model.predict(image_array);
           return torch.from_numpy(image_embedding);
-
+          """
          
 #===============================================================================
 class TxtEmbeddings():
