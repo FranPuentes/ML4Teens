@@ -189,7 +189,7 @@ class UrlDownload:
              response = requests.get(url);
              response.raise_for_status();
              if filename is None:
-                with tempfile.NamedTemporaryFile(delete=False, delete_on_close=False) as temp:
+                with tempfile.NamedTemporaryFile(delete=False) as temp:
                      temp.write(response.content);
                      self._filename=temp.name;
              else:
