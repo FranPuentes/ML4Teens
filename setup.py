@@ -64,3 +64,11 @@ setup(
     long_description_content_type='text/markdown',
     url='https://github.com/FranPuentes/ML4Teens',
    )
+
+########################################################################################
+import json;
+import ml4teens as ml;
+
+with open("./ml4teens/autodoc.json",mode="wt", encoding="utf-8") as fd:
+     autodoc = ml.tools.autodoc.autodoc();
+     json.dump(autodoc, fd);

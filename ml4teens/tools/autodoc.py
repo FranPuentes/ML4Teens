@@ -11,6 +11,8 @@ def autodoc():
     from .. import core;
     from .. import blocks;
     
+    from .. import version;
+    
     global __AUTODOC__;
 
     if __AUTODOC__ is not None:
@@ -67,8 +69,8 @@ def autodoc():
                    if details: details='\n'.join(details);
                    else:       details="";
 
-                   rt.append({"name": name,
-                              "fullpath": f"{obj.__module__}.{obj.__qualname__}",
+                   rt.append({"name": obj.__name__,
+                              "path": f"{ '.'.join(obj.__module__.rsplit('.',1)[:-1])}",
                               "description": description,
                               "details": details,
                               "parameters": _parameters(obj),
@@ -76,16 +78,21 @@ def autodoc():
                               "signals": _signals(obj),
                              });
                return rt;
+               
+           def _recursive(paquete, rt=[]):
+               for _, modname, ispkg in pkgutil.walk_packages(paquete.__path__, paquete.__name__ + "."):
+                      pkg = __import__(modname, fromlist="dummy");
+                      blocks = _classes(pkg);
+                      rt = rt + blocks;
+               paths=set();
+               for block in rt:
+                   paths.add(block["path"]);
+               return list(paths),rt;           
 
-           rt=[];
-           for importer, modname, ispkg in pkgutil.walk_packages(paquete.__path__, paquete.__name__ + "."):
-               if ispkg:
-                  pkg = __import__(modname, fromlist="dummy");
-                  blocks = _classes(pkg);
-                  rt.append( {"package":modname, "blocks":blocks} );
-           return rt;
+           return _recursive(paquete);
        
-       __AUTODOC__ = _doc(blocks);
+       paths, blocks = _doc(blocks);
+       __AUTODOC__ = { "version":version.__version__, "paths":paths, "blocks": blocks };
        
        return __AUTODOC__;
 
@@ -469,26 +476,23 @@ ul li {
 # TODO parametrizar colores.
 # TODO documentación inline o pushup.
 
-def class_html(full_class_name, short=True):
+def class_html(path, class_name, short=True):
 
     from jinja2 import Template;
     
     if short: template = Template(__short_html_str_template);
     else:     template = Template(__long_html_str_template);
 
-    def boxdoc_class(pkg_name, classes, full_class_name):
-        for cls in classes:
-            if cls["fullpath"]==full_class_name:
-               module_name, _ = full_class_name.rsplit('.',1);
-               unit={};
-               unit["module"]=pkg_name;
-               unit["class"]=cls;
-               return unit;
+    def boxdoc_class(pkg_name, cls):
+        unit={};
+        unit["module"]=pkg_name;
+        unit["class"]=cls;
+        return unit;
 
-    def boxdoc_module(docs, full_class_name):
-        for doc in docs:
-            r = boxdoc_class(doc["package"], doc["blocks"], full_class_name);
-            if r is not None: return r;
+    def boxdoc_module(docs, path, name):
+        for block in docs["blocks"]:
+            if block["path"]==path and name==block["name"]:
+               return boxdoc_class('.'.join([path,name]), block);
         raise RuntimeError(f"Clase no encontrada: '{full_class_name}'");
 
     gvars={ "box_dark_bgcolor" :"PaleGoldenRod",
@@ -496,12 +500,15 @@ def class_html(full_class_name, short=True):
             "box_width":"300px",
           };
 
-    if full_class_name.startswith("."):
-       full_class_name=f"ml4teens.{full_class_name[1:]}";
+    if path is None:
+       path=f"ml4teens.blocks";
         
-    if full_class_name.startswith("ml."):
-       full_class_name=f"ml4teens.{full_class_name[3:]}";
+    if path.startswith("."):
+       path=f"ml4teens.blocks{path}";
         
-    rawdoc=boxdoc_module(autodoc(), full_class_name);
+    if path.startswith("ml."):
+       path=f"ml4teens.{path[3:]}";
+        
+    rawdoc=boxdoc_module(autodoc(), path, class_name);
     return template.render(rawdoc, **gvars);
     

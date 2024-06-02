@@ -136,7 +136,7 @@ class Block(ABC):
       #-------------------------------------------------------------------------
       @classmethod
       def autodoc(cls):
-          return autodoc.class_html(f"{cls.__module__}.{cls.__qualname__}");
+          return autodoc.class_html('.'.join([cls.__module__.rsplit('.',1)[0]]), cls.__qualname__);
 
       #-------------------------------------------------------------------------
       def __init__(self, **kwargs):
