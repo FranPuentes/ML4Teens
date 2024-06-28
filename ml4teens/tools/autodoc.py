@@ -73,7 +73,7 @@ def autodoc():
                    if details: details='\n'.join(details);
                    else:       details="";
 
-                   print(fullname, flush=True);
+                   #print(fullname, flush=True);
                    #print('\t',classes);
                    rt.append({"name": obj.__name__,
                               "path": f"{ '.'.join(obj.__module__.rsplit('.',1)[:-1])}",
@@ -102,6 +102,7 @@ def autodoc():
            return _recursive(paquete);
        
        paths, blocks = _doc(blocks);
+       blocks = sorted(blocks, key=lambda x: (x["path"],x["name"]) );
        __AUTODOC__ = { "version":version.__version__, "paths":paths, "blocks": blocks };
        
        return __AUTODOC__;
