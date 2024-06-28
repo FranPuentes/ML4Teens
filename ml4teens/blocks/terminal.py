@@ -20,20 +20,20 @@ def escape(t):
 
 class Terminal(Block):
       """
-      Muestra (display) la información que se le envía como texto.
-      Es adecuado para visualizar textos, listas, diccionarios, etc.
+      Muestra la información que se le envía como texto.
+      Es adecuado para mostrar textos, listas, diccionarios, etc.
       
       Tiene dos tipos de slots: stdout y out por un lado, y stderr y error por el otro.
       Ambos grupos se diferencian en los colores que se emplean, nada más.
-      Los slots stdout y stderr mustran las información usando <pre>, mientras que out y error usan <p>.
+      Los slots stdout y stderr mustran las información usando &lt;pre&gt;, mientras que out y error usan &lt;p&gt;.
       Esto último se puede cambiar usando los parámetros 'p' y 'pre'.
       """
       
-      parameters=[ {"name":"feed",    "type":"bool",   "default":"False",      "doc":"Añade o substituye lo último mostrado"},
-                   {"name":"p",       "type":"bool",   "default":"True/False", "doc":"Usa la etiqueta <p>"},
-                   {"name":"pre",     "type":"bool",   "default":"True/False", "doc":"Usa la etiqueta <pre>"},
-                   {"name":"dump",    "type":"bool",   "default":"False",      "doc":"En stdout/stderr muestra los parámetros recibidos"},
-                   {"name":"message", "type":"string", "default":"None",       "doc":"Texto a mostrar si se recibe un texto vacío"},
+      parameters=[ {"name":"feed",    "type":"bool",   "default":"False", "doc":"Añade o substituye lo último mostrado"},
+                   {"name":"p",       "type":"bool",   "default":"None",  "doc":"Usa la etiqueta <p>"},
+                   {"name":"pre",     "type":"bool",   "default":"None",  "doc":"Usa la etiqueta <pre>"},
+                   {"name":"dump",    "type":"bool",   "default":"False", "doc":"En stdout/stderr muestra los parámetros recibidos"},
+                   {"name":"message", "type":"string", "default":"None",  "doc":"Texto a mostrar si se recibe un texto vacío"},
                  ];
 
       #-------------------------------------------------------------------------
