@@ -49,7 +49,7 @@ def autodoc():
                       return obj;
                return [];
 
-           def _classes(pkg):
+           def _classes(pkg, classes):
                rt=[];
                for name, obj in inspect.getmembers(pkg, predicate=lambda obj: inspect.isclass(obj) and issubclass(obj, core.Block) and obj is not core.Block):
                    description=[];
@@ -63,12 +63,18 @@ def autodoc():
                           else:
                              if line: details.append(line);
 
+                   fullname=f"{'.'.join(obj.__module__.rsplit('.',1)[:-1])}.{obj.__name__}";
+                   
+                   if fullname in classes: continue;
+                   
                    if description: description='\n'.join(description);
                    else:           description="";
 
                    if details: details='\n'.join(details);
                    else:       details="";
 
+                   print(fullname, flush=True);
+                   #print('\t',classes);
                    rt.append({"name": obj.__name__,
                               "path": f"{ '.'.join(obj.__module__.rsplit('.',1)[:-1])}",
                               "description": description,
@@ -77,12 +83,16 @@ def autodoc():
                               "slots": _slots(obj),
                               "signals": _signals(obj),
                              });
+                             
+                   classes.add(fullname);
+                             
                return rt;
                
            def _recursive(paquete, rt=[]):
+               classes=set();
                for _, modname, ispkg in pkgutil.walk_packages(paquete.__path__, paquete.__name__ + "."):
                       pkg = __import__(modname, fromlist="dummy");
-                      blocks = _classes(pkg);
+                      blocks = _classes(pkg,classes);
                       rt = rt + blocks;
                paths=set();
                for block in rt:
